@@ -1,0 +1,154 @@
+Background
+==========
+
+- Priority scale: High, Medium and Low
+
+- Complexity scale:
+ C1, C2, C4 and C8.
+   The complexity scale is exponential, with complexity 1 being the
+   lowest complexity. Complexity is a function of both task 'complexity'
+   and task 'scope'.
+
+
+Tasks
+=====
+
+Exploratory
+===========
+- Look at the existing open-source Miracast implementations
+  http://cgit.freedesktop.org/~dvdhrm/miracle/ and
+  https://github.com/codemonkeyricky/piracast
+  Report to the team what we can reuse from these and what we can later on
+  share with them
+	Priority: Medium
+	Complexity: C2
+	Owner: alexander.kanavin@intel.com
+	Status: (03.09) -- Done.  The research results were distributed in an email.
+10.09: REMAINS AR Andrei to add it to wiki
+
+- ChromeOS P2P subsystem: POC and architectural ideas
+	Priority: Low
+	Complexity: C8
+	Owner: alexander.shalamov@intel.com
+	Status: Study ongoing
+
+
+IVI Miracast sink proof of concept
+===================================
+- Order more Miracast source IOP devices
+	Priority: Medium
+	Complexity: C2
+	Owner: andrei.laperie@intel.com
+	Status: (10.09) -- Starting. Will pick up devices from some 'certified' devices list
+
+- Add proper build system support, Cmake maybe
+	Priority: Medium
+	Complexity: C2
+	Owner: imran.zaman@intel.com
+	Owner: jussi.laako@intel.com
+	Owner: alexander.kanavin@intel.com
+	Status: (10.09) -- Done and already validated by Jussi K.
+
+- Prepare version of P2P service registration/advertisement
+	Priority: High
+	Complexity: C4
+	Owner: tomasz.bursztyka@intel.com
+	Status: (1.10) -- All patches done. Jussi K has verified that it works.
+		Some patches merged to wpa_supp upstream, some still waiting for merge, no ETA for those
+
+- Prepare an instruction/configuration file on how to set a P2P device type to be a 'TV'. Save the instruction to git
+	Priority: High
+	Complexity: C2
+	Owner: tomasz.bursztyka@intel.com
+	Status: (1.1o) -- Done but not verified that works (wiki to be updated by Jussi K.)
+
+- Create initial version of WiFi P2P  information element for Miracast
+	to cover our initial scenario
+	Priority: High
+	Complexity: C2
+	Owner: jussi.kukkonen@intel.com
+	Status: (10.09) -- Done
+
+- Create the code that connects networking layer and ConnMan P2P
+	Priority: High
+	Complexity: C4
+	Owner: jussi.kukkonen@intel.com
+	Owner: tomasz.bursztyka@intel.com
+	Owner: alexander.shalamov@intel.com
+	Status:  (1.10) --  In progress, trying with different HW next step.
+
+- Create code to start  Gstreamer pipeline based on negotiated stream parameters
+    and device props so that they can be communicated in connection establishment.
+	As an initial step one can look at the intercepted traffic and see if we can emulate
+	the codec parameters that are mentioned in the dump.
+	Priority: Med
+	Complexity: C2
+	Owner: alexander.kanavin@intel.com
+	Status:  (1.10) --  Done.  Alex implemented a cmd line tool and sent out an email.
+
+- Create initial Sink "application" build around the gstreamer playbin.
+	Priority: Medium
+	Complexity: C4
+	Owner: jussi.kukkonen@intel.com
+	Owner: alexander.kanavin@intel.com
+	Status:  (8.10) --  In progress, needs adding missing features (service advertisement, codec info)
+
+
+- Start working on 01.org/WYSIWiDi presence
+        Set up mailing list and repository
+	NB: Consider GitHub issues vs JIRA
+	Priority: Medium
+	Complexity: C1
+	Owner: andrei.laperie@intel.com
+	Status:  (8.10) --  In progress, mailing list and repositories done
+
+- Virtual machine setup for WiDi
+        Priority: Medium
+        Complexity: C4
+        Owner: jussi.kukkonen@intel.com
+        Status:  (1.10) --  In progress, on hold for now
+
+- Fix code copyright headers and push code to the repository
+        Priority: Medium
+        Complexity: C4
+        Owner: alexander.shalamov@intel.com
+        Status:  (8.10) --  Done
+
+- Populate 01.org repository with wysiwidi sources
+        Priority: Medium
+        Complexity: C4
+        Owner: jussi.kukkonen@intel.com
+        Owner: alexander.kanavin@intel.com
+        Status:  (8.10) --  New, target end of WW41 before plumbers    
+
+
+Miracast Sink implementation
+============================
+
+- Implement WiDi IE Handling for P2P.  We need to be able to collect and
+	encode system caps (codecs, bandwidths etc) into IE
+  Note: needed only after POC for proper WiDi service integration
+	Priority: Medium
+	Complexity: C2
+	Owner:
+	Status: Not started
+
+- Create interface code to query  Gstreamer for available codecs
+    and device caps so that they can be communicated in connection established
+	Priority: Med
+	Complexity: C2
+	Owner:
+	Owner:
+	Status:  (03.09) --  new
+
+- Figure out the certification practicalities for Miracast
+	Priority: Medium
+	Complexity: C4
+	Owner: andrei.laperie@intel.com
+	Status: (10.09) - new
+
+- IVI-specific: Implement agent interface for ConnMan to handle P2P PIN code request
+	Priority: Medium
+	Complexity: C4
+	Owner:
+	Status:

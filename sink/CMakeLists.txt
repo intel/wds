@@ -1,0 +1,20 @@
+#FIXME in the future: with cmake 2.8.12 and up it's better
+#to use target_compile_options or add_compile_options
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -std=c++11")
+
+include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories ("${PROJECT_SOURCE_DIR}/wfd_parser")
+include_directories ("${PROJECT_SOURCE_DIR}/p2p")
+include_directories ("${PROJECT_SOURCE_DIR}/mirac_network")
+
+find_package(PkgConfig)
+pkg_check_modules (GLIB2 glib-2.0)
+include_directories(${GLIB2_INCLUDE_DIRS})
+
+find_package(PkgConfig)
+pkg_check_modules (GIO gio-2.0)
+include_directories(${GIO_INCLUDE_DIRS})
+
+add_library(sink STATIC mirac-sink.cpp)
+add_executable(sink-test main.cpp)
+target_link_libraries (sink-test ${GLIB2_LIBRARIES} ${GIO_LIBRARIES} mirac p2p wfdparser sink)
