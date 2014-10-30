@@ -36,9 +36,9 @@ class PropertyErrors {
   PropertyErrors(const std::string& generic_property_name, std::vector<unsigned short> error_codes);
   ~PropertyErrors();
 
-  PropertyType type() { return type_; }
-  std::vector<unsigned short>& error_codes() { return error_codes_; }
-  std::string& generic_property_name() {return generic_property_name_; }
+  PropertyType type() const { return type_; }
+  const std::vector<unsigned short>& error_codes() const { return error_codes_; }
+  const std::string& generic_property_name() const {return generic_property_name_; }
 
   std::string to_string() const;
 
