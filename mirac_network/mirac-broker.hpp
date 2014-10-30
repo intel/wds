@@ -41,21 +41,25 @@ class MiracBroker
 {
     public:
         MiracBroker ();
+        MiracBroker(const std::string& address, const std::string& port);
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
 
     protected:
         virtual void got_message(std::shared_ptr<WFD::Message> message) = 0;
         void send(WFD::Message& message) const;
+        virtual void on_connected() {};
 
     private:
         static gboolean send_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean receive_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean listen_cb (gint fd, GIOCondition condition, gpointer data_ptr);
+        static gboolean connect_cb (gint fd, GIOCondition condition, gpointer data_ptr);
 
         gboolean send_cb (gint fd, GIOCondition condition);
         gboolean receive_cb (gint fd, GIOCondition condition);
         gboolean listen_cb (gint fd, GIOCondition condition);
+        gboolean connect_cb (gint fd, GIOCondition condition);
 
         void handle_body(const std::string msg);
         void handle_header(const std::string msg);
