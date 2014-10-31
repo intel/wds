@@ -66,6 +66,21 @@ MiracGst::MiracGst (wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::strin
     }
 }
 
+int MiracGst::sink_udp_port() {
+    if (gst_elem == NULL)
+        return 0;
+
+    GstElement* source = NULL;
+    g_object_get(gst_elem, "source", &source, NULL);
+
+    if (source == NULL)
+        return 0;
+
+    gint port = 0;
+    g_object_get(source, "port", &port, NULL);
+    return port;
+}
+
 MiracGst::~MiracGst ()
 {
     if (gst_elem) {

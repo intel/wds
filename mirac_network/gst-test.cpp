@@ -91,9 +91,11 @@ int main (int argc, char *argv[])
     g_free(hostname_option);
 
     gst_init (&argc, &argv);
-    
+
     MiracGst gst_pipeline(wfd_device, wfd_stream, hostname, port);
-    
+    if (wfd_device == WFD_SINK)
+        g_print("Listening on port %d\n", gst_pipeline.sink_udp_port());
+
     ml = g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, ml);
     g_unix_signal_add(SIGTERM, _sig_handler, ml);
