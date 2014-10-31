@@ -3,8 +3,8 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -std=c++11 -ggdb3 -Wall")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O0 -std=c99 -ggdb3 -Wall")
 
-find_package(PkgConfig)
-pkg_check_modules (GIO gio-2.0)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules (GIO REQUIRED gio-2.0)
 include_directories(${GIO_INCLUDE_DIRS})
 
 add_library(p2p STATIC

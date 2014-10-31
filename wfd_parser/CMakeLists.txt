@@ -5,10 +5,10 @@ set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O0 -std=c99 -ggdb3 -Wall")
 
 include_directories ("${PROJECT_SOURCE_DIR}/include" )
 
-find_package(BISON)
+find_package(BISON REQUIRED)
 BISON_TARGET(Parser parser.ypp ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp COMPILE_FLAGS "-d -v -t -r all --debug")
 
-find_package(FLEX)
+find_package(FLEX REQUIRED)
 FLEX_TARGET(MessageLexer messagelexer.l  ${CMAKE_CURRENT_BINARY_DIR}/messagescanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(MessageLexer Parser)
 FLEX_TARGET(HeaderLexer headerlexer.l  ${CMAKE_CURRENT_BINARY_DIR}/headerscanner.cpp)

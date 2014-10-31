@@ -7,12 +7,12 @@ include_directories ("${PROJECT_SOURCE_DIR}/wfd_parser")
 include_directories ("${PROJECT_SOURCE_DIR}/p2p")
 include_directories ("${PROJECT_SOURCE_DIR}/mirac_network")
 
-find_package(PkgConfig)
-pkg_check_modules (GLIB2 glib-2.0)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules (GLIB2 REQUIRED glib-2.0)
 include_directories(${GLIB2_INCLUDE_DIRS})
 
-find_package(PkgConfig)
-pkg_check_modules (GIO gio-2.0)
+pkg_check_modules (GIO REQUIRED gio-2.0)
 include_directories(${GIO_INCLUDE_DIRS})
 
 add_library(sink STATIC mirac-sink.cpp)
