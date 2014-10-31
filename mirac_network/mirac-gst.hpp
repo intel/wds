@@ -36,6 +36,8 @@ public:
     MiracGst(wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::string hostname, int port);
     ~MiracGst ();
 
+    int sink_udp_port();
+
 private:
     GstElement* gst_elem;
 };
