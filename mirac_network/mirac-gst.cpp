@@ -25,13 +25,25 @@
 
 #include "mirac-gst.hpp"
 
+void _set_udp_caps(GstElement *playbin, GstElement *source, gpointer    user_data)
+{
+    GstCaps* caps = gst_caps_new_simple ("application/x-rtp",
+        "media", G_TYPE_STRING, "video",
+        "clock-rate", G_TYPE_INT, 1,
+        "encoding-name", G_TYPE_STRING, "MP2T",
+        NULL);
+
+    g_object_set(source, "caps", caps, NULL);
+    gst_caps_unref(caps);
+}
+
 MiracGst::MiracGst (wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::string hostname, int port)
 {
     std::string gst_pipeline;
-    
+
     if (wfd_device == WFD_SOURCE) {
         std::string hostname_port = (!hostname.empty() ? "host=" + hostname + " ": " ") + (port > 0 ? "port=" + std::to_string(port) : "");
-        
+
         if (wfd_stream == WFD_BOTH) {
             gst_pipeline = "videotestsrc ! x264enc ! muxer.  audiotestsrc ! avenc_ac3 ! muxer.  mpegtsmux name=muxer ! rtpmp2tpay ! udpsink " +
                 hostname_port;
@@ -41,21 +53,17 @@ MiracGst::MiracGst (wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::strin
             gst_pipeline = "videotestsrc ! x264enc ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
         }
     } else if (wfd_device == WFD_SINK) {
-        std::string hostname_port = (!hostname.empty() ? "address=" + hostname + " ": " ") + (port > 0 ? "port=" + std::to_string(port) : "");
-
-        if (wfd_stream == WFD_BOTH) {
-            gst_pipeline = "udpsrc " + hostname_port + " caps=\"application/x-rtp\" ! rtpmp2tdepay ! decodebin name=decoder ! autoaudiosink  decoder. ! autovideosink";
-        } else if (wfd_stream == WFD_AUDIO) {
-            gst_pipeline = "udpsrc " + hostname_port + " caps=\"application/x-rtp\" ! rtpmp2tdepay ! decodebin ! autoaudiosink";
-        } else if (wfd_stream == WFD_VIDEO) {
-            gst_pipeline = "udpsrc " + hostname_port + " caps=\"application/x-rtp\" ! rtpmp2tdepay ! decodebin ! autovideosink";
-        }
-        
+        std::string url =  "udp://" + (!hostname.empty() ? hostname  : "0.0.0.0") + (port > 0 ? ":" + std::to_string(port) : "");
+        gst_pipeline = "playbin uri=" + url;
     }
-    
+
     gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
-    if (gst_elem)
+    if (gst_elem) {
+        if (wfd_device == WFD_SINK) {
+            g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
+        }
         gst_element_set_state (gst_elem, GST_STATE_PLAYING);
+    }
 }
 
 MiracGst::~MiracGst ()
