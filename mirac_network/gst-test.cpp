@@ -52,13 +52,13 @@ int main (int argc, char *argv[])
     GOptionEntry main_entries[] =
     {
         { "device", 0, 0, G_OPTION_ARG_STRING, &wfd_device_option, "Specify WFD device type: source or sink", "(source|sink)"},
-        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type: audio, video or both", "(audio|video|both)"},
+        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type for source: audio, video or both", "(audio|video|both)"},
         { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname or ip address to stream to or listen on", "host"},
-        { "port", 0, 0, G_OPTION_ARG_INT, &port, "Specify UDP port number to stream to or listen on", "port"},
+        { "port", 0, 0, G_OPTION_ARG_INT, &port, "Specify optional UDP port number to stream to or listen on", "port"},
         { NULL }
     };
 
-    context = g_option_context_new ("- WFD source/sink demo application\n\nExample:\ngst-test --device=source --stream=both --hostname=127.0.0.1 --port=5000\ngst-test --device=sink --stream=both --port=5000");
+    context = g_option_context_new ("- WFD source/sink demo application\n\nExample:\ngst-test --device=source --stream=both --hostname=127.0.0.1 --port=5000\ngst-test --device=sink --port=5000");
     g_option_context_add_main_entries (context, main_entries, NULL);
     
    if (!g_option_context_parse (context, &argc, &argv, &error)) {
