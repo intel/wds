@@ -25,7 +25,7 @@
 #define MIRAC_GST_HPP
 
 #include <gst/gst.h>
- 
+
 enum wfd_device_t {WFD_SOURCE, WFD_SINK, WFD_UNKNOWN_DEVICE};
 enum wfd_stream_t {WFD_AUDIO, WFD_VIDEO, WFD_BOTH, WFD_UNKNOWN_STREAM};
 

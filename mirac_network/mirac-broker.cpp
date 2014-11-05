@@ -117,6 +117,7 @@ gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
         connection_.reset(network_->Accept());
         g_message("connection from: %s", connection_->GetPeerAddress().c_str());
         g_unix_fd_add(connection_->GetHandle(), G_IO_IN, receive_cb, this);
+        on_connected();
     } catch (std::exception &x) {
         g_warning("exception: %s", x.what());
     }

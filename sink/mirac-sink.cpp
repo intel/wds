@@ -37,6 +37,8 @@
 #include "clientrtpports.h"
 #include "presentationurl.h"
 
+#include "mirac-gst.hpp"
+
 
 MiracSink::SetParameterType MiracSink::get_method(std::shared_ptr<WFD::SetParameter> set_param)
 {
@@ -394,6 +396,12 @@ void MiracSink::got_message(std::shared_ptr<WFD::Message> message)
             std::cout << "** Method not implemented" << std::endl;
             break;
     }
+}
+
+void MiracSink::on_connected()
+{
+    set_state(INIT);
+    gst_pipeline.reset(new MiracGst(WFD_SINK, WFD_UNKNOWN_STREAM, "", 0));
 }
 
 

@@ -30,6 +30,7 @@
 #include "mirac-broker.hpp"
 #include "reply.h"
 #include "setparameter.h"
+#include "mirac-gst.hpp"
 
 class MiracSink: public MiracBroker
 {
@@ -57,6 +58,7 @@ class MiracSink: public MiracBroker
         static SetParameterType get_method(std::shared_ptr<WFD::SetParameter> set_param);
 
         void got_message(std::shared_ptr<WFD::Message> message);
+        void on_connected();
 
         bool validate_message_sequence(std::shared_ptr<WFD::Message> message) const;
 
@@ -82,6 +84,8 @@ class MiracSink: public MiracBroker
 
         int send_cseq_;
         int receive_cseq_;
+
+        std::unique_ptr<MiracGst> gst_pipeline;
 };
 
 #endif  /* MIRAC_SINK_HPP */

@@ -15,6 +15,9 @@ include_directories(${GLIB2_INCLUDE_DIRS})
 pkg_check_modules (GIO REQUIRED gio-2.0)
 include_directories(${GIO_INCLUDE_DIRS})
 
+pkg_check_modules (GST REQUIRED gstreamer-1.0)
+include_directories(${GST_INCLUDE_DIRS})
+
 add_library(sink STATIC mirac-sink.cpp)
 add_executable(sink-test main.cpp)
-target_link_libraries (sink-test ${GLIB2_LIBRARIES} ${GIO_LIBRARIES} mirac p2p wfdparser sink)
+target_link_libraries (sink-test ${GIO_LIBRARIES} ${GST_LIBRARIES} sink mirac wfdparser p2p)
