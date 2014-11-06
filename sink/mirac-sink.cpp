@@ -137,13 +137,24 @@ void MiracSink::handle_m3_get_parameter (std::shared_ptr<WFD::Message> message)
     for (auto it = props.begin(); it != props.end(); it++) {
         std::shared_ptr<WFD::Property> new_prop;
         if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_AUDIO_CODECS]){
-            auto codec = new WFD::AudioCodec (WFD::AudioFormat::LPCM, WFD::AudioFormat::Modes(3), 0);
+            // declare that we support absolutely everything, let gstreamer deal with it
+            auto codec_lpcm = new WFD::AudioCodec (WFD::AudioFormat::LPCM, WFD::AudioFormat::Modes(3), 0);
+            auto codec_aac = new WFD::AudioCodec (WFD::AudioFormat::AAC, WFD::AudioFormat::Modes(15), 0);
+            auto codec_ac3 = new WFD::AudioCodec (WFD::AudioFormat::AC3, WFD::AudioFormat::Modes(7), 0);
             auto codec_list = std::vector<WFD::AudioCodec>();
-            codec_list.push_back(*codec);
+            codec_list.push_back(*codec_lpcm);
+            codec_list.push_back(*codec_aac);
+            codec_list.push_back(*codec_ac3);
             new_prop.reset(new WFD::AudioCodecs(codec_list));
             reply.payload().add_property(new_prop);
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_VIDEO_FORMATS]){
-            new_prop.reset(new WFD::VideoFormats());
+            auto codec_list = WFD::H264Codecs();
+            // again, declare that we support absolutely everything, let gstreamer deal with it
+            auto codec_cbp = new WFD::H264Codec(1, 16. ...
+            auto codec_chp = new WFD::H264Codec(2, 16. ...
+            codec_list.push_back(*codec_cbp);
+            codec_list.push_back(*codec_chp);
+            new_prop.reset(new WFD::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
             reply.payload().add_property(new_prop);
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_3D_FORMATS]){
             new_prop.reset(new WFD::Formats3d());
