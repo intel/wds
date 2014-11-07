@@ -203,42 +203,19 @@ void MiracSink::handle_m4_set_parameter (std::shared_ptr<WFD::Message> message, 
 
     auto props = message->payload().properties();
 
+    // presentation URL is the only thing we care about
+    // support for other parameters can be added later as needed
     if (initial) {
-        auto prop = props.find (WFD::PropertyName::name[WFD::PropertyType::WFD_CLIENT_RTP_PORTS]);
+        auto prop = props.find (WFD::PropertyName::name[WFD::PropertyType::WFD_PRESENTATION_URL]);
         if (prop == props.end()) {
-            reply.set_response_code (400);
-            std::cout << "** SET_PARAMETER: missing wfd_client_rtp_ports" << std::endl;
-            // TODO what is the correct error?
-        } else {
-            // TODO check port values
-        }
-
-        prop = props.find (WFD::PropertyName::name[WFD::PropertyType::WFD_PRESENTATION_URL]);
-        if (prop == props.end()) {
-            reply.set_response_code (400);
+            reply.set_response_code (303);
             std::cout << "** SET_PARAMETER: missing wfd_presentation_url" << std::endl;
-            // TODO what is the correct error?
+            // Is 404 the right code? The spec is unclear...
+            std::shared_ptr<WFD::PropertyErrors> error(new WFD::PropertyErrors(WFD::PropertyType::WFD_PRESENTATION_URL, {404}));
+            reply.payload().add_property_error(error);
         } else {
             auto url = std::static_pointer_cast<WFD::PresentationUrl>((*prop).second);
             set_presentation_url (url->presentation_url_1());
-        }
-
-        // TODO require WFD_AV_FORMAT_CHANGE_TIMING in some cases
-    }
-
-    if (reply.response_code () == 200) {
-        for (auto it = props.begin(); it != props.end(); it++) {
-            if ((*it).first == WFD::PropertyName::name[WFD::PropertyType::WFD_AUDIO_CODECS]) {
-            } else {
-                /* Do this for known but unexpected properties
-                    reply.set_response_code (303);
-                    std::shared_ptr<WFD::PropertyErrors> error;
-                    std::vector<unsigned short> v {451};
-                    error.reset (new WFD::PropertyErrors((*it).first, v));
-                    reply.payload().add_property_error(error);
-                */  
-                ;
-            }
         }
     }
 
