@@ -36,6 +36,11 @@
 #include "formats3d.h"
 #include "clientrtpports.h"
 #include "presentationurl.h"
+#include "displayedid.h"
+#include "coupledsink.h"
+#include "i2c.h"
+#include "connectortype.h"
+#include "standbyresumecapability.h"
 
 #include "mirac-gst.hpp"
 
@@ -150,17 +155,38 @@ void MiracSink::handle_m3_get_parameter (std::shared_ptr<WFD::Message> message)
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_VIDEO_FORMATS]){
             auto codec_list = WFD::H264Codecs();
             // again, declare that we support absolutely everything, let gstreamer deal with it
-            //auto codec_cbp = new WFD::H264Codec(1, 16. ...
-            //auto codec_chp = new WFD::H264Codec(2, 16. ...
-            //codec_list.push_back(*codec_cbp);
-            //codec_list.push_back(*codec_chp);
+            auto codec_cbp = new WFD::H264Codec(1, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
+            auto codec_chp = new WFD::H264Codec(2, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
+            codec_list.push_back(*codec_cbp);
+            codec_list.push_back(*codec_chp);
             new_prop.reset(new WFD::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
             reply.payload().add_property(new_prop);
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_3D_FORMATS]){
             new_prop.reset(new WFD::Formats3d());
             reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONTENT_PROTECTION]){
+            new_prop.reset(new WFD::ContentProtection());
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_DISPLAY_EDID]){
+            new_prop.reset(new WFD::DisplayEdid());
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_COUPLED_SINK]){
+            new_prop.reset(new WFD::CoupledSink());
+            reply.payload().add_property(new_prop);
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CLIENT_RTP_PORTS]){
-            new_prop.reset(new WFD::ClientRtpPorts(9999, 0));
+            new_prop.reset(new WFD::ClientRtpPorts(gst_pipeline->sink_udp_port(), 0));
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_I2C]){
+            new_prop.reset(new WFD::I2C(0));
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_UIBC_CAPABILITY]){
+            new_prop.reset(new WFD::UIBCCapability());
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONNECTOR_TYPE]){
+            new_prop.reset(new WFD::ConnectorType());
+            reply.payload().add_property(new_prop);
+        } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
+            new_prop.reset(new WFD::StandbyResumeCapability(false));
             reply.payload().add_property(new_prop);
         } else {
             std::cout << "** GET_PARAMETER: Property not supported" << std::endl;
