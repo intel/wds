@@ -19,40 +19,34 @@
  * 02110-1301 USA
  */
 
-#ifndef CONNMAN_CLIENT_H_
-#define CONNMAN_CLIENT_H_
-
-#include <memory>
-#include <gio/gio.h>
-
 #include "information-element.h"
-#include "connman-peer.h"
 
-class ConnmanClient {
+#ifndef CONNMAN_PEER_H_
+#define CONNMAN_PEER_H_
+
+
+namespace P2P {
+
+class Peer {
     public:
-        ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array);
-        virtual ~ConnmanClient();
+        Peer(std::string object_path, std::shared_ptr<P2P::InformationElement>);
+        virtual ~Peer();
 
-        void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
-		
-		// TODO scan()   (for source)
-		// TODO Observer for changes in peer list   (for source)
+		// notify of readiness changes
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
-        static void register_peer_service_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
 
-        void peers_changed (GVariant *params);
-        void proxy_cb(GObject *object, GAsyncResult *res);
-        void register_peer_service_cb(GObject *object, GAsyncResult *res);
+		void ip_changed (char *ip);
+		void state_changed (bool ready);
+        void proxy_cb (GAsyncResult *res);
 
-        void register_peer_service();
-        void unregister_peer_service();
-
+		std::string ip_address_;
+		bool ready_;
         GDBusProxy *proxy_;
-        std::unique_ptr<P2P::InformationElementArray>array_;
-		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
+		std::shared_ptr<P2P::InformationElement> ie_;
 };
 
-#endif // CONNMAN_CLIENT_H_
+}
+#endif // CONNMAN_PEER_H_

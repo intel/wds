@@ -22,6 +22,7 @@
 #ifndef INFORMATION_ELEMENT_H_
 #define INFORMATION_ELEMENT_H_
 
+#include <cstring>
 #include <map>
 #include <memory>
 #include <string>
@@ -125,6 +126,14 @@ struct InformationElementArray {
     InformationElementArray(uint len) : length(len) {
         bytes = new uint8_t[length];
     }
+
+    InformationElementArray(uint len, uint8_t* in_bytes) :
+		length(len) {
+        bytes = new uint8_t[length];
+        memcpy (bytes, in_bytes, length);
+
+	}
+
     ~InformationElementArray() {
         delete[] bytes;
     }
@@ -139,6 +148,7 @@ class InformationElement {
     virtual ~InformationElement();
 
     void add_subelement(P2P::Subelement* subelement);
+    DeviceType get_device_type();
 
     std::unique_ptr<InformationElementArray> serialize () const;
     std::string to_string() const;

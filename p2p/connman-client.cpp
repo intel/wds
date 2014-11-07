@@ -19,18 +19,28 @@
  * 02110-1301 USA
  */
 
-
 #include <iostream>
 #include <gio/gio.h>
+#include <memory>
 
 #include "connman-client.h"
 
 /* static C callback */
+void ConnmanClient::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr)
+{
+    if (g_strcmp0(signal, "PeersChanged") != 0)
+        return;
+
+    auto client = reinterpret_cast<ConnmanClient*> (data_ptr);
+    client->peers_changed (params);
+}
+
 void ConnmanClient::register_peer_service_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
     auto client = reinterpret_cast<ConnmanClient*> (data_ptr);
     client->register_peer_service_cb (object, res);
 }
+
 
 /* static C callback */
 void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
@@ -39,14 +49,65 @@ void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_
     client->proxy_cb (object, res);
 }
 
+void ConnmanClient::peers_changed (GVariant *params)
+{
+    GVariantIter *added, *removed, *props;
+    char *path;
+
+    g_variant_get (params, "(a(oa{sv})ao)", &added, &removed);
+    while (g_variant_iter_loop (added, "(&oa{sv})", &path, &props)) {
+        std::cout << "changed peer " << path << std::endl;
+        char *name;
+        GVariant *val;
+		while (g_variant_iter_loop (props, "{&sv}", &name, &val)) {
+            if (g_strcmp0 (name, "Services") == 0) {
+                GVariantIter *service_array, *services;
+                GVariant *spec_val;
+
+                g_variant_get (val, "a(a{sv})", &service_array);
+                while (g_variant_iter_loop (service_array, "(a{sv})", &services)) {
+    	            while (g_variant_iter_loop (services, "{sv}", &name, &spec_val)) {
+                        if (g_strcmp0 (name, "WiFiDisplayIEs") == 0) {
+                            uint8_t *bytes;
+							gsize length;
+
+                            bytes = (uint8_t*)g_variant_get_fixed_array (spec_val, &length, 1);
+							std::unique_ptr<P2P::InformationElementArray> array
+									(new P2P::InformationElementArray(length, bytes));
+							auto ie = std::make_shared<P2P::InformationElement>(array);
+							peers_[path] = std::make_shared<P2P::Peer>(std::string(path), ie);
+
+/*
+							if (ie.get_device_type() == P2P::SOURCE) {
+								std::cout << "Source " << ie.to_string() << " exists, subscribe to properties..." <<std::endl;
+								
+							}
+*/
+                       }
+                   }
+               }
+           }
+        }
+    }
+
+
+    while (g_variant_iter_loop (removed, "o", &path)) {
+        std::cout << "removed peer " << path << std::endl;
+        peers_.erase (path);
+    }
+
+    g_variant_iter_free (added);
+    g_variant_iter_free (removed);
+}
+
 void ConnmanClient::register_peer_service_cb (GObject *object, GAsyncResult *res)
 {
     GError *error = NULL;
     GDBusProxy *proxy = G_DBUS_PROXY (object);
 
-    g_dbus_proxy_call_finish(proxy, res, &error);
+    g_dbus_proxy_call_finish (proxy, res, &error);
     if (error) {
-        std::cout << "register error " << error->message<< std::endl;
+        std::cout << "register error " << error->message << std::endl;
         g_clear_error (&error);
         return;
     }
@@ -106,6 +167,10 @@ void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *result)
         g_clear_error (&error);
         return;
     }
+
+    g_signal_connect (proxy_, "g-signal",
+                      G_CALLBACK (ConnmanClient::proxy_signal_cb), this);
+    /* TODO run GetPeers just in case the list is up to date already */
 
     register_peer_service();
 }
