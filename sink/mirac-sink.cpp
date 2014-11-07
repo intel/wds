@@ -150,10 +150,10 @@ void MiracSink::handle_m3_get_parameter (std::shared_ptr<WFD::Message> message)
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_VIDEO_FORMATS]){
             auto codec_list = WFD::H264Codecs();
             // again, declare that we support absolutely everything, let gstreamer deal with it
-            auto codec_cbp = new WFD::H264Codec(1, 16. ...
-            auto codec_chp = new WFD::H264Codec(2, 16. ...
-            codec_list.push_back(*codec_cbp);
-            codec_list.push_back(*codec_chp);
+            //auto codec_cbp = new WFD::H264Codec(1, 16. ...
+            //auto codec_chp = new WFD::H264Codec(2, 16. ...
+            //codec_list.push_back(*codec_cbp);
+            //codec_list.push_back(*codec_chp);
             new_prop.reset(new WFD::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
             reply.payload().add_property(new_prop);
         } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_3D_FORMATS]){
