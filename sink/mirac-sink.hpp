@@ -38,6 +38,10 @@ class MiracSink: public MiracBroker
         MiracSink(const std::string& host, int rtsp_port);
         ~MiracSink();
 
+        void Teardown(); // sends M8 RTSP message.
+        void Play(); // sends M7 RTSP message.
+        void Pause(); // sends M9 RTSP message.
+
     private:
         enum State {
             INIT,
@@ -71,6 +75,7 @@ class MiracSink: public MiracBroker
         void handle_m6_setup_reply (std::shared_ptr<WFD::Reply> reply);
         void handle_m7_play_reply (std::shared_ptr<WFD::Reply> reply);
         void handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply);
+        void handle_m9_pause_reply (std::shared_ptr<WFD::Reply> reply);
 
         void set_state(MiracSink::State state);
         void set_presentation_url (std::string url);

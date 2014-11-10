@@ -28,6 +28,7 @@
 #include "reply.h"
 #include "options.h"
 #include "setup.h"
+#include "pause.h"
 #include "play.h"
 #include "teardown.h"
 #include "setparameter.h"
@@ -252,11 +253,7 @@ void MiracSink::handle_m5_trigger_teardown (std::shared_ptr<WFD::Message> messag
 
     send(reply);
 
-    // Send M8 TEARDOWN
-    expected_reply_ = WFD::Method::TEARDOWN;
-    WFD::Teardown m8(presentation_url_);
-    m8.header().set_cseq (send_cseq_++);
-    send (m8);
+    Teardown();
 }
 
 void MiracSink::handle_m6_setup_reply (std::shared_ptr<WFD::Reply> reply)
@@ -276,12 +273,7 @@ void MiracSink::handle_m6_setup_reply (std::shared_ptr<WFD::Reply> reply)
 
     set_state (WFD_SESSION_ESTABLISHMENT);
 
-    // Send M7
-    expected_reply_ = WFD::Method::PLAY;
-    WFD::Play m7(presentation_url_);
-    m7.header().set_session (session_);
-    m7.header().set_cseq (send_cseq_++);
-    send (m7);
+    Play();
 }
 
 void MiracSink::handle_m7_play_reply (std::shared_ptr<WFD::Reply> reply)
@@ -308,6 +300,16 @@ void MiracSink::handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply)
         return;
 
     set_state (INIT);
+}
+
+void MiracSink::handle_m9_pause_reply (std::shared_ptr<WFD::Reply> reply)
+{
+    // not expecting anything
+    expected_reply_ = WFD::Method::ORG_WFA_WFD_1_0;
+
+    // Ensure M9 PAUSE reply is valid
+    if (reply->response_code() != 200)
+      std::cout << "M9 PAUSE reply is " << reply->response_code() << std::endl;
 }
 
 bool MiracSink::validate_message_sequence(std::shared_ptr<WFD::Message> message) const
@@ -403,9 +405,17 @@ void MiracSink::got_message(std::shared_ptr<WFD::Message> message)
             } else if (state_ == WFD_SESSION_ESTABLISHMENT &&
                        expected_reply_ == WFD::Method::PLAY) {
                 handle_m7_play_reply(std::static_pointer_cast<WFD::Reply>(message));
-            } else if (state_ == WFD_SESSION &&
-                       expected_reply_ == WFD::Method::TEARDOWN) {
-                handle_m8_teardown_reply(std::static_pointer_cast<WFD::Reply>(message));
+            } else if (state_ == WFD_SESSION) {
+                switch (expected_reply_) {
+                case WFD::Method::TEARDOWN:
+                    handle_m8_teardown_reply(std::static_pointer_cast<WFD::Reply>(message));
+                    break;
+                case WFD::Method::PAUSE:
+                    handle_m9_pause_reply(std::static_pointer_cast<WFD::Reply>(message));
+                    break;
+                default:
+                    break;
+                }
             } else {
                 std::cout << "** Unexpected reply" << std::endl;
             }
@@ -430,4 +440,29 @@ MiracSink::MiracSink(const std::string& host, int rtsp_port)
 
 MiracSink::~MiracSink()
 {
+}
+
+void MiracSink::Teardown() {
+    std::cout << "** teardown" << std::endl;
+    expected_reply_ = WFD::Method::TEARDOWN;
+    auto m8 = new WFD::Teardown (presentation_url_);
+    m8->header().set_cseq (send_cseq_++);
+    send(*m8);
+}
+
+void MiracSink::Play() {
+    std::cout << "** play" << std::endl;
+    expected_reply_ = WFD::Method::PLAY;
+    auto m7 = new WFD::Play (presentation_url_);
+    m7->header().set_session (session_);
+    m7->header().set_cseq (send_cseq_++);
+    send (*m7);
+}
+
+void MiracSink::Pause() {
+    std::cout << "** pause" << std::endl;
+    expected_reply_ = WFD::Method::PAUSE;
+    auto m9 = new WFD::Pause (presentation_url_);
+    m9->header().set_cseq (send_cseq_++);
+    send(*m9);
 }

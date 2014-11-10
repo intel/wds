@@ -35,6 +35,49 @@ static gboolean _sig_handler (gpointer data_ptr)
     return G_SOURCE_CONTINUE;
 }
 
+static void parse_input_and_call_sink(
+    const std::string& command, MiracSink* sink) {
+    if (command == "teardown\n") {
+        sink->Teardown();
+        return;
+    }
+    if (command == "pause\n") {
+        sink->Pause();
+        return;
+    }
+    if (command == "play\n") {
+        sink->Play();
+        return;
+    }
+    std::cout << "Received unknown command: " << command << std::endl;
+}
+
+static gboolean _user_input_handler (
+    GIOChannel* channel, GIOCondition /*condition*/, gpointer data)
+{
+    GError* error = NULL;
+    char* str = NULL;
+    size_t len;
+    MiracSink* sink = static_cast<MiracSink*>(data);
+
+    switch (g_io_channel_read_line(channel, &str, &len, NULL, &error)) {
+    case G_IO_STATUS_NORMAL:
+        parse_input_and_call_sink(str, sink);
+        g_free(str);
+        return true;
+    case G_IO_STATUS_ERROR:
+        std::cout << "User input error: " << error->message << std::endl;
+        g_error_free(error);
+        return false;
+    case G_IO_STATUS_EOF:
+    case G_IO_STATUS_AGAIN:
+        return true;
+    default:
+        return false;
+    }
+    return false;
+}
+
 int main (int argc, char *argv[])
 {
     gchar* hostname_option = NULL;
@@ -72,6 +115,10 @@ int main (int argc, char *argv[])
 
     auto sink = new MiracSink (hostname, static_cast<int>(rtsp_port));
     std::cout << "Running sink on port "<< sink->get_host_port() << std::endl;
+
+    GIOChannel* io_channel = g_io_channel_unix_new (STDIN_FILENO);
+    g_io_add_watch(io_channel, G_IO_IN, _user_input_handler, sink);
+    g_io_channel_unref(io_channel);
 
     // Create a information element for a simple WFD Sink
     P2P::InformationElement ie;
