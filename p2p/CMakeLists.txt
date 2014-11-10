@@ -12,9 +12,9 @@ add_library(p2p STATIC
 )
 
 add_executable(register-peer-service main.cpp)
-target_link_libraries (register-peer-service ${GIO_LIBRARIES} p2p)
+target_link_libraries (register-peer-service p2p ${GIO_LIBRARIES})
 
 add_executable(test-ie test-ie.cpp)
-target_link_libraries (test-ie ${GIO_LIBRARIES} p2p)
+target_link_libraries (test-ie p2p ${GIO_LIBRARIES})
 
 add_test(InformationElementTest test-ie)
