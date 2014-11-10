@@ -37,11 +37,40 @@ static gboolean _sig_handler (gpointer data_ptr)
 
 int main (int argc, char *argv[])
 {
+    gchar* hostname_option = NULL;
+    gint rtsp_port = 8080;
+
+    GOptionEntry main_entries[] =
+    {
+        { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname, local host by default", "host"},
+        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &rtsp_port, "Specify optional RTSP port number, 8080 by default", "rtsp_port"},
+        { NULL }
+    };
+
+    GOptionContext* context = g_option_context_new ("- WFD sink demo application\n");
+    g_option_context_add_main_entries (context, main_entries, NULL);
+
+    GError* error = NULL;
+    if (!g_option_context_parse (context, &argc, &argv, &error)) {
+        g_print ("option parsing failed: %s\n", error->message);
+        g_option_context_free(context);
+        exit (1);
+    }
+    g_option_context_free(context);
+
+    std::string hostname = "127.0.0.1";
+    if (hostname_option) {
+        hostname = hostname_option;
+        g_free(hostname_option);
+    }
+
+    gst_init (&argc, &argv);
+
     GMainLoop *main_loop =  g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, main_loop);
     g_unix_signal_add(SIGTERM, _sig_handler, main_loop);
 
-    auto sink = new MiracSink (); 
+    auto sink = new MiracSink (hostname, static_cast<int>(rtsp_port));
     std::cout << "Running sink on port "<< sink->get_host_port() << std::endl;
 
     // Create a information element for a simple WFD Sink

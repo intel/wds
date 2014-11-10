@@ -20,4 +20,4 @@ include_directories(${GST_INCLUDE_DIRS})
 
 add_library(sink STATIC mirac-sink.cpp)
 add_executable(sink-test main.cpp)
-target_link_libraries (sink-test ${GIO_LIBRARIES} ${GST_LIBRARIES} sink mirac wfdparser p2p)
+target_link_libraries (sink-test sink mirac wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})
