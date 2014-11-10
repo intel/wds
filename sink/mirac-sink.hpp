@@ -35,7 +35,7 @@
 class MiracSink: public MiracBroker
 {
     public:
-        MiracSink() : MiracBroker() {};
+        MiracSink(const std::string& host, int rtsp_port);
         ~MiracSink();
 
     private:

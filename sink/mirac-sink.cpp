@@ -421,6 +421,12 @@ void MiracSink::on_connected()
     set_state(INIT);
 }
 
+MiracSink::MiracSink(const std::string& host, int rtsp_port)
+    : MiracBroker(host.c_str(), std::to_string(rtsp_port)),
+      send_cseq_(0),
+      receive_cseq_(0) {
+
+}
 
 MiracSink::~MiracSink()
 {
