@@ -71,6 +71,8 @@ MiracSink::SetParameterType MiracSink::get_method(std::shared_ptr<WFD::SetParame
 void MiracSink::set_state(MiracSink::State state)
 {
     state_ = state;
+    if (state == INIT)
+        gst_pipeline.reset(new MiracGst(WFD_SINK, WFD_UNKNOWN_STREAM, "", 0));
     std::cout << "** State "<< state_ << std::endl;
 }
 
@@ -236,6 +238,9 @@ void MiracSink::handle_m5_trigger_setup (std::shared_ptr<WFD::Message> message)
 
     expected_reply_ = WFD::Method::SETUP;
     WFD::Setup m6(presentation_url_);
+    WFD::TransportHeader transport;
+    transport.set_client_port(gst_pipeline->sink_udp_port());
+    m6.header().set_transport(&transport);
     m6.header().set_cseq (send_cseq_++);
     send (m6);
 }
@@ -290,7 +295,7 @@ void MiracSink::handle_m7_play_reply (std::shared_ptr<WFD::Reply> reply)
 
     set_state (WFD_SESSION);
 
-    // TODO start playing stream...
+    // UDP packets should start flowing into gstreamer pipeline...
 }
 
 void MiracSink::handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply)
@@ -303,7 +308,6 @@ void MiracSink::handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply)
         return;
 
     set_state (INIT);
-    // TODO
 }
 
 bool MiracSink::validate_message_sequence(std::shared_ptr<WFD::Message> message) const
@@ -415,7 +419,6 @@ void MiracSink::got_message(std::shared_ptr<WFD::Message> message)
 void MiracSink::on_connected()
 {
     set_state(INIT);
-    gst_pipeline.reset(new MiracGst(WFD_SINK, WFD_UNKNOWN_STREAM, "", 0));
 }
 
 
