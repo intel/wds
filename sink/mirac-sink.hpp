@@ -35,7 +35,9 @@
 class MiracSink: public MiracBroker
 {
     public:
-        MiracSink() : MiracBroker() {};
+        MiracSink(const std::string& host,
+                  int rtsp_port,
+                  int rtp_port);
         ~MiracSink();
 
     private:
@@ -84,6 +86,7 @@ class MiracSink: public MiracBroker
 
         int send_cseq_;
         int receive_cseq_;
+        int rtp_port_;
 
         std::unique_ptr<MiracGst> gst_pipeline;
 };
