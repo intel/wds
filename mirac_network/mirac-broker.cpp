@@ -130,7 +130,7 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
 {
     try {
         if (!network_->Connect(NULL, NULL))
-        return G_SOURCE_CONTINUE;
+            return G_SOURCE_CONTINUE;
         g_message("connection success to: %s", network_->GetPeerAddress().c_str());
         connection_.reset(network_.release());
         g_unix_fd_add(connection_->GetHandle(), G_IO_IN, receive_cb, this);
