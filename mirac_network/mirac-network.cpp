@@ -85,7 +85,10 @@ void MiracNetwork::Close ()
     handle = -1;
 
     if (conn_ares)
+    {
         freeaddrinfo(reinterpret_cast<struct addrinfo *> (conn_ares));
+        conn_ares = NULL;
+    }
 }
 
 
@@ -152,7 +155,10 @@ bool MiracNetwork::Connect (const char *address, const char *service)
     {
         Close();
 
-        ec = getaddrinfo(address, service, NULL,
+        struct addrinfo addr_hint;
+        memset(&addr_hint, 0x00, sizeof(addr_hint));
+        addr_hint.ai_socktype = SOCK_STREAM;
+        ec = getaddrinfo(address, service, &addr_hint,
             reinterpret_cast<struct addrinfo **> (&conn_ares));
         if (ec)
             throw MiracException(gai_strerror(ec), __FUNCTION__);
