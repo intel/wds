@@ -26,6 +26,15 @@
 #include "mirac-sink.hpp"
 #include "connman-client.h"
 
+
+struct SinkAppData {
+    std::unique_ptr<MiracSink> sink;
+    std::unique_ptr<ConnmanClient> connman;
+
+    std::string host;
+    int port;
+};
+
 static gboolean _sig_handler (gpointer data_ptr)
 {
     GMainLoop *main_loop = (GMainLoop *) data_ptr;
@@ -36,7 +45,7 @@ static gboolean _sig_handler (gpointer data_ptr)
 }
 
 static void parse_input_and_call_sink(
-    const std::string& command, MiracSink* sink) {
+    const std::string& command, const std::unique_ptr<MiracSink> &sink) {
     if (command == "teardown\n") {
         sink->Teardown();
         return;
@@ -53,16 +62,16 @@ static void parse_input_and_call_sink(
 }
 
 static gboolean _user_input_handler (
-    GIOChannel* channel, GIOCondition /*condition*/, gpointer data)
+    GIOChannel* channel, GIOCondition /*condition*/, gpointer data_ptr)
 {
     GError* error = NULL;
     char* str = NULL;
     size_t len;
-    MiracSink* sink = static_cast<MiracSink*>(data);
+    SinkAppData* data = static_cast<SinkAppData*>(data_ptr);
 
     switch (g_io_channel_read_line(channel, &str, &len, NULL, &error)) {
     case G_IO_STATUS_NORMAL:
-        parse_input_and_call_sink(str, sink);
+        parse_input_and_call_sink(str, data->sink);
         g_free(str);
         return true;
     case G_IO_STATUS_ERROR:
@@ -78,15 +87,30 @@ static gboolean _user_input_handler (
     return false;
 }
 
+static gboolean create_sink (gpointer data_ptr)
+{
+    SinkAppData* data = static_cast<SinkAppData*>(data_ptr);
+
+    try {
+        data->sink.reset(new MiracSink (data->host.c_str(), data->port));
+        std::cout << "Running sink on port "<< data->sink->get_host_port() << std::endl;
+        return G_SOURCE_REMOVE;
+    } catch (const std::exception &x) {
+        std::cout << "Failed to create sink, trying again soon..." << std::endl;
+        return G_SOURCE_CONTINUE;
+    }
+}
+
 int main (int argc, char *argv[])
 {
+    SinkAppData data;
     gchar* hostname_option = NULL;
-    gint rtsp_port = 8080;
+    data.port = 8080;
 
     GOptionEntry main_entries[] =
     {
         { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname, local host by default", "host"},
-        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &rtsp_port, "Specify optional RTSP port number, 8080 by default", "rtsp_port"},
+        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &(data.port), "Specify optional RTSP port number, 8080 by default", "rtsp_port"},
         { NULL }
     };
 
@@ -102,28 +126,27 @@ int main (int argc, char *argv[])
     }
     g_option_context_free(context);
 
-    std::string hostname = "127.0.0.1";
     if (hostname_option) {
-        hostname = hostname_option;
+        data.host = hostname_option;
         g_free(hostname_option);
+    } else {
+        data.host ="127.0.0.1";
     }
 
     GMainLoop *main_loop =  g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, main_loop);
     g_unix_signal_add(SIGTERM, _sig_handler, main_loop);
 
-    auto sink = new MiracSink (hostname, static_cast<int>(rtsp_port));
-    std::cout << "Running sink on port "<< sink->get_host_port() << std::endl;
-
     GIOChannel* io_channel = g_io_channel_unix_new (STDIN_FILENO);
-    g_io_add_watch(io_channel, G_IO_IN, _user_input_handler, sink);
+    g_io_add_watch(io_channel, G_IO_IN, _user_input_handler, &data);
     g_io_channel_unref(io_channel);
 
     // Create a information element for a simple WFD Sink
     P2P::InformationElement ie;
     auto sub_element = P2P::new_subelement(P2P::DEVICE_INFORMATION);
     auto dev_info = (P2P::DeviceInformationSubelement*)sub_element;
-    dev_info->session_management_control_port =  htons(sink->get_host_port());
+    // FIXME port number is a lie
+    dev_info->session_management_control_port =  htons(7236);
     dev_info->maximum_throughput = htons(50);
     dev_info->field1.device_type = P2P::PRIMARY_SINK;
     dev_info->field1.session_availability = true;
@@ -133,12 +156,16 @@ int main (int argc, char *argv[])
 
     // register the P2P service with connman
     auto array = ie.serialize ();
-    ConnmanClient client (array);
+    data.connman.reset(new ConnmanClient (array));
+
+    // Hack while we wait for a better solution:
+    // try to create a sink every second and hope the connect succeeds at some point
+    // when the source is actually there...
+    g_timeout_add_seconds (1, create_sink, &data);
 
     g_main_loop_run (main_loop);
 
     g_main_loop_unref (main_loop);
-    delete sink;
 
     return 0;
 }
