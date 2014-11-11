@@ -239,9 +239,9 @@ void MiracSink::handle_m5_trigger_setup (std::shared_ptr<WFD::Message> message)
 
     expected_reply_ = WFD::Method::SETUP;
     WFD::Setup m6(presentation_url_);
-    WFD::TransportHeader transport;
-    transport.set_client_port(gst_pipeline->sink_udp_port());
-    m6.header().set_transport(&transport);
+    auto transport = new WFD::TransportHeader();
+    transport->set_client_port(gst_pipeline->sink_udp_port());
+    m6.header().set_transport(transport);
     m6.header().set_cseq (send_cseq_++);
     send (m6);
 }
