@@ -36,8 +36,8 @@ class MiracConnectionLostException : public MiracException
     public:
         MiracConnectionLostException (const char *function = NULL) throw ()
             {
-                if (function)
-                    msg = std::string(function) + std::string("()");
+                msg = std::string("Connection lost");
+                add_func(function);
             }
         virtual ~MiracConnectionLostException () throw ()
             { }
