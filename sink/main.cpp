@@ -92,6 +92,7 @@ int main (int argc, char *argv[])
 
     GOptionContext* context = g_option_context_new ("- WFD sink demo application\n");
     g_option_context_add_main_entries (context, main_entries, NULL);
+    g_option_context_add_group (context, gst_init_get_option_group ());
 
     GError* error = NULL;
     if (!g_option_context_parse (context, &argc, &argv, &error)) {
@@ -106,8 +107,6 @@ int main (int argc, char *argv[])
         hostname = hostname_option;
         g_free(hostname_option);
     }
-
-    gst_init (&argc, &argv);
 
     GMainLoop *main_loop =  g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, main_loop);
