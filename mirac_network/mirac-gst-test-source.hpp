@@ -26,7 +26,7 @@
 
 #include <gst/gst.h>
 
-enum wfd_test_stream_t {WFD_AUDIO, WFD_VIDEO, WFD_BOTH, WFD_UNKNOWN_STREAM};
+enum wfd_test_stream_t {WFD_TEST_AUDIO, WFD_TEST_VIDEO, WFD_TEST_BOTH, WFD_DESKTOP, WFD_UNKNOWN_STREAM};
 
 
 class MiracGstTestSource

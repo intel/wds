@@ -31,13 +31,15 @@ MiracGstTestSource::MiracGstTestSource (wfd_test_stream_t wfd_stream_type, std::
 
     std::string hostname_port = (!hostname.empty() ? "host=" + hostname + " ": " ") + (port > 0 ? "port=" + std::to_string(port) : "");
 
-    if (wfd_stream_type == WFD_BOTH) {
+    if (wfd_stream_type == WFD_TEST_BOTH) {
         gst_pipeline = "videotestsrc ! x264enc ! muxer.  audiotestsrc ! avenc_ac3 ! muxer.  mpegtsmux name=muxer ! rtpmp2tpay ! udpsink " +
             hostname_port;
-    } else if (wfd_stream_type == WFD_AUDIO) {
+    } else if (wfd_stream_type == WFD_TEST_AUDIO) {
         gst_pipeline = "audiotestsrc ! avenc_ac3 ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
-    } else if (wfd_stream_type == WFD_VIDEO) {
+    } else if (wfd_stream_type == WFD_TEST_VIDEO) {
         gst_pipeline = "videotestsrc ! x264enc ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
+    } else if (wfd_stream_type == WFD_DESKTOP) {
+        gst_pipeline = "ximagesrc ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
     }
 
     gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);

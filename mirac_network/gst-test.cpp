@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
     GOptionEntry main_entries[] =
     {
         { "device", 0, 0, G_OPTION_ARG_STRING, &wfd_device_option, "Specify WFD device type: testsource or sink", "(testsource|sink)"},
-        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type for testsource: audio, video or both", "(audio|video|both)"},
+        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type for testsource: audio, video, both or desktop capture", "(audio|video|both|desktop)"},
         { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname or ip address to stream to or listen on", "host"},
         { "port", 0, 0, G_OPTION_ARG_INT, &port, "Specify optional UDP port number to stream to or listen on", "port"},
         { NULL }
@@ -73,11 +73,13 @@ int main (int argc, char *argv[])
 
     wfd_test_stream_t wfd_stream = WFD_UNKNOWN_STREAM;
     if (g_strcmp0(wfd_stream_option, "audio") == 0)
-        wfd_stream = WFD_AUDIO;
+        wfd_stream = WFD_TEST_AUDIO;
     else if (g_strcmp0(wfd_stream_option, "video") == 0)
-        wfd_stream = WFD_VIDEO;
+        wfd_stream = WFD_TEST_VIDEO;
     else if (g_strcmp0(wfd_stream_option, "both") == 0)
-        wfd_stream = WFD_BOTH;
+        wfd_stream = WFD_TEST_BOTH;
+    else if (g_strcmp0(wfd_stream_option, "desktop") == 0)
+        wfd_stream = WFD_DESKTOP;
 
     std::string hostname;
     if (hostname_option)
