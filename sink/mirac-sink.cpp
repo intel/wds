@@ -43,8 +43,6 @@
 #include "connectortype.h"
 #include "standbyresumecapability.h"
 
-#include "mirac-gst.hpp"
-
 
 MiracSink::SetParameterType MiracSink::get_method(std::shared_ptr<WFD::SetParameter> set_param)
 {
@@ -74,7 +72,7 @@ void MiracSink::set_state(MiracSink::State state)
     state_ = state;
     if (state == INIT) {
         send_cseq_ = 1;
-        gst_pipeline.reset(new MiracGst(WFD_SINK, WFD_UNKNOWN_STREAM, "", 0));
+        gst_pipeline.reset(new MiracGstSink("", 0));
     }
     std::cout << "** State "<< state_ << std::endl;
 }

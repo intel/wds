@@ -30,7 +30,7 @@
 #include "mirac-broker.hpp"
 #include "reply.h"
 #include "setparameter.h"
-#include "mirac-gst.hpp"
+#include "mirac-gst-sink.hpp"
 
 class MiracSink: public MiracBroker
 {
@@ -92,7 +92,7 @@ class MiracSink: public MiracBroker
         int send_cseq_;
         int receive_cseq_;
 
-        std::unique_ptr<MiracGst> gst_pipeline;
+        std::unique_ptr<MiracGstSink> gst_pipeline;
 };
 
 #endif  /* MIRAC_SINK_HPP */

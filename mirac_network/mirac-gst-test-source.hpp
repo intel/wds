@@ -21,22 +21,19 @@
  * 02110-1301 USA
  */
 
-#ifndef MIRAC_GST_HPP
-#define MIRAC_GST_HPP
+#ifndef MIRAC_GST_TEST_SOURCE_HPP
+#define MIRAC_GST_TEST_SOURCE_HPP
 
 #include <gst/gst.h>
 
-enum wfd_device_t {WFD_SOURCE, WFD_SINK, WFD_UNKNOWN_DEVICE};
-enum wfd_stream_t {WFD_AUDIO, WFD_VIDEO, WFD_BOTH, WFD_UNKNOWN_STREAM};
+enum wfd_test_stream_t {WFD_AUDIO, WFD_VIDEO, WFD_BOTH, WFD_UNKNOWN_STREAM};
 
 
-class MiracGst 
+class MiracGstTestSource
 {
 public:
-    MiracGst(wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::string hostname, int port);
-    ~MiracGst ();
-
-    int sink_udp_port();
+    MiracGstTestSource(wfd_test_stream_t wfd_stream, std::string hostname, int port);
+    ~MiracGstTestSource ();
 
 private:
     GstElement* gst_elem;
