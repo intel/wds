@@ -38,6 +38,8 @@ class MiracSink: public MiracBroker
         MiracSink(const std::string& host, int rtsp_port);
         ~MiracSink();
 
+        typedef void (MiracSink::*TriggeredCommand)();
+        void Setup(); // sends M6 RTSP message.
         void Teardown(); // sends M8 RTSP message.
         void Play(); // sends M7 RTSP message.
         void Pause(); // sends M9 RTSP message.
@@ -48,7 +50,8 @@ class MiracSink: public MiracBroker
             CAPABILITY_NEGOTIATION,
             RTSP_SESSION_ESTABLISHMENT,
             WFD_SESSION_ESTABLISHMENT, // RSTP SESSION OK
-            WFD_SESSION, // WFD SESSION OK
+            WFD_SESSION_PLAYING,
+            WFD_SESSION_PAUSED,
         };
 
         enum SetParameterType {
@@ -70,8 +73,7 @@ class MiracSink: public MiracBroker
         void handle_m2_options_reply (std::shared_ptr<WFD::Reply> reply);
         void handle_m3_get_parameter (std::shared_ptr<WFD::Message> message);
         void handle_m4_set_parameter (std::shared_ptr<WFD::Message> message, bool initial);
-        void handle_m5_trigger_setup (std::shared_ptr<WFD::Message> message);
-        void handle_m5_trigger_teardown (std::shared_ptr<WFD::Message> message);
+        void handle_m5_trigger (std::shared_ptr<WFD::Message> message, TriggeredCommand command);
         void handle_m6_setup_reply (std::shared_ptr<WFD::Reply> reply);
         void handle_m7_play_reply (std::shared_ptr<WFD::Reply> reply);
         void handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply);
