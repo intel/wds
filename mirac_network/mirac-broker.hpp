@@ -40,8 +40,8 @@ class MiracBrokerObserver
 class MiracBroker
 {
     public:
-        MiracBroker ();
-        MiracBroker(const std::string& address, const std::string& port);
+        MiracBroker (const std::string& listen_port);
+        MiracBroker(const std::string& peer_address, const std::string& peer_port);
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
 
