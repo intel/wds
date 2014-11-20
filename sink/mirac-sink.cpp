@@ -294,7 +294,7 @@ void MiracSink::handle_m9_pause_reply (std::shared_ptr<WFD::Reply> reply)
     if (reply->response_code() != 200)
       return;
 
-    set_state (WFD_SESSION_PLAYING);
+    set_state (WFD_SESSION_PAUSED);
 }
 
 bool MiracSink::validate_message_sequence(std::shared_ptr<WFD::Message> message) const
@@ -448,35 +448,35 @@ MiracSink::~MiracSink()
 void MiracSink::Teardown() {
     std::cout << "** teardown" << std::endl;
     expected_reply_ = WFD::Method::TEARDOWN;
-    auto m8 = new WFD::Teardown (presentation_url_);
-    m8->header().set_cseq (send_cseq_++);
-    send(*m8);
+    WFD::Teardown m8(presentation_url_);
+    m8.header().set_cseq (send_cseq_++);
+    send(m8);
 }
 
 void MiracSink::Play() {
     std::cout << "** play" << std::endl;
     expected_reply_ = WFD::Method::PLAY;
-    auto m7 = new WFD::Play (presentation_url_);
-    m7->header().set_session (session_);
-    m7->header().set_cseq (send_cseq_++);
-    send (*m7);
+    WFD::Play m7(presentation_url_);
+    m7.header().set_session (session_);
+    m7.header().set_cseq (send_cseq_++);
+    send (m7);
 }
 
 void MiracSink::Pause() {
     std::cout << "** pause" << std::endl;
     expected_reply_ = WFD::Method::PAUSE;
-    auto m9 = new WFD::Pause (presentation_url_);
-    m9->header().set_cseq (send_cseq_++);
-    send(*m9);
+    WFD::Pause m9(presentation_url_);
+    m9.header().set_cseq (send_cseq_++);
+    send(m9);
 }
 
 void MiracSink::Setup() {
     std::cout << "** setup" << std::endl;
     expected_reply_ = WFD::Method::SETUP;
-    auto m6 = new WFD::Setup(presentation_url_);
+    WFD::Setup m6(presentation_url_);
     auto transport = new WFD::TransportHeader();
     transport->set_client_port(gst_pipeline->sink_udp_port());
-    m6->header().set_transport(transport);
-    m6->header().set_cseq (send_cseq_++);
-    send (*m6);
+    m6.header().set_transport(transport);
+    m6.header().set_cseq (send_cseq_++);
+    send (m6);
 }
