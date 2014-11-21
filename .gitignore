@@ -26,5 +26,6 @@ p2p/test-ie
 p2p/register-peer-service
 mirac_network/gst-test
 mirac_network/network-test
+desktop_source/desktop-source-test
 
 *.a
