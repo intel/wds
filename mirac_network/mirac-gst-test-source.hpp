@@ -35,6 +35,9 @@ public:
     MiracGstTestSource(wfd_test_stream_t wfd_stream, std::string hostname, int port);
     ~MiracGstTestSource ();
 
+    void SetState(GstState state);
+    int UdpSourcePort();
+
 private:
     GstElement* gst_elem;
 };

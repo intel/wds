@@ -95,6 +95,7 @@ int main (int argc, char *argv[])
 
     if (g_strcmp0(wfd_device_option, "testsource") == 0) {
         source_pipeline.reset(new MiracGstTestSource(wfd_stream, hostname, port));
+        source_pipeline->SetState(GST_STATE_PLAYING);
     } else if (g_strcmp0(wfd_device_option, "sink") == 0) {
         sink_pipeline.reset(new MiracGstSink(hostname, port));
         g_print("Listening on port %d\n", sink_pipeline->sink_udp_port());
