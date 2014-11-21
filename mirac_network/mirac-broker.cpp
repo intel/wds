@@ -152,6 +152,11 @@ unsigned short MiracBroker::get_host_port() const
     return network_->GetHostPort();
 }
 
+std::string MiracBroker::get_peer_address() const
+{
+    return connection_->GetPeerAddress();
+}
+
 MiracBroker::MiracBroker (const std::string& listen_port)
 {
     network_.reset (new MiracNetwork());

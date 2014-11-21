@@ -44,6 +44,7 @@ class MiracBroker
         MiracBroker(const std::string& peer_address, const std::string& peer_port);
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
+        std::string get_peer_address() const;
 
     protected:
         virtual void got_message(std::shared_ptr<WFD::Message> message) = 0;
