@@ -211,8 +211,7 @@ std::string MiracNetwork::GetPeerAddress ()
         NI_NOFQDN|NI_NUMERICSERV);
     if (ec)
         throw MiracException(gai_strerror(ec), __FUNCTION__);
-    return std::string(namebuf.get()) + std::string(":") +
-        std::string(servbuf.get());
+    return std::string(namebuf.get());
 }
 
 
