@@ -202,6 +202,7 @@ void MiracSource::handle_m6_setup (std::shared_ptr<WFD::Message> message)
 
     // set up gstreamer pipeline with client_port, but do not play yet
     gst_pipeline.reset(new MiracGstTestSource(WFD_DESKTOP, get_peer_address(), client_port));
+    gst_pipeline->SetState(GST_STATE_READY);
 
     // also get the source udp port from gstreamer
     unsigned int server_port = gst_pipeline->UdpSourcePort();

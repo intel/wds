@@ -9,6 +9,9 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules (GLIB2 REQUIRED glib-2.0)
 include_directories(${GLIB2_INCLUDE_DIRS})
 
+pkg_check_modules (GIO REQUIRED gio-2.0)
+include_directories(${GIO_INCLUDE_DIRS})
+
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
@@ -18,4 +21,4 @@ add_executable(network-test network-test.cpp)
 target_link_libraries (network-test ${GLIB2_LIBRARIES} mirac)
 
 add_executable(gst-test gst-test.cpp)
-target_link_libraries (gst-test ${GLIB2_LIBRARIES} ${GST_LIBRARIES} mirac)
+target_link_libraries (gst-test ${GLIB2_LIBRARIES} ${GIO_LIBRARIES} ${GST_LIBRARIES} mirac)

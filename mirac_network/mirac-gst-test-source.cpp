@@ -22,6 +22,7 @@
  */
 
 #include <iostream>
+#include <gio/gio.h>
 
 #include "mirac-gst-test-source.hpp"
 
@@ -35,11 +36,11 @@ MiracGstTestSource::MiracGstTestSource (wfd_test_stream_t wfd_stream_type, std::
         gst_pipeline = "videotestsrc ! x264enc ! muxer.  audiotestsrc ! avenc_ac3 ! muxer.  mpegtsmux name=muxer ! rtpmp2tpay ! udpsink name=sink " +
             hostname_port;
     } else if (wfd_stream_type == WFD_TEST_AUDIO) {
-        gst_pipeline = "audiotestsrc ! avenc_ac3 ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
+        gst_pipeline = "audiotestsrc ! avenc_ac3 ! mpegtsmux ! rtpmp2tpay ! udpsink name=sink " + hostname_port;
     } else if (wfd_stream_type == WFD_TEST_VIDEO) {
-        gst_pipeline = "videotestsrc ! x264enc ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
+        gst_pipeline = "videotestsrc ! x264enc ! mpegtsmux ! rtpmp2tpay ! udpsink name=sink " + hostname_port;
     } else if (wfd_stream_type == WFD_DESKTOP) {
-        gst_pipeline = "ximagesrc ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
+        gst_pipeline = "ximagesrc ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux ! rtpmp2tpay ! udpsink name=sink " + hostname_port;
     }
 
     gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
@@ -58,13 +59,18 @@ int MiracGstTestSource::UdpSourcePort()
         return 0;
 
     GstElement* sink = NULL;
-    gst_bin_get_by_name(GST_BIN(gst_elem), "sink");
+    sink = gst_bin_get_by_name(GST_BIN(gst_elem), "sink");
 
     if (sink == NULL)
         return 0;
 
-    gint port = 0;
-    g_object_get(sink, "bind-port", &port, NULL);
+    GSocket* socket = NULL;
+    g_object_get(sink, "used-socket", &socket, NULL);
+    if (socket == NULL)
+        return 0;
+
+    guint16 port = g_inet_socket_address_get_port(G_INET_SOCKET_ADDRESS(g_socket_get_local_address(socket, NULL)));
+
     return port;
 }
 
