@@ -41,7 +41,7 @@ MiracGstSink::MiracGstSink (std::string hostname, int port)
 {
     std::string gst_pipeline;
 
-    std::string url =  "udp://" + (!hostname.empty() ? hostname  : "0.0.0.0") + (port > 0 ? ":" + std::to_string(port) : "");
+    std::string url =  "udp://" + (!hostname.empty() ? hostname  : "::") + (port > 0 ? ":" + std::to_string(port) : ":");
     gst_pipeline = "playbin uri=" + url;
 
     gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
