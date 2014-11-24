@@ -386,7 +386,7 @@ play:
   ;
 
 teardown:
-    WFD_TEARDOWN WFD_SP WFD_REQUEST_URI WFD_END {
+    WFD_TEARDOWN WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
       $$ = new Teardown(*$3);
     }
   ;

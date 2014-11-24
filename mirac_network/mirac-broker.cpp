@@ -93,7 +93,7 @@ void MiracBroker::handle_header(std::string msg)
             if (message_ && message_->header().content_length())
                 handle_body(msg);
         } catch (std::exception &x) {
-            g_message("Failed to parse received header\n%s", msg.c_str());
+            g_message("Failed to parse received header: %s\n%s", x.what(), msg.c_str());
         }
     }
 }
