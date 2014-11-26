@@ -22,27 +22,27 @@
  */
 
 
-#ifndef MIRAC_SINK_HPP
-#define MIRAC_SINK_HPP
+#ifndef MIRAC_DESKTOP_SOURCE_HPP
+#define MIRAC_DESKTOP_SOURCE_HPP
 
 #include <memory>
 
 #include "mirac-broker.hpp"
 #include "reply.h"
 #include "setparameter.h"
-#include "mirac-gst-sink.hpp"
+#include "mirac-gst-test-source.hpp"
 
-class MiracSink: public MiracBroker
+class MiracSource: public MiracBroker
 {
     public:
-        MiracSink(const std::string& host, int rtsp_port);
-        ~MiracSink();
+        MiracSource(int rtsp_port);
+        ~MiracSource();
 
-        typedef void (MiracSink::*TriggeredCommand)();
-        void Setup(); // sends M6 RTSP message.
-        void Teardown(); // sends M8 RTSP message.
-        void Play(); // sends M7 RTSP message.
-        void Pause(); // sends M9 RTSP message.
+        typedef void (MiracSource::*TriggeredCommand)();
+        // these send M5 wfd_trigger_method messages
+        void Teardown();
+        void Play();
+        void Pause();
 
     private:
         enum State {
@@ -69,21 +69,24 @@ class MiracSink: public MiracBroker
 
         bool validate_message_sequence(std::shared_ptr<WFD::Message> message) const;
 
-        void handle_m1_options (std::shared_ptr<WFD::Message> message);
-        void handle_m2_options_reply (std::shared_ptr<WFD::Reply> reply);
-        void handle_m3_get_parameter (std::shared_ptr<WFD::Message> message);
-        void handle_m4_set_parameter (std::shared_ptr<WFD::Message> message, bool initial);
-        void handle_m5_trigger (std::shared_ptr<WFD::Message> message, TriggeredCommand command);
-        void handle_m6_setup_reply (std::shared_ptr<WFD::Reply> reply);
-        void handle_m7_play_reply (std::shared_ptr<WFD::Reply> reply);
-        void handle_m8_teardown_reply (std::shared_ptr<WFD::Reply> reply);
-        void handle_m9_pause_reply (std::shared_ptr<WFD::Reply> reply);
+        void handle_m2_options(std::shared_ptr<WFD::Message>);
+        void handle_m1_options_reply(std::shared_ptr<WFD::Reply>);
+        void handle_m3_get_parameters_reply(std::shared_ptr<WFD::Reply>);
+        void send_wfd_trigger_method(WFD::TriggerMethod::Method);
+        void handle_m4_set_parameters_reply(std::shared_ptr<WFD::Reply>);
+        void handle_m5_set_parameters_reply(std::shared_ptr<WFD::Reply>);
+        void handle_m6_setup(std::shared_ptr<WFD::Message>);
+        void handle_m7_play(std::shared_ptr<WFD::Message>);
+        void handle_m9_pause(std::shared_ptr<WFD::Message>);
+        void handle_m8_teardown(std::shared_ptr<WFD::Message>);
+        void handle_get_parameter(std::shared_ptr<WFD::Message>);
+        void handle_set_parameter(std::shared_ptr<WFD::Message>);
 
-        void set_state(MiracSink::State state);
-        void set_presentation_url (std::string url);
+        void set_state(MiracSource::State state);
         void set_session (std::string session);
+        void set_rtp_ports(unsigned short port_0, unsigned short port_1);
 
-        MiracSink::State state_;
+        MiracSource::State state_;
         std::string presentation_url_;
         std::string session_;
 
@@ -91,9 +94,10 @@ class MiracSink: public MiracBroker
 
         int send_cseq_;
         int receive_cseq_;
+        unsigned short rtp_port_0_;
+        unsigned short rtp_port_1_;
 
-        std::unique_ptr<MiracGstSink> gst_pipeline;
+        std::unique_ptr<MiracGstTestSource> gst_pipeline;
 };
 
-#endif  /* MIRAC_SINK_HPP */
-
+#endif

@@ -24,9 +24,12 @@
 
 #include <glib.h>
 #include <iostream>
+#include <memory>
+
 #include <glib-unix.h>
 
-#include "mirac-gst.hpp"
+#include "mirac-gst-test-source.hpp"
+#include "mirac-gst-sink.hpp"
 
 static gboolean _sig_handler (gpointer data_ptr)
 {
@@ -51,14 +54,14 @@ int main (int argc, char *argv[])
     
     GOptionEntry main_entries[] =
     {
-        { "device", 0, 0, G_OPTION_ARG_STRING, &wfd_device_option, "Specify WFD device type: source or sink", "(source|sink)"},
-        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type for source: audio, video or both", "(audio|video|both)"},
+        { "device", 0, 0, G_OPTION_ARG_STRING, &wfd_device_option, "Specify WFD device type: testsource or sink", "(testsource|sink)"},
+        { "stream", 0, 0, G_OPTION_ARG_STRING, &wfd_stream_option, "Specify WFD stream type for testsource: audio, video, both or desktop capture", "(audio|video|both|desktop)"},
         { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname or ip address to stream to or listen on", "host"},
         { "port", 0, 0, G_OPTION_ARG_INT, &port, "Specify optional UDP port number to stream to or listen on", "port"},
         { NULL }
     };
 
-    context = g_option_context_new ("- WFD source/sink demo application\n\nExample:\ngst-test --device=source --stream=both --hostname=127.0.0.1 --port=5000\ngst-test --device=sink --port=5000");
+    context = g_option_context_new ("- WFD source/sink demo application\n\nExample:\ngst-test --device=testsource --stream=both --hostname=127.0.0.1 --port=5000\ngst-test --device=sink --port=5000");
     g_option_context_add_main_entries (context, main_entries, NULL);
     
    if (!g_option_context_parse (context, &argc, &argv, &error)) {
@@ -68,33 +71,38 @@ int main (int argc, char *argv[])
     }
     g_option_context_free(context);
 
-    wfd_device_t wfd_device = WFD_UNKNOWN_DEVICE;
-    if (g_strcmp0(wfd_device_option, "source") == 0)
-        wfd_device = WFD_SOURCE;
-    else if (g_strcmp0(wfd_device_option, "sink") == 0)
-        wfd_device = WFD_SINK;
-    
-    wfd_stream_t wfd_stream = WFD_UNKNOWN_STREAM;
+    wfd_test_stream_t wfd_stream = WFD_UNKNOWN_STREAM;
     if (g_strcmp0(wfd_stream_option, "audio") == 0)
-        wfd_stream = WFD_AUDIO;
+        wfd_stream = WFD_TEST_AUDIO;
     else if (g_strcmp0(wfd_stream_option, "video") == 0)
-        wfd_stream = WFD_VIDEO;
+        wfd_stream = WFD_TEST_VIDEO;
     else if (g_strcmp0(wfd_stream_option, "both") == 0)
-        wfd_stream = WFD_BOTH;
+        wfd_stream = WFD_TEST_BOTH;
+    else if (g_strcmp0(wfd_stream_option, "desktop") == 0)
+        wfd_stream = WFD_DESKTOP;
 
     std::string hostname;
     if (hostname_option)
         hostname = hostname_option;
 
-    g_free(wfd_device_option);
     g_free(wfd_stream_option);
     g_free(hostname_option);
 
     gst_init (&argc, &argv);
 
-    MiracGst gst_pipeline(wfd_device, wfd_stream, hostname, port);
-    if (wfd_device == WFD_SINK)
-        g_print("Listening on port %d\n", gst_pipeline.sink_udp_port());
+    std::unique_ptr<MiracGstSink> sink_pipeline;
+    std::unique_ptr<MiracGstTestSource> source_pipeline;
+
+    if (g_strcmp0(wfd_device_option, "testsource") == 0) {
+        source_pipeline.reset(new MiracGstTestSource(wfd_stream, hostname, port));
+        source_pipeline->SetState(GST_STATE_PLAYING);
+        g_print("Source UDP port: %d\n", source_pipeline->UdpSourcePort());
+    } else if (g_strcmp0(wfd_device_option, "sink") == 0) {
+        sink_pipeline.reset(new MiracGstSink(hostname, port));
+        g_print("Listening on port %d\n", sink_pipeline->sink_udp_port());
+    }
+
+    g_free(wfd_device_option);
 
     ml = g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, ml);

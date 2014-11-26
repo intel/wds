@@ -23,7 +23,7 @@
 
 #include <iostream>
 
-#include "mirac-gst.hpp"
+#include "mirac-gst-sink.hpp"
 
 void _set_udp_caps(GstElement *playbin, GstElement *source, gpointer    user_data)
 {
@@ -37,36 +37,21 @@ void _set_udp_caps(GstElement *playbin, GstElement *source, gpointer    user_dat
     gst_caps_unref(caps);
 }
 
-MiracGst::MiracGst (wfd_device_t wfd_device, wfd_stream_t wfd_stream, std::string hostname, int port)
+MiracGstSink::MiracGstSink (std::string hostname, int port)
 {
     std::string gst_pipeline;
 
-    if (wfd_device == WFD_SOURCE) {
-        std::string hostname_port = (!hostname.empty() ? "host=" + hostname + " ": " ") + (port > 0 ? "port=" + std::to_string(port) : "");
-
-        if (wfd_stream == WFD_BOTH) {
-            gst_pipeline = "videotestsrc ! x264enc ! muxer.  audiotestsrc ! avenc_ac3 ! muxer.  mpegtsmux name=muxer ! rtpmp2tpay ! udpsink " +
-                hostname_port;
-        } else if (wfd_stream == WFD_AUDIO) {
-            gst_pipeline = "audiotestsrc ! avenc_ac3 ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
-        } else if (wfd_stream == WFD_VIDEO) {
-            gst_pipeline = "videotestsrc ! x264enc ! mpegtsmux ! rtpmp2tpay ! udpsink " + hostname_port;
-        }
-    } else if (wfd_device == WFD_SINK) {
-        std::string url =  "udp://" + (!hostname.empty() ? hostname  : "0.0.0.0") + (port > 0 ? ":" + std::to_string(port) : "");
-        gst_pipeline = "playbin uri=" + url;
-    }
+    std::string url =  "udp://" + (!hostname.empty() ? hostname  : "::") + (port > 0 ? ":" + std::to_string(port) : ":");
+    gst_pipeline = "playbin uri=" + url;
 
     gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
     if (gst_elem) {
-        if (wfd_device == WFD_SINK) {
-            g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
-        }
+        g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
         gst_element_set_state (gst_elem, GST_STATE_PLAYING);
     }
 }
 
-int MiracGst::sink_udp_port() {
+int MiracGstSink::sink_udp_port() {
     if (gst_elem == NULL)
         return 0;
 
@@ -81,7 +66,7 @@ int MiracGst::sink_udp_port() {
     return port;
 }
 
-MiracGst::~MiracGst ()
+MiracGstSink::~MiracGstSink ()
 {
     if (gst_elem) {
         gst_element_set_state (gst_elem, GST_STATE_NULL);

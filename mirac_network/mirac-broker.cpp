@@ -93,7 +93,7 @@ void MiracBroker::handle_header(std::string msg)
             if (message_ && message_->header().content_length())
                 handle_body(msg);
         } catch (std::exception &x) {
-            g_message("Failed to parse received header\n%s", msg.c_str());
+            g_message("Failed to parse received header: %s\n%s", x.what(), msg.c_str());
         }
     }
 }
@@ -152,20 +152,25 @@ unsigned short MiracBroker::get_host_port() const
     return network_->GetHostPort();
 }
 
-MiracBroker::MiracBroker ()
+std::string MiracBroker::get_peer_address() const
+{
+    return connection_->GetPeerAddress();
+}
+
+MiracBroker::MiracBroker (const std::string& listen_port)
 {
     network_.reset (new MiracNetwork());
 
-    network_->Bind(NULL, "0");
+    network_->Bind(NULL, listen_port.c_str());
     g_unix_fd_add(network_->GetHandle(), G_IO_IN,
                   MiracBroker::listen_cb, this);
 }
 
-MiracBroker::MiracBroker(const std::string& address, const std::string& port)
+MiracBroker::MiracBroker(const std::string& peer_address, const std::string& peer_port)
 {
     network_.reset(new MiracNetwork());
 
-    if (network_->Connect(address.c_str(), port.c_str())) {
+    if (network_->Connect(peer_address.c_str(), peer_port.c_str())) {
         g_unix_fd_add(network_->GetHandle(), G_IO_OUT, MiracBroker::send_cb, this);
     } else {
         g_unix_fd_add(network_->GetHandle(), G_IO_OUT, MiracBroker::connect_cb, this);
