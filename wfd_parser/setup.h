@@ -31,7 +31,7 @@ class Setup : public Message {
  public:
     explicit Setup(const std::string& request_uri);
     virtual ~Setup();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

@@ -35,7 +35,7 @@ class DisplayEdid: public Property {
 
   unsigned short block_count() const { return edid_block_count_; }
   const std::string& payload() const { return edid_payload_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned short edid_block_count_;

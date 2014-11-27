@@ -2,7 +2,6 @@
 %option nodefault
 %option c++
 %option yyclass="WFD::MessageScanner"
-%option outfile="messagescanner.cpp"
 %option prefix="Msg_"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state

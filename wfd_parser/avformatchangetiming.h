@@ -35,7 +35,7 @@ public:
   unsigned long long int pts() const { return pts_; }
   unsigned long long int dts() const { return dts_; }
 
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned long long int pts_;

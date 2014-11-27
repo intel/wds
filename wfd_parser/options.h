@@ -31,7 +31,7 @@ class Options: public Message {
   public:
     explicit Options(const std::string& request_uri);
     virtual ~Options();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

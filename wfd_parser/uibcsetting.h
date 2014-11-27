@@ -33,7 +33,7 @@ class UIBCSetting : public Property {
   virtual ~UIBCSetting();
 
   bool is_enabled() const { return is_enabled_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   bool is_enabled_;

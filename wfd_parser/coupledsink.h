@@ -35,7 +35,7 @@ class CoupledSink: public Property {
 
   unsigned char status() const { return status_; }
   unsigned long long int sink_address() const { return sink_address_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned short status_;

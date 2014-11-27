@@ -37,7 +37,7 @@ class GenericProperty: public Property {
     const std::string& key () const { return key_; }
     const std::string& value () const { return value_; }
 
-    virtual std::string to_string() const;
+    virtual std::string to_string() const override;
   private:
     std::string key_;
     std::string value_;

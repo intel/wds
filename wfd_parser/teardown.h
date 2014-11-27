@@ -31,7 +31,7 @@ class Teardown : public Message {
  public:
     explicit Teardown(const std::string& request_uri);
     virtual ~Teardown();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

@@ -19,35 +19,21 @@
  * 02110-1301 USA
  */
 
+#ifndef CAP_NEGOTIATION_STATE_H_
+#define CAP_NEGOTIATION_STATE_H_
 
-#ifndef CONTENTPROTECTION_H_
-#define CONTENTPROTECTION_H_
+#include "message_handler.h"
 
-#include "property.h"
+namespace wfd {
 
-namespace WFD {
-
-class ContentProtection: public Property {
+// Capability negotiation state for RTSP source.
+// Includes M3 and M4 messages handling
+class CapNegotiationState : public MessageSequenceHandler {
  public:
-  enum HDCPSpec {
-    HDCP_SPEC_2_0,
-    HDCP_SPEC_2_1
-  };
-
- public:
-  ContentProtection();
-  ContentProtection(HDCPSpec hdcp_spec, unsigned int port);
-  virtual ~ContentProtection();
-
-  HDCPSpec hdcp_spec() const;
-  unsigned int port() const { return port_; }
-  virtual std::string to_string() const override;
-
- private:
-  HDCPSpec hdcp_spec_;
-  unsigned int port_;
+  CapNegotiationState(const InitParams& init_params);
+  virtual ~CapNegotiationState();
 };
 
-}  // namespace WFD
+}  // miracast
 
-#endif  // CONTENTPROTECTION_H_
+#endif // CAP_NEGOTIATION_STATE_H_

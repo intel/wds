@@ -47,6 +47,7 @@ class Payload {
 
   std::shared_ptr<WFD::Property> get_property(std::string name) const;
   std::shared_ptr<WFD::Property> get_property(WFD::PropertyType type) const;
+  bool has_property(WFD::PropertyType type) const;
   void add_property(const std::shared_ptr<WFD::Property>& property);
   const PropertyMap& properties() const;
 

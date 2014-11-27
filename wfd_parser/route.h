@@ -39,7 +39,7 @@ class Route: public Property {
   virtual ~Route();
 
   Route::Destination destination() const { return destination_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   Route::Destination destination_;

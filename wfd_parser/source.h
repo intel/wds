@@ -19,35 +19,34 @@
  * 02110-1301 USA
  */
 
+#ifndef SOURCE_H_
+#define SOURCE_H_
 
-#ifndef CONTENTPROTECTION_H_
-#define CONTENTPROTECTION_H_
+#include <string>
 
-#include "property.h"
+namespace wfd {
 
-namespace WFD {
+class MediaManager;
 
-class ContentProtection: public Property {
+class Peer {
  public:
-  enum HDCPSpec {
-    HDCP_SPEC_2_0,
-    HDCP_SPEC_2_1
+  class Delegate {
+   public:
+    virtual void SendRTSPData(const std::string& data) = 0;
+   protected:
+    virtual ~Delegate() {}
   };
-
- public:
-  ContentProtection();
-  ContentProtection(HDCPSpec hdcp_spec, unsigned int port);
-  virtual ~ContentProtection();
-
-  HDCPSpec hdcp_spec() const;
-  unsigned int port() const { return port_; }
-  virtual std::string to_string() const override;
-
- private:
-  HDCPSpec hdcp_spec_;
-  unsigned int port_;
+  virtual ~Peer() {}
+  virtual void Start() = 0;
+  virtual void RTSPDataReceived(const std::string& data) = 0;
 };
 
-}  // namespace WFD
+class Source : public Peer {
+ public:
+  virtual ~Source() {}
+  static Source* Create(Peer::Delegate* delegate, MediaManager* mng);
+};
 
-#endif  // CONTENTPROTECTION_H_
+}
+
+#endif // SOURCE_H_

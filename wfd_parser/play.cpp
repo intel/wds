@@ -31,7 +31,7 @@ Play::Play(const std::string& request_uri)
 Play::~Play() {
 }
 
-std::string Play::to_string() {
+std::string Play::to_string() const {
   std::string ret = MethodName::PLAY
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);

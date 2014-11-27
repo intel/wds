@@ -31,7 +31,7 @@ class GetParameter : public Message {
  public:
     explicit GetParameter(const std::string& request_uri);
     virtual ~GetParameter();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

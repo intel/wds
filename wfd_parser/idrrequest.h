@@ -32,7 +32,7 @@ public:
   IDRRequest();
   virtual ~IDRRequest();
 
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 };
 
 }  // namespace WFD

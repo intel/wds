@@ -31,7 +31,7 @@ Pause::Pause(const std::string& request_uri)
 Pause::~Pause() {
 }
 
-std::string Pause::to_string() {
+std::string Pause::to_string() const {
   std::string ret = MethodName::PAUSE
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);

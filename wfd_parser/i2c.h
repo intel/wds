@@ -34,7 +34,7 @@ class I2C: public Property {
 
   bool is_supported() const { return port_ > 0; }
   int port() const { return port_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   int port_;

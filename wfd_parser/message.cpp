@@ -60,7 +60,7 @@ Payload& Message::payload() const {
   return *payload_;
 }
 
-std::string Message::to_string() {
+std::string Message::to_string() const {
   std::string ret;
   if (payload_)
     ret = payload_->to_string();

@@ -67,7 +67,7 @@ class UIBCCapability: public Property {
       int tcp_port);
   virtual ~UIBCCapability();
 
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
 

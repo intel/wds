@@ -31,7 +31,7 @@ Options::Options(const std::string& request_uri)
 Options::~Options() {
 }
 
-std::string Options::to_string() {
+std::string Options::to_string() const {
   std::string ret = MethodName::OPTIONS
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);

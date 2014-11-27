@@ -2,7 +2,6 @@
 %option nodefault
 %option c++
 %option yyclass="WFD::HeaderScanner"
-%option outfile="headerscanner.cpp"
 %option prefix="Hdr_"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state

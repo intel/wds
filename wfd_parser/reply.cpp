@@ -37,7 +37,7 @@ Reply::Reply(int response_code)
 Reply::~Reply() {
 }
 
-std::string Reply::to_string() {
+std::string Reply::to_string() const {
   std::string ret;
   ret += kRTSPHeader + std::to_string(response_code_)
        + std::string(SPACE) + kOK + std::string(CRLF);

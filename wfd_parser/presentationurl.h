@@ -35,7 +35,7 @@ class PresentationUrl: public Property {
 
   const std::string& presentation_url_1() const { return presentation_url_1_; }
   const std::string& presentation_url_2() const { return presentation_url_2_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   std::string presentation_url_1_;

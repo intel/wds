@@ -38,7 +38,7 @@ class HeaderScanner : public yyFlexLexer, public BaseLexer {
    BaseLexer() {};
 
  private:
-  virtual int yylex();
+  virtual int yylex() override;
 };
 
 }  // namespace WFD

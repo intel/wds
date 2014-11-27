@@ -2,7 +2,6 @@
 %option nodefault
 %option c++
 %option yyclass="WFD::ErrorScanner"
-%option outfile="errorscanner.cpp"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state
 %option case-insensitive

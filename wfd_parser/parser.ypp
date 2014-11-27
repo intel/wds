@@ -90,7 +90,6 @@
 #include "preferreddisplaymode.h"
 #include "presentationurl.h"
 #include "uibccapability.h"
-#include "mirac-exception.hpp"
 
 #undef yylex
 #define yylex scanner.yylex
@@ -1096,6 +1095,5 @@ wfd_connector_type:
 
 void WFD::Parser::error(const std::string &err_message)
 {
-  std::string where = std::string("WFD::Parser::") + std::string(__func__);
-  throw MiracException(err_message.c_str(), where.c_str());
+  driver.set_message(nullptr);
 }

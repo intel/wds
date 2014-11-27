@@ -24,8 +24,6 @@
 #include "message.h"
 #include "reply.h"
 
-#include "mirac-exception.hpp"
-
 #include <cctype>
 #include <sstream>
 
@@ -40,20 +38,15 @@ void Driver::parse_header(const std::string& message) {
 }
 
 void Driver::parse_payload(const std::string& message) {
-  if (!message_) {
-    std::string where = std::string("WFD::Driver::") + std::string(__func__);
-    throw MiracException("Cannot parse payload without header", where.c_str());
-  }
-
+  if (!message_)
+    return;
   parse(message);
 }
 
 void Driver::parse(const std::string& message) {
   std::istringstream in(message);
-  if (!in.good()) {
-    std::string where = std::string("WFD::Driver::") + std::string(__func__);
-    throw MiracException("Invalid input stream", where.c_str());
-  }
+  if (!in.good())
+    return;
 
   scanner_.reset(new Scanner(&in, *this));
   parser_.reset(new Parser(*scanner_, *this));

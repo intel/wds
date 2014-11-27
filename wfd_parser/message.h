@@ -63,7 +63,7 @@ class Message {
   void set_payload(Payload* payload);
   Payload& payload() const;
 
-  virtual std::string to_string();
+  virtual std::string to_string() const;
 
  protected:
   MessageType type_;
@@ -73,6 +73,8 @@ class Message {
   mutable std::unique_ptr<Header> header_;
   mutable std::unique_ptr<Payload> payload_;
 };
+
+typedef std::shared_ptr<Message> MessagePtr;
 
 }  // namespace WFD
 

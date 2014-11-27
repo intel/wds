@@ -75,7 +75,7 @@ class Formats3d: public Property {
   unsigned char preferred_display_mode() const { return preferred_display_mode_;}
   const H264Codecs3d& codecs() const { return h264_codecs_3d_; }
 
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned char native_;

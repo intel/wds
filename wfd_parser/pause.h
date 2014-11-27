@@ -31,7 +31,7 @@ class Pause : public Message {
  public:
     explicit Pause(const std::string& request_uri);
     virtual ~Pause();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

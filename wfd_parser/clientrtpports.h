@@ -34,7 +34,7 @@ class ClientRtpPorts: public Property {
 
   unsigned short rtp_port_0() const { return rtp_port_0_; }
   unsigned short rtp_port_1() const { return rtp_port_1_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned short rtp_port_0_;

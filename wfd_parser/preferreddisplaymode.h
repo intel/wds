@@ -53,7 +53,7 @@ class PreferredDisplayMode: public Property {
   unsigned char p_depth() const { return p_depth_; }
   const H264Codec& h264_codec() const { return h264_codec_; }
 
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned int p_clock_;

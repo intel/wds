@@ -31,7 +31,7 @@ GetParameter::GetParameter(const std::string& request_uri)
 GetParameter::~GetParameter() {
 }
 
-std::string GetParameter::to_string() {
+std::string GetParameter::to_string() const {
   std::string ret = MethodName::GET_PARAMETER
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);

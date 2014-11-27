@@ -45,15 +45,22 @@ Payload::~Payload() {
 
 std::shared_ptr<WFD::Property> Payload::get_property(std::string name) const
 {
-  return properties_.at(name);
+  auto property = properties_.find(name);
+  if (property != properties_.end())
+    return (*property).second;
+  return nullptr;
 }
 
 std::shared_ptr<WFD::Property> Payload::get_property(WFD::PropertyType type) const
 {
   if (type == WFD_GENERIC)
-    throw std::out_of_range("WFD_GENERIC can't be used as a PropertyMap key");
+    return nullptr;
 
-  return properties_.at(WFD::PropertyName::name[type]);
+  return get_property(WFD::PropertyName::name[type]);
+}
+
+bool Payload::has_property(WFD::PropertyType type) const {
+  return properties_.find(WFD::PropertyName::name[type]) != properties_.end();
 }
 
 void Payload::add_property(const std::shared_ptr<Property>& property) {
@@ -71,15 +78,18 @@ const PropertyMap& Payload::properties() const {
 
 std::shared_ptr<WFD::PropertyErrors> Payload::get_property_error(std::string name) const
 {
-  return property_errors_.at(name);
+  auto property_error = property_errors_.find(name);
+  if (property_error != property_errors_.end())
+    return (*property_error).second;
+  return nullptr;
 }
 
 std::shared_ptr<WFD::PropertyErrors> Payload::get_property_error(WFD::PropertyType type) const
 {
   if (type == WFD_GENERIC)
-    throw std::out_of_range("WFD_GENERIC can't be used as a PropertyErrorMap key");
+    return nullptr;
 
-  return property_errors_.at(WFD::PropertyName::name[type]);
+  return get_property_error(WFD::PropertyName::name[type]);
 }
 
 void Payload::add_property_error(const std::shared_ptr<WFD::PropertyErrors>& errors) {

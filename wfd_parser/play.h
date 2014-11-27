@@ -31,7 +31,7 @@ class Play : public Message {
  public:
     explicit Play(const std::string& request_uri);
     virtual ~Play();
-    virtual std::string to_string();
+    virtual std::string to_string() const override;
 };
 
 } // namespace WFD

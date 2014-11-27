@@ -34,7 +34,7 @@ class ConnectorType: public Property {
   virtual ~ConnectorType();
 
   unsigned short connector_type() const { return connector_type_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   unsigned short connector_type_;

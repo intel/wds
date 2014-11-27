@@ -26,6 +26,25 @@
 
 namespace WFD {
 
+
+H264Codec::H264Codec(unsigned char profile, unsigned char level,
+    unsigned int cea_support, unsigned int vesa_support,
+    unsigned int hh_support, unsigned char latency,
+    unsigned short min_slice_size, unsigned short slice_enc_params,
+    unsigned char frame_rate_control_support, int max_hres,
+    int max_vres)
+  : profile_(profile),
+    level_(level),
+    cea_support_(cea_support),
+    vesa_support_(vesa_support),
+    hh_support_(hh_support),
+    latency_(latency),
+    min_slice_size_(min_slice_size),
+    slice_enc_params_(slice_enc_params),
+    frame_rate_control_support_(frame_rate_control_support),
+    max_hres_(max_hres),
+    max_vres_(max_vres) {}
+
 VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
 }
 

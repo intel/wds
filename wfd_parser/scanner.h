@@ -34,11 +34,8 @@ namespace WFD {
 class BaseLexer {
  public:
   BaseLexer() : yylval(nullptr) {}
-  virtual ~BaseLexer() {}
-  virtual int yylex(WFD::Parser::semantic_type *lval) {
-    yylval = lval;
-    return( yylex() );
-  }
+  virtual ~BaseLexer();
+  virtual int yylex(WFD::Parser::semantic_type *lval);
 
  protected:
   virtual int yylex() = 0;
@@ -48,7 +45,7 @@ class BaseLexer {
 class Scanner {
 public:
   Scanner(std::istream *in, const WFD::Driver& driver);
-  ~Scanner() {}
+  virtual ~Scanner();
   virtual int yylex(WFD::Parser::semantic_type *lval);
 
  private:

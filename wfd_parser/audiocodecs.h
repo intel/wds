@@ -78,7 +78,7 @@ class AudioCodecs: public Property {
   virtual ~AudioCodecs();
 
   const std::vector<AudioCodec>& audio_codecs() const { return audio_codecs_; }
-  virtual std::string to_string() const;
+  virtual std::string to_string() const override;
 
  private:
   std::vector<AudioCodec> audio_codecs_;

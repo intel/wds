@@ -31,7 +31,7 @@ Teardown::Teardown(const std::string& request_uri)
 Teardown::~Teardown() {
 }
 
-std::string Teardown::to_string() {
+std::string Teardown::to_string() const {
   std::string ret = MethodName::TEARDOWN
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);
