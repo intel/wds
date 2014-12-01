@@ -39,7 +39,8 @@ class M8Handler final : public MessageReceiver<TypedMessage::M8> {
   M8Handler(const InitParams& init_params);
 
  private:
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(
+      TypedMessage* message) override;
 };
 
 class M7Handler final : public MessageReceiver<TypedMessage::M7> {
@@ -47,7 +48,8 @@ class M7Handler final : public MessageReceiver<TypedMessage::M7> {
   M7Handler(const InitParams& init_params);
 
  private:
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(
+      TypedMessage* message) override;
 };
 
 }  // miracast

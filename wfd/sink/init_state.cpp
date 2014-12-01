@@ -32,16 +32,14 @@ class M1Handler final : public MessageReceiver<TypedMessage::M1> {
   M1Handler(const InitParams& init_params)
     : MessageReceiver<TypedMessage::M1>(init_params) {
   }
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
-    WFD::Reply reply(200);
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override {
+    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
     std::vector<WFD::Method> supported_methods;
     supported_methods.push_back(WFD::ORG_WFA_WFD_1_0);
     supported_methods.push_back(WFD::GET_PARAMETER);
     supported_methods.push_back(WFD::SET_PARAMETER);
-    reply.header().set_supported_methods(supported_methods);
-    reply.header().set_cseq(message->cseq());
-    sender_->SendRTSPData(reply.to_string());
-    return true;
+    reply->header().set_supported_methods(supported_methods);
+    return std::move(reply);
   }
 };
 

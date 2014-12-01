@@ -38,13 +38,13 @@ class CapNegotiationState : public MessageSequenceWithOptionalSetHandler {
 class M4Handler final : public MessageReceiver<TypedMessage::M4> {
  public:
   M4Handler(const InitParams& init_params);
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override;
 };
 
 class M3Handler final : public MessageReceiver<TypedMessage::M3> {
  public:
   M3Handler(const InitParams& init_params);
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override;
 };
 
 }  // miracast

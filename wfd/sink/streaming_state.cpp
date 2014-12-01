@@ -50,11 +50,8 @@ class M5Handler final : public MessageReceiver<TypedMessage::M5> {
     return  method == property->method();
   }
 
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
-    WFD::Reply reply;
-    reply.header().set_cseq(message->cseq());
-    sender_->SendRTSPData(reply.to_string());
-    return true;
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override {
+    return std::unique_ptr<WFD::Reply>(new WFD::Reply());
   }
 };
 

@@ -137,52 +137,42 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
 // 2. We wait for the message and reply ourselves.
 // class Handler : public MessageReceiver<type of the message
 // we're waiting for>
-template <TypedMessage::Type type>
-class MessageReceiver : public MessageHandler {
+class MessageReceiverBase : public MessageHandler {
  public:
-  static_assert(type != TypedMessage::Reply,
-                "MessageSender class should be used");
-
-  explicit MessageReceiver(const InitParams& init_params)
-    : MessageHandler(init_params),
-      wait_for_message_(false) {
-  }
-  virtual ~MessageReceiver() {}
+  explicit MessageReceiverBase(const InitParams& init_params);
+  virtual ~MessageReceiverBase();
 
  protected:
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) = 0;
-  virtual bool CanHandle(TypedMessage* message) const override {
-    assert(message);
-    return wait_for_message_ && (type == message->type());
-  }
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) = 0;
+  virtual bool CanHandle(TypedMessage* message) const override;
 
  private:
-  virtual void Start() override { wait_for_message_ = true; }
-  virtual void Reset() override { wait_for_message_ = false; }
-  virtual bool CanSend(TypedMessage* message) const override {
-    return false;
-  }
-  virtual void Send(std::unique_ptr<TypedMessage> message) override {}
-  virtual void Handle(std::unique_ptr<TypedMessage> message) override {
-    assert(message);
-    if (!CanHandle(message.get())) {
-      observer_->OnError(this);
-      return;
-    }
-    wait_for_message_ = false;
-    if (HandleMessage(std::move(message)))
-      observer_->OnCompleted(this);
-    else
-      observer_->OnError(this);
-  }
+  virtual void Start() override;
+  virtual void Reset() override;
+  virtual bool CanSend(TypedMessage* message) const override;
+  virtual void Send(std::unique_ptr<TypedMessage> message) override;
+  virtual void Handle(std::unique_ptr<TypedMessage> message) override;
 
   bool wait_for_message_;
 };
 
-class MessageSender : public MessageHandler {
+template <TypedMessage::Type type>
+class MessageReceiver : public MessageReceiverBase {
+  static_assert(type != TypedMessage::Reply,
+                "MessageSender class should be used");
  public:
-  explicit MessageSender(const InitParams& init_params);
-  virtual ~MessageSender();
+  using MessageReceiverBase::MessageReceiverBase;
+
+ protected:
+  virtual bool CanHandle(TypedMessage* message) const override {
+    return MessageReceiverBase::CanHandle(message) && (type == message->type());
+  }
+};
+
+class MessageSenderBase : public MessageHandler {
+ public:
+  explicit MessageSenderBase(const InitParams& init_params);
+  virtual ~MessageSenderBase();
 
  protected:
   virtual bool HandleReply(Reply* reply) = 0;
@@ -198,9 +188,9 @@ class MessageSender : public MessageHandler {
 
 // To be used for optional senders.
 template <TypedMessage::Type type>
-class OptionalMessageSender : public MessageSender {
+class OptionalMessageSender : public MessageSenderBase {
  public:
-  using MessageSender::MessageSender;
+  using MessageSenderBase::MessageSenderBase;
 
   virtual ~OptionalMessageSender() {}
 
@@ -213,7 +203,7 @@ class OptionalMessageSender : public MessageSender {
 };
 
 // To be used for sequensed senders.
-class SequencedMessageSender : public MessageSender {
+class SequencedMessageSender : public MessageSenderBase {
  public:
   explicit SequencedMessageSender(const InitParams& init_params);
   virtual ~SequencedMessageSender();

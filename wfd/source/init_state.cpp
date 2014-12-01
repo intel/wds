@@ -52,7 +52,8 @@ class M2Handler final : public MessageReceiver<TypedMessage::M2> {
   M2Handler(const InitParams& init_params)
     : MessageReceiver<TypedMessage::M2>(init_params) {
   }
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(
+      TypedMessage* message) override {
     auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
     std::vector<WFD::Method> supported_methods;
     supported_methods.push_back(WFD::ORG_WFA_WFD_1_0);
@@ -63,9 +64,7 @@ class M2Handler final : public MessageReceiver<TypedMessage::M2> {
     supported_methods.push_back(WFD::SETUP);
     supported_methods.push_back(WFD::TEARDOWN);
     reply->header().set_supported_methods(supported_methods);
-    reply->header().set_cseq(message->message()->header().cseq());
-    sender_->SendRTSPData(reply->to_string());
-    return true;
+    return std::move(reply);
   }
 };
 

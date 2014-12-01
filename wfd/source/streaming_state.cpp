@@ -35,16 +35,14 @@ class M9Handler final : public MessageReceiver<TypedMessage::M9> {
     : MessageReceiver<TypedMessage::M9>(init_params) {
   }
 
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(
+      TypedMessage* message) override {
     int response_code = 406;
     if (!manager_->IsPaused()) {
       manager_->Pause();
       response_code = 200;
     }
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(response_code));
-    reply->header().set_cseq(message->cseq());
-    sender_->SendRTSPData(reply->to_string());
-    return true;
+    return std::unique_ptr<WFD::Reply>(new WFD::Reply(response_code));
   }
 };
 

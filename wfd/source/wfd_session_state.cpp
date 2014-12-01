@@ -57,13 +57,12 @@ class M6Handler final : public MessageReceiver<TypedMessage::M6> {
     : MessageReceiver<TypedMessage::M6>(init_params) {
   }
 
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(
+      TypedMessage* message) override {
     auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
-    reply->header().set_cseq(message->cseq());
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
-    sender_->SendRTSPData(reply->to_string());
-    return true;
+    return std::move(reply);
   }
 };
 
@@ -71,30 +70,21 @@ M7Handler::M7Handler(const InitParams& init_params)
   : MessageReceiver<TypedMessage::M7>(init_params) {
 }
 
-bool M7Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
-  if (!manager_->IsPaused()) {
-    assert(observer_);
-    observer_->OnError(this);
-    return false;
-  }
-
-  auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
-  reply->header().set_cseq(message->cseq());
+std::unique_ptr<WFD::Reply> M7Handler::HandleMessage(
+    TypedMessage* message) {
+  if (!manager_->IsPaused())
+    return nullptr; // FIXME : Shouldn't we just send error code?
   manager_->Play();
-  sender_->SendRTSPData(reply->to_string());
-  return true;
+  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
 }
 
 M8Handler::M8Handler(const InitParams& init_params)
   : MessageReceiver<TypedMessage::M8>(init_params) {
 }
 
-bool M8Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
-  auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
-  reply->header().set_cseq(message->cseq());
+std::unique_ptr<WFD::Reply> M8Handler::HandleMessage(TypedMessage* message) {
   manager_->Teardown(); // FIXME : make proper reset.
-  sender_->SendRTSPData(reply->to_string());
-  return true;
+  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
 }
 
 WfdSessionState::WfdSessionState(const InitParams& init_params)

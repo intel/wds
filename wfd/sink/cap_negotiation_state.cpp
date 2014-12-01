@@ -49,9 +49,9 @@ namespace wfd {
 M3Handler::M3Handler(const InitParams& init_params)
   : MessageReceiver<TypedMessage::M3>(init_params) {
 }
-bool M3Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
-  WFD::Reply reply(200);
 
+std::unique_ptr<WFD::Reply> M3Handler::HandleMessage(TypedMessage* message) {
+  auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
   auto props = message->payload().get_parameter_properties();
   for (auto it = props.begin(); it != props.end(); it++) {
       std::shared_ptr<WFD::Property> new_prop;
@@ -65,7 +65,7 @@ bool M3Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
           codec_list.push_back(*codec_aac);
           codec_list.push_back(*codec_ac3);
           new_prop.reset(new WFD::AudioCodecs(codec_list));
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_VIDEO_FORMATS]){
           auto codec_list = WFD::H264Codecs();
           // again, declare that we support absolutely everything, let gstreamer deal with it
@@ -74,60 +74,55 @@ bool M3Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
           codec_list.push_back(*codec_cbp);
           codec_list.push_back(*codec_chp);
           new_prop.reset(new WFD::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_3D_FORMATS]){
           new_prop.reset(new WFD::Formats3d());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONTENT_PROTECTION]){
           new_prop.reset(new WFD::ContentProtection());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_DISPLAY_EDID]){
           new_prop.reset(new WFD::DisplayEdid());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_COUPLED_SINK]){
           new_prop.reset(new WFD::CoupledSink());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CLIENT_RTP_PORTS]){
           new_prop.reset(new WFD::ClientRtpPorts(manager_->RtpPort(), 0));
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_I2C]){
           new_prop.reset(new WFD::I2C(0));
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_UIBC_CAPABILITY]){
           new_prop.reset(new WFD::UIBCCapability());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONNECTOR_TYPE]){
           new_prop.reset(new WFD::ConnectorType());
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
           new_prop.reset(new WFD::StandbyResumeCapability(false));
-          reply.payload().add_property(new_prop);
+          reply->payload().add_property(new_prop);
       } else {
           std::cout << "** GET_PARAMETER: Property not supported" << std::endl;
       }
   }
 
-  reply.header().set_cseq(message->cseq());
-  sender_->SendRTSPData(reply.to_string());
-  return true;
+  return std::move(reply);
 }
 
 
 M4Handler::M4Handler(const InitParams& init_params)
   : MessageReceiver<TypedMessage::M4>(init_params) {
 }
-bool M4Handler::HandleMessage(std::unique_ptr<TypedMessage> message) {
+
+std::unique_ptr<WFD::Reply> M4Handler::HandleMessage(TypedMessage* message) {
   auto property =
       static_cast<WFD::PresentationUrl*>(message->payload().get_property(WFD::WFD_PRESENTATION_URL).get());
 
   // presentation URL is the only thing we care about
   // support for other parameters can be added later as needed
   manager_->SetPresentationUrl(property->presentation_url_1());
-
-  WFD::Reply reply(200);
-  reply.header().set_cseq(message->cseq());
-  sender_->SendRTSPData(reply.to_string());
-  return true;
+  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
 }
 
 class M5Handler final : public MessageReceiver<TypedMessage::M5> {
@@ -135,18 +130,17 @@ class M5Handler final : public MessageReceiver<TypedMessage::M5> {
   M5Handler(const InitParams& init_params)
     : MessageReceiver<TypedMessage::M5>(init_params) {
   }
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
+  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override {
     auto property =
         static_cast<WFD::TriggerMethod*>(message->payload().get_property(WFD::WFD_TRIGGER_METHOD).get());
 
-    WFD::Reply reply(200);
-    reply.header().set_cseq(message->cseq());
+    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+    reply->header().set_cseq(message->cseq());
     if (property->method() != WFD::TriggerMethod::SETUP) {
-      reply.set_response_code(303);
+      reply->set_response_code(303);
     }
 
-    sender_->SendRTSPData(reply.to_string());
-    return reply.response_code() == 200;
+    return std::move(reply);
   }
 };
 
