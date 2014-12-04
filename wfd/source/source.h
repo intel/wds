@@ -22,7 +22,6 @@
 #ifndef SOURCE_H_
 #define SOURCE_H_
 
-#include <string>
 #include "peer.h"
 
 namespace wfd {

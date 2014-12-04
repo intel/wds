@@ -66,50 +66,11 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
 
 gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
 {
-    try
-    {
-        std::string msg;
-        if (message_ && message_->header().content_length() > 0)
-            handle_body(msg);
-        else
-            handle_header(msg);
-
-    } catch (std::exception &x) {
-        g_warning("exception: %s", x.what());
-        /* Is this correct for both connection lost and recv() errors? */
-        return G_SOURCE_REMOVE;
+    std::string msg;
+    if (connection_->Receive(msg)) {
+      got_message (msg);
     }
     return G_SOURCE_CONTINUE;
-}
-
-void MiracBroker::handle_header(std::string msg)
-{
-    while (connection_->Receive(msg)) {
-        try {
-            driver_.parse_header(msg);
-            message_ = driver_.parsed_message();
-            if (message_ && message_->header().content_length() == 0)
-                got_message (message_);
-            if (message_ && message_->header().content_length())
-                handle_body(msg);
-        } catch (std::exception &x) {
-            g_message("Failed to parse received header: %s\n%s", x.what(), msg.c_str());
-        }
-    }
-}
-
-void MiracBroker::handle_body(std::string msg)
-{
-    if (connection_->Receive(msg, message_->header().content_length())) {
-        try {
-            driver_.parse_payload(msg);
-            got_message (driver_.parsed_message());
-        } catch (std::exception &x) {
-            g_message("Failed to parse received payload\n%s", msg.c_str());
-        }
-
-        message_ = NULL;
-    }
 }
 
 gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
@@ -181,3 +142,7 @@ MiracBroker::~MiracBroker ()
 {
 }
 
+void MiracBroker::SendRTSPData(const std::string& data) {
+    if (connection_ && !connection_->Send(data))
+        g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
+}

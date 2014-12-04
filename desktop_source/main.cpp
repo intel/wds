@@ -23,12 +23,13 @@
 #include <glib-unix.h>
 #include <netinet/in.h> // htons()
 
-#include "mirac-desktop-source.hpp"
+#include "desktop_source.h"
+
 #include "connman-client.h"
 
 
 struct SourceAppData {
-    std::unique_ptr<MiracSource> source;
+    std::unique_ptr<DesktopSource> source;
     std::unique_ptr<ConnmanClient> connman;
 
     int port;
@@ -44,19 +45,19 @@ static gboolean _sig_handler (gpointer data_ptr)
 }
 
 static void parse_input_and_call_source(
-    const std::string& command, const std::unique_ptr<MiracSource> &source) {
-    if (command == "teardown\n") {
-        source->Teardown();
-        return;
-    }
-    if (command == "pause\n") {
-        source->Pause();
-        return;
-    }
-    if (command == "play\n") {
-        source->Play();
-        return;
-    }
+    const std::string& command, const std::unique_ptr<DesktopSource> &source) {
+//    if (command == "teardown\n") {
+//        source->wfd_source()->Teardown();
+//        return;
+//    }
+//    if (command == "pause\n") {
+//        source->wfd_source()->Pause();
+//        return;
+//    }
+//    if (command == "play\n") {
+//        source->wfd_source()->Play();
+//        return;
+//    }
     std::cout << "Received unknown command: " << command << std::endl;
 }
 
@@ -86,24 +87,10 @@ static gboolean _user_input_handler (
     return false;
 }
 
-static gboolean create_source (gpointer data_ptr)
-{
-    SourceAppData* data = static_cast<SourceAppData*>(data_ptr);
-
-    try {
-        data->source.reset(new MiracSource (data->port));
-        std::cout << "Running source on port "<< data->source->get_host_port() << std::endl;
-        return true;
-    } catch (const std::exception &x) {
-        std::cout << "Failed to create source" << std::endl;
-        return false;
-    }
-}
-
 int main (int argc, char *argv[])
 {
     SourceAppData data;
-    data.port = 7236;
+    data.port = 8080;
 
     GOptionEntry main_entries[] =
     {
@@ -148,9 +135,8 @@ int main (int argc, char *argv[])
     // register the P2P service with connman
     auto array = ie.serialize ();
     data.connman.reset(new ConnmanClient (array));
-
-    if (create_source(&data))
-        g_main_loop_run (main_loop);
+    data.source.reset(new DesktopSource(data.port));
+    g_main_loop_run (main_loop);
 
     g_main_loop_unref (main_loop);
 

@@ -70,7 +70,7 @@ void MessageSequenceHandler::Handle(std::unique_ptr<TypedMessage> message) {
 }
 
 void MessageSequenceHandler::AddSequencedHandler(MessageHandler* handler) {
-  assert(!current_handler_); // We are not staret
+  assert(!current_handler_); // We are not started
   assert(handler);
   assert(handlers_.end() == std::find(
       handlers_.begin(), handlers_.end(), handler));

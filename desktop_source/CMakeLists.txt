@@ -2,7 +2,9 @@
 #to use target_compile_options or add_compile_options
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -std=c++11")
 
+include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories ("${PROJECT_SOURCE_DIR}/wfd/public")
 include_directories ("${PROJECT_SOURCE_DIR}/wfd/parser")
 include_directories ("${PROJECT_SOURCE_DIR}/p2p")
 include_directories ("${PROJECT_SOURCE_DIR}/mirac_network")
@@ -18,5 +20,5 @@ include_directories(${GIO_INCLUDE_DIRS})
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
-add_executable(desktop-source-test main.cpp mirac-desktop-source.cpp)
-target_link_libraries (desktop-source-test mirac wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})
+add_executable(desktop-source-test main.cpp desktop_source.cpp desktop_media_manager.cpp)
+target_link_libraries (desktop-source-test  mirac source common wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})

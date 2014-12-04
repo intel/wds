@@ -81,13 +81,9 @@ class SourceStateMachine : public MessageSequenceHandler {
      AddSequencedHandler(new WfdSessionState(init_params));
      AddSequencedHandler(new StreamingState(init_params));
    }
-   SourceStateMachine(Peer::Delegate* sender, MediaManager* mng)
-     : SourceStateMachine({sender, mng, this}) {}
-   virtual void OnCompleted(MessageHandler* handler) override {}
-   virtual void OnError(MessageHandler* handler) override {}
 };
 
-class SourceImpl final : public Source, public RTSPInputHandler {
+class SourceImpl final : public Source, public RTSPInputHandler, public MessageHandler::Observer {
  public:
   SourceImpl(Delegate* delegate, MediaManager* mng);
 
@@ -95,6 +91,11 @@ class SourceImpl final : public Source, public RTSPInputHandler {
   // Source implementation.
   virtual void Start() override;
   virtual void RTSPDataReceived(const std::string& message) override;
+
+  // public MessageHandler::Observer
+  virtual void OnCompleted(MessageHandler* handler) override;
+  virtual void OnError(MessageHandler* handler) override;
+
   // RTSPInputHandler
   virtual void MessageParsed(WFD::MessagePtr message) override;
 
@@ -102,7 +103,7 @@ class SourceImpl final : public Source, public RTSPInputHandler {
 };
 
 SourceImpl::SourceImpl(Delegate* delegate, MediaManager* mng)
-  : state_machine_(new SourceStateMachine(delegate, mng)) {
+  : state_machine_(new SourceStateMachine({delegate, mng, this})) {
 }
 
 void SourceImpl::Start() {
@@ -112,6 +113,10 @@ void SourceImpl::Start() {
 void SourceImpl::RTSPDataReceived(const std::string& message) {
   InputReceived(message);
 }
+
+void SourceImpl::OnCompleted(MessageHandler* handler) {}
+
+void SourceImpl::OnError(MessageHandler* handler) {}
 
 void SourceImpl::MessageParsed(WFD::MessagePtr message) {
   auto typed_message = CreateTypedMessage(message);
