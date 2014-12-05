@@ -46,19 +46,18 @@ static gboolean _sig_handler (gpointer data_ptr)
 
 static void parse_input_and_call_source(
     const std::string& command, const std::unique_ptr<DesktopSource> &source) {
-//    if (command == "teardown\n") {
-//        source->wfd_source()->Teardown();
-//        return;
-//    }
-//    if (command == "pause\n") {
-//        source->wfd_source()->Pause();
-//        return;
-//    }
-//    if (command == "play\n") {
-//        source->wfd_source()->Play();
-//        return;
-//    }
-    std::cout << "Received unknown command: " << command << std::endl;
+    bool status = true;
+    if (command == "teardown\n") {
+      status = source->wfd_source()->Teardown();
+    } else if (command == "pause\n") {
+      status = source->wfd_source()->Pause();
+    } else if (command == "play\n") {
+      status = source->wfd_source()->Play();
+    } else {
+      std::cout << "Received unknown command: " << command << std::endl;
+    }
+    if (!status)
+      std::cout << "This command cannot be executed now." << std::endl;
 }
 
 static gboolean _user_input_handler (

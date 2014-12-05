@@ -36,17 +36,25 @@ class M9Handler final : public MessageReceiver<TypedMessage::M9> {
   }
 
   virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
-    if (manager_->IsPaused()) {
-      assert(observer_);
-      observer_->OnError(this);
-      return false;
+    int response_code = 406;
+    if (!manager_->IsPaused()) {
+      manager_->Pause();
+      response_code = 200;
     }
-
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(response_code));
     reply->header().set_cseq(message->cseq());
-    manager_->Pause();
     sender_->SendRTSPData(reply->to_string());
     return true;
+  }
+};
+
+class M5Sender final : public OptionalMessageSender<TypedMessage::M5> {
+ public:
+  M5Sender(const InitParams& init_params)
+    : OptionalMessageSender<TypedMessage::M5>(init_params) {
+  }
+  virtual bool HandleReply(Reply* reply) override {
+    return (reply->GetResponseCode() == 200);
   }
 };
 
@@ -54,6 +62,7 @@ StreamingState::StreamingState(const InitParams& init_params)
   : MessageSequenceWithOptionalSetHandler(init_params) {
   AddSequencedHandler(new M8Handler(init_params));
 
+  AddOptionalHandler(new M5Sender(init_params));
   AddOptionalHandler(new M7Handler(init_params));
   AddOptionalHandler(new M9Handler(init_params));
 }

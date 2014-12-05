@@ -7,17 +7,22 @@ DesktopMediaManager::DesktopMediaManager(const std::string& hostname)
 }
 
 void DesktopMediaManager::Play() {
+  assert(gst_pipeline_);
   gst_pipeline_->SetState(GST_STATE_PLAYING);
 }
 
 void DesktopMediaManager::Pause() {
+  assert(gst_pipeline_);
+  gst_pipeline_->SetState(GST_STATE_PAUSED);
 }
 
 void DesktopMediaManager::Teardown() {
+  assert(gst_pipeline_);
+  gst_pipeline_->SetState(GST_STATE_READY);
 }
 
 bool DesktopMediaManager::IsPaused() const {
-  return true;
+  return (gst_pipeline_->GetState() != GST_STATE_PLAYING);
 }
 
 void DesktopMediaManager::SetRtpPorts(int port1, int port2) {

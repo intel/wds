@@ -36,6 +36,8 @@ public:
     ~MiracGstTestSource ();
 
     void SetState(GstState state);
+    GstState GetState() const;
+
     int UdpSourcePort();
 
 private:

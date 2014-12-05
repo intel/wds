@@ -30,6 +30,7 @@
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
 #include "wfd/common/typed_message.h"
+#include "wfd/parser/setparameter.h"
 
 namespace wfd {
 
@@ -81,6 +82,8 @@ class SourceStateMachine : public MessageSequenceHandler {
      AddSequencedHandler(new WfdSessionState(init_params));
      AddSequencedHandler(new StreamingState(init_params));
    }
+
+   int GetNextCSeq() { return send_cseq_++; }
 };
 
 class SourceImpl final : public Source, public RTSPInputHandler, public MessageHandler::Observer {
@@ -91,6 +94,9 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   // Source implementation.
   virtual void Start() override;
   virtual void RTSPDataReceived(const std::string& message) override;
+  virtual bool Teardown() override;
+  virtual bool Play() override;
+  virtual bool Pause() override;
 
   // public MessageHandler::Observer
   virtual void OnCompleted(MessageHandler* handler) override;
@@ -99,7 +105,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   // RTSPInputHandler
   virtual void MessageParsed(WFD::MessagePtr message) override;
 
-  std::unique_ptr<MessageHandler> state_machine_;
+  std::unique_ptr<SourceStateMachine> state_machine_;
 };
 
 SourceImpl::SourceImpl(Delegate* delegate, MediaManager* mng)
@@ -112,6 +118,49 @@ void SourceImpl::Start() {
 
 void SourceImpl::RTSPDataReceived(const std::string& message) {
   InputReceived(message);
+}
+
+namespace  {
+
+std::unique_ptr<TypedMessage> CreateM5(int send_cseq, WFD::TriggerMethod::Method method) {
+  auto set_param =
+      std::make_shared<WFD::SetParameter>("rtsp://localhost/wfd1.0");
+  set_param->header().set_cseq(send_cseq);
+  set_param->payload().add_property(
+      std::shared_ptr<WFD::Property>(new WFD::TriggerMethod(method)));
+  return std::unique_ptr<TypedMessage>(new M5(set_param));
+}
+
+}
+
+bool SourceImpl::Teardown() {
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
+                     WFD::TriggerMethod::TEARDOWN);
+
+  if (!state_machine_->CanSend(m5.get()))
+    return false;
+  state_machine_->Send(std::move(m5));
+  return true;
+}
+
+bool SourceImpl::Play() {
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
+                     WFD::TriggerMethod::PLAY);
+
+  if (!state_machine_->CanSend(m5.get()))
+    return false;
+  state_machine_->Send(std::move(m5));
+  return true;
+}
+
+bool SourceImpl::Pause() {
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
+                     WFD::TriggerMethod::PAUSE);
+
+  if (!state_machine_->CanSend(m5.get()))
+    return false;
+  state_machine_->Send(std::move(m5));
+  return true;
 }
 
 void SourceImpl::OnCompleted(MessageHandler* handler) {}

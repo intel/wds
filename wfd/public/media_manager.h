@@ -22,8 +22,6 @@
 #ifndef MEDIA_MANAGER_H_
 #define MEDIA_MANAGER_H_
 
-#include <string>
-
 namespace wfd {
 
 class MediaManager {

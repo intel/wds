@@ -32,6 +32,11 @@ class Source : public Peer {
  public:
   virtual ~Source() {}
   static Source* Create(Peer::Delegate* delegate, MediaManager* mng);
+  // these send M5 wfd_trigger_method messages
+  // return 'false' if M5 cannot be send at the moment.
+  virtual bool Teardown() = 0;
+  virtual bool Play() = 0;
+  virtual bool Pause() = 0;
 };
 
 }

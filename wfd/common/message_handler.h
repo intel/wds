@@ -198,11 +198,11 @@ class MessageSender : public MessageHandler {
 
 // To be used for optional senders.
 template <TypedMessage::Type type>
-class TypedMessageSender : public MessageSender {
+class OptionalMessageSender : public MessageSender {
  public:
   using MessageSender::MessageSender;
 
-  virtual ~TypedMessageSender() {}
+  virtual ~OptionalMessageSender() {}
 
  private:
   virtual void Start() override {}
