@@ -20,5 +20,5 @@ include_directories(${GIO_INCLUDE_DIRS})
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
-add_executable(desktop-source-test main.cpp desktop_source.cpp desktop_media_manager.cpp)
+add_executable(desktop-source-test main.cpp mirac_broker_source.cpp desktop_media_manager.cpp)
 target_link_libraries (desktop-source-test  mirac source common wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})

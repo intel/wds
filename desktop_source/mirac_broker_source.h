@@ -1,18 +1,19 @@
-#ifndef DESKTOP_SOURCE_H
-#define DESKTOP_SOURCE_H
+#ifndef MIRAC_BROKER_SOURCE_H_
+#define MIRAC_BROKER_SOURCE_H_
 
 #include <memory>
 
-#include "wfd/public/media_manager.h"
-#include "wfd/public/source.h"
-
 #include "mirac-broker.hpp"
-#include "mirac-gst-test-source.hpp"
 
-class DesktopSource : public MiracBroker {
+namespace wfd {
+class MediaManager;
+class Source;
+}
+
+class MiracBrokerSource : public MiracBroker {
  public:
-  explicit DesktopSource(int rtsp_port);
-  ~DesktopSource();
+  explicit MiracBrokerSource(int rtsp_port);
+  ~MiracBrokerSource();
 
   wfd::Source* wfd_source() { return wfd_source_.get(); }
 
@@ -24,4 +25,4 @@ class DesktopSource : public MiracBroker {
   std::unique_ptr<wfd::Source> wfd_source_;
 };
 
-#endif // DESKTOP_SOURCE_H
+#endif // MIRAC_BROKER_SOURCE_H_

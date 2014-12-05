@@ -1,18 +1,19 @@
 #include "desktop_media_manager.h"
-#include "desktop_source.h"
+#include "mirac_broker_source.h"
 
-DesktopSource::DesktopSource(int rtsp_port)
+#include "wfd/public/source.h"
+
+MiracBrokerSource::MiracBrokerSource(int rtsp_port)
   : MiracBroker(std::to_string(rtsp_port)) {
 }
 
-DesktopSource::~DesktopSource() {}
+MiracBrokerSource::~MiracBrokerSource() {}
 
-
-void DesktopSource::got_message(const std::string& message) {
+void MiracBrokerSource::got_message(const std::string& message) {
   wfd_source_->RTSPDataReceived(message);
 }
 
-void DesktopSource::on_connected() {
+void MiracBrokerSource::on_connected() {
   media_manager_.reset(new DesktopMediaManager(get_peer_address()));
   wfd_source_.reset(wfd::Source::Create(this, media_manager_.get()));
   wfd_source_->Start();

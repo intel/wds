@@ -23,13 +23,15 @@
 #include <glib-unix.h>
 #include <netinet/in.h> // htons()
 
-#include "desktop_source.h"
+#include "mirac_broker_source.h"
+#include "mirac-gst-test-source.hpp"
 
 #include "connman-client.h"
 
+#include "wfd/public/source.h"
 
 struct SourceAppData {
-    std::unique_ptr<DesktopSource> source;
+    std::unique_ptr<MiracBrokerSource> source;
     std::unique_ptr<ConnmanClient> connman;
 
     int port;
@@ -45,7 +47,7 @@ static gboolean _sig_handler (gpointer data_ptr)
 }
 
 static void parse_input_and_call_source(
-    const std::string& command, const std::unique_ptr<DesktopSource> &source) {
+    const std::string& command, const std::unique_ptr<MiracBrokerSource> &source) {
     bool status = true;
     if (command == "teardown\n") {
       status = source->wfd_source()->Teardown();
@@ -134,7 +136,7 @@ int main (int argc, char *argv[])
     // register the P2P service with connman
     auto array = ie.serialize ();
     data.connman.reset(new ConnmanClient (array));
-    data.source.reset(new DesktopSource(data.port));
+    data.source.reset(new MiracBrokerSource(data.port));
     g_main_loop_run (main_loop);
 
     g_main_loop_unref (main_loop);
