@@ -19,29 +19,22 @@
  * 02110-1301 USA
  */
 
-#ifndef MEDIA_MANAGER_H_
-#define MEDIA_MANAGER_H_
+#ifndef SINK_H_
+#define SINK_H_
 
 #include <string>
+#include "peer.h"
 
 namespace wfd {
 
-class MediaManager {
- public:  
-  virtual ~MediaManager() {}
-  virtual void Play() = 0;
-  virtual void Pause() = 0;
-  virtual void Teardown() = 0;
-  virtual bool IsPaused() const = 0;
-  virtual void SetRtpPorts(int port1, int port2) = 0;
-  virtual int RtpPort() const = 0;
-  virtual void SetPresentationUrl(const std::string& url) = 0;
-  virtual std::string PresentationUrl() const = 0;
-  virtual void SetSession(std::string& session) = 0;
-  virtual std::string Session() const = 0;
+class MediaManager;
+
+class Sink : public Peer {
+ public:
+  virtual ~Sink() {}
+  static Sink* Create(Peer::Delegate* delegate, MediaManager* mng);
 };
 
-}  // namespace wfd
+}
 
-#endif // MEDIA_MANAGER_H_
-
+#endif // SINK_H_

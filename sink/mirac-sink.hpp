@@ -28,8 +28,8 @@
 #include <memory>
 
 #include "mirac-broker.hpp"
-#include "reply.h"
-#include "setparameter.h"
+#include "wfd/parser/reply.h"
+#include "wfd/parser/setparameter.h"
 #include "mirac-gst-sink.hpp"
 
 class MiracSink: public MiracBroker

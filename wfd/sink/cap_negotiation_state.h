@@ -19,29 +19,34 @@
  * 02110-1301 USA
  */
 
-#ifndef MEDIA_MANAGER_H_
-#define MEDIA_MANAGER_H_
+#ifndef CAP_NEGOTIATION_STATE_H_
+#define CAP_NEGOTIATION_STATE_H_
 
-#include <string>
+#include "message_handler.h"
 
 namespace wfd {
 
-class MediaManager {
- public:  
-  virtual ~MediaManager() {}
-  virtual void Play() = 0;
-  virtual void Pause() = 0;
-  virtual void Teardown() = 0;
-  virtual bool IsPaused() const = 0;
-  virtual void SetRtpPorts(int port1, int port2) = 0;
-  virtual int RtpPort() const = 0;
-  virtual void SetPresentationUrl(const std::string& url) = 0;
-  virtual std::string PresentationUrl() const = 0;
-  virtual void SetSession(std::string& session) = 0;
-  virtual std::string Session() const = 0;
+
+// Capability negotiation state for RTSP source.
+// Includes M3 and M4 messages handling
+class CapNegotiationState : public MessageSequenceWithOptionalSetHandler {
+ public:
+  CapNegotiationState(const InitParams& init_params);
+  virtual ~CapNegotiationState();
 };
 
-}  // namespace wfd
+class M4Handler final : public MessageReceiver<TypedMessage::M4> {
+ public:
+  M4Handler(const InitParams& init_params);
+  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+};
 
-#endif // MEDIA_MANAGER_H_
+class M3Handler final : public MessageReceiver<TypedMessage::M3> {
+ public:
+  M3Handler(const InitParams& init_params);
+  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override;
+};
 
+}  // miracast
+
+#endif // CAP_NEGOTIATION_STATE_H_

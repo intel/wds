@@ -40,8 +40,8 @@ TypedMessage::~TypedMessage() {
 }
 
 template <typename  T>
-std::shared_ptr<T> TypedMessage::get_property(WFD::PropertyType type) const {
-  return std::static_pointer_cast<T>(message()->payload().get_property(type));
+T* TypedMessage::get_property(WFD::PropertyType type) const {
+  return reinterpret_cast<T*>(message()->payload().get_property(type).get());
 }
 
 int TypedMessage::cseq() const {
@@ -74,7 +74,11 @@ M4::M4(WFD::MessagePtr message)
 }
 
 M5::M5(WFD::MessagePtr message)
-  : TypedMessageBase<TypedMessage::M4>(message) {
+  : TypedMessageBase<TypedMessage::M5>(message) {
+}
+
+WFD::TriggerMethod::Method M5::trigger_method() const {
+  return get_property<WFD::TriggerMethod>(WFD::WFD_TRIGGER_METHOD)->method();
 }
 
 M6::M6(WFD::MessagePtr message)
@@ -97,7 +101,7 @@ M10::M10(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M10>(message) {
 }
 
-std::shared_ptr<WFD::Route> M10::route() const {
+WFD::Route* M10::route() const {
   return get_property<WFD::Route>(WFD::WFD_ROUTE);
 }
 
@@ -105,7 +109,7 @@ M11::M11(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M11>(message) {
 }
 
-std::shared_ptr<WFD::ConnectorType> M11::connector_type() const {
+WFD::ConnectorType* M11::connector_type() const {
   return get_property<WFD::ConnectorType>(WFD::WFD_CONNECTOR_TYPE);
 }
 
@@ -113,7 +117,7 @@ M12::M12(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M12>(message) {
 }
 
-std::shared_ptr<WFD::Standby> M12::standby() const {
+WFD::Standby* M12::standby() const {
   return get_property<WFD::Standby>(WFD::WFD_STANDBY);
 }
 
@@ -121,7 +125,7 @@ M13::M13(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M13>(message) {
 }
 
-std::shared_ptr<WFD::IDRRequest> M13::idr_request() const {
+WFD::IDRRequest* M13::idr_request() const {
   return get_property<WFD::IDRRequest>(WFD::WFD_IDR_REQUEST);
 }
 
@@ -129,7 +133,7 @@ M14::M14(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M14>(message) {
 }
 
-std::shared_ptr<WFD::UIBCCapability> M14::uibc_capability() const {
+WFD::UIBCCapability* M14::uibc_capability() const {
   return get_property<WFD::UIBCCapability>(WFD::WFD_UIBC_CAPABILITY);
 }
 
@@ -137,7 +141,7 @@ M15::M15(WFD::MessagePtr message)
   : TypedMessageBase<TypedMessage::M15>(message) {
 }
 
-std::shared_ptr<WFD::UIBCSetting> M15::uibc_setting() const {
+WFD::UIBCSetting* M15::uibc_setting() const {
   return get_property<WFD::UIBCSetting>(WFD::WFD_UIBC_SETTING);
 }
 

@@ -22,6 +22,8 @@
 
 #include "header.h"
 
+#include <algorithm>
+
 namespace WFD {
 
 namespace {
@@ -118,6 +120,12 @@ const GenericHeaderMap& Header::generic_headers() const {
 void Header::set_supported_methods(
     const std::vector<Method>& supported_methods) {
   supported_methods_ = supported_methods;
+}
+
+bool Header::has_method(const Method& method) const {
+  return std::find (supported_methods_.begin(),
+      supported_methods_.end(),
+      method) != supported_methods_.end();
 }
 
 std::string Header::to_string() const {

@@ -19,29 +19,21 @@
  * 02110-1301 USA
  */
 
-#ifndef MEDIA_MANAGER_H_
-#define MEDIA_MANAGER_H_
+#ifndef INIT_STATE_H_
+#define INIT_STATE_H_
 
-#include <string>
+#include "message_handler.h"
 
 namespace wfd {
 
-class MediaManager {
- public:  
-  virtual ~MediaManager() {}
-  virtual void Play() = 0;
-  virtual void Pause() = 0;
-  virtual void Teardown() = 0;
-  virtual bool IsPaused() const = 0;
-  virtual void SetRtpPorts(int port1, int port2) = 0;
-  virtual int RtpPort() const = 0;
-  virtual void SetPresentationUrl(const std::string& url) = 0;
-  virtual std::string PresentationUrl() const = 0;
-  virtual void SetSession(std::string& session) = 0;
-  virtual std::string Session() const = 0;
+// Inital state for RTSP sink.
+// Includes M1 and M2 messages handling
+class InitState : public MessageSequenceHandler {
+ public:
+  InitState(const InitParams& init_params);
+  virtual ~InitState();
 };
 
-}  // namespace wfd
+}  // miracast
 
-#endif // MEDIA_MANAGER_H_
-
+#endif // INIT_STATE_H_

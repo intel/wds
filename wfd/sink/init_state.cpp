@@ -27,45 +27,50 @@
 
 namespace wfd {
 
-class M1Handler final : public SequencedMessageSender {
+class M1Handler final : public MessageReceiver<TypedMessage::M1> {
  public:
-//  M1Handler(Peer::Delegate* sender, MediaManager* manager, Observer* observer)
-//    : SequencedMessageSender(manager, observer) {
-//  }
+  M1Handler(const InitParams& init_params)
+    : MessageReceiver<TypedMessage::M1>(init_params) {
+  }
+  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
+    WFD::Reply reply(200);
+    std::vector<WFD::Method> supported_methods;
+    supported_methods.push_back(WFD::ORG_WFA_WFD_1_0);
+    supported_methods.push_back(WFD::GET_PARAMETER);
+    supported_methods.push_back(WFD::SET_PARAMETER);
+    reply.header().set_supported_methods(supported_methods);
+    reply.header().set_cseq(message->cseq());
+    sender_->SendRTSPData(reply.to_string());
+    return true;
+  }
+};
+
+class M2Handler final : public SequencedMessageSender {
+ public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
     auto options = std::make_shared<WFD::Options>("*");
     options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
-    return std::unique_ptr<M1>(new M1(options));
+    return std::unique_ptr<M2>(new M2(options));
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
-  }
+    const WFD::Header& header = reply->message()->header();
 
-};
+    if (reply->GetResponseCode() == 200
+        && header.has_method(WFD::Method::ORG_WFA_WFD_1_0)
+        && header.has_method(WFD::Method::GET_PARAMETER)
+        && header.has_method(WFD::Method::SET_PARAMETER)
+        && header.has_method(WFD::Method::SETUP)
+        && header.has_method(WFD::Method::PLAY)
+        && header.has_method(WFD::Method::TEARDOWN)
+        && header.has_method(WFD::Method::PAUSE)) {
+      return true;
+    }
 
-class M2Handler final : public MessageReceiver<TypedMessage::M2> {
- public:
-  M2Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M2>(init_params) {
-  }
-  virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) override {
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
-    std::vector<WFD::Method> supported_methods;
-    supported_methods.push_back(WFD::ORG_WFA_WFD_1_0);
-    supported_methods.push_back(WFD::GET_PARAMETER);
-    supported_methods.push_back(WFD::SET_PARAMETER);
-    supported_methods.push_back(WFD::PLAY);
-    supported_methods.push_back(WFD::PAUSE);
-    supported_methods.push_back(WFD::SETUP);
-    supported_methods.push_back(WFD::TEARDOWN);
-    reply->header().set_supported_methods(supported_methods);
-    reply->header().set_cseq(message->message()->header().cseq());
-    sender_->SendRTSPData(reply->to_string());
-    return true;
+    return false;
   }
 };
 

@@ -26,12 +26,14 @@
 
 #include "message.h"
 #include "reply.h"
+#include "triggermethod.h"
 
 namespace WFD {
-  class Route;
   class ConnectorType;
-  class Standby;
   class IDRRequest;
+  class Payload;
+  class Route;
+  class Standby;
   class UIBCCapability;
   class UIBCSetting;
 }
@@ -48,7 +50,8 @@ class TypedMessage {
   virtual ~TypedMessage();
   virtual TypedMessage::Type type() const = 0;
 
-  const WFD::Message* message() const { return message_.get(); };
+  const WFD::Message* message() const { return message_.get(); }
+  const WFD::Payload& payload() const { return message_->payload(); }
 
   // Utility methods
   int cseq() const;
@@ -56,7 +59,7 @@ class TypedMessage {
  protected:
   explicit TypedMessage(WFD::MessagePtr message);
   template <typename T>
-  std::shared_ptr<T> get_property(WFD::PropertyType) const;
+  T* get_property(WFD::PropertyType) const;
 
   WFD::MessagePtr message_;
 };
@@ -97,9 +100,10 @@ class M4 : public TypedMessageBase<TypedMessage::M4> {
   explicit M4(WFD::MessagePtr message);
 };
 
-class M5 : public TypedMessageBase<TypedMessage::M4> {
+class M5 : public TypedMessageBase<TypedMessage::M5> {
  public:
   explicit M5(WFD::MessagePtr message);
+  WFD::TriggerMethod::Method trigger_method() const;
 };
 
 class M6 : public TypedMessageBase<TypedMessage::M6> {
@@ -125,37 +129,37 @@ class M9 : public TypedMessageBase<TypedMessage::M9> {
 class M10 : public TypedMessageBase<TypedMessage::M10> {
  public:
   explicit M10(WFD::MessagePtr message);
-  std::shared_ptr<WFD::Route> route() const;
+  WFD::Route* route() const;
 };
 
 class M11 : public TypedMessageBase<TypedMessage::M11> {
  public:
   explicit M11(WFD::MessagePtr message);
-  std::shared_ptr<WFD::ConnectorType> connector_type() const;
+  WFD::ConnectorType* connector_type() const;
 };
 
 class M12 : public TypedMessageBase<TypedMessage::M12> {
  public:
   explicit M12(WFD::MessagePtr message);
-  std::shared_ptr<WFD::Standby> standby() const;
+  WFD::Standby* standby() const;
 };
 
 class M13 : public TypedMessageBase<TypedMessage::M13> {
  public:
   explicit M13(WFD::MessagePtr message);
-  std::shared_ptr<WFD::IDRRequest> idr_request() const;
+  WFD::IDRRequest* idr_request() const;
 };
 
 class M14 : public TypedMessageBase<TypedMessage::M14> {
  public:
   explicit M14(WFD::MessagePtr message);
-  std::shared_ptr<WFD::UIBCCapability> uibc_capability() const;
+  WFD::UIBCCapability* uibc_capability() const;
 };
 
 class M15 : public TypedMessageBase<TypedMessage::M15> {
  public:
   explicit M15(WFD::MessagePtr message);
-  std::shared_ptr<WFD::UIBCSetting> uibc_setting() const;
+  WFD::UIBCSetting* uibc_setting() const;
 };
 
 }

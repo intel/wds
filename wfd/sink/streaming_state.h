@@ -19,29 +19,26 @@
  * 02110-1301 USA
  */
 
-#ifndef MEDIA_MANAGER_H_
-#define MEDIA_MANAGER_H_
+#ifndef STREAMING_STATE_H_
+#define STREAMING_STATE_H_
 
-#include <string>
+#include "message_handler.h"
 
 namespace wfd {
 
-class MediaManager {
- public:  
-  virtual ~MediaManager() {}
-  virtual void Play() = 0;
-  virtual void Pause() = 0;
-  virtual void Teardown() = 0;
-  virtual bool IsPaused() const = 0;
-  virtual void SetRtpPorts(int port1, int port2) = 0;
-  virtual int RtpPort() const = 0;
-  virtual void SetPresentationUrl(const std::string& url) = 0;
-  virtual std::string PresentationUrl() const = 0;
-  virtual void SetSession(std::string& session) = 0;
-  virtual std::string Session() const = 0;
+// Streaming state for RTSP sink.
+// Includes M8 message handling and optionally can handle M3, M4, M7 and M9
+class StreamingState : public MessageSequenceWithOptionalSetHandler {
+ public:
+  StreamingState(const InitParams& init_params);
+  virtual ~StreamingState();
 };
 
-}  // namespace wfd
+class TeardownHandler : public MessageSequenceHandler {
+ public:
+  explicit TeardownHandler(const InitParams& init_params);
+};
 
-#endif // MEDIA_MANAGER_H_
+}  // miracast
 
+#endif // STREAMING_STATE_H_

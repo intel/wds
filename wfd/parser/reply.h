@@ -29,7 +29,7 @@ namespace WFD {
 
 class Reply: public Message {
  public:
-  explicit Reply(int response_code);
+  explicit Reply(int response_code = 200);
   virtual ~Reply();
 
   int response_code() const { return response_code_; }

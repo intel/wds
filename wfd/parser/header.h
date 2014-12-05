@@ -63,6 +63,7 @@ class Header {
 
     const std::vector<Method>& supported_methods() const;
     void set_supported_methods(const std::vector<Method>& supported_methods);
+    bool has_method(const Method& method) const;
 
     void add_generic_header(const std::string& key ,const std::string& value);
     const GenericHeaderMap& generic_headers () const;

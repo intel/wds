@@ -14,6 +14,12 @@ class DesktopMediaManager : public wfd::MediaManager {
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
   virtual void SetRtpPorts(int port1, int port2) override;
+  virtual int RtpPort() const override;
+  virtual void SetPresentationUrl(const std::string& url) override;
+  virtual std::string PresentationUrl() const override;
+  virtual void SetSession(std::string& session) override;
+  virtual std::string Session() const override;
+
  private:
   std::string hostname_;
   std::unique_ptr<MiracGstTestSource> gst_pipeline_;

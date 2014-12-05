@@ -151,6 +151,10 @@ class MessageReceiver : public MessageHandler {
 
  protected:
   virtual bool HandleMessage(std::unique_ptr<TypedMessage> message) = 0;
+  virtual bool CanHandle(TypedMessage* message) const override {
+    assert(message);
+    return wait_for_message_ && (type == message->type());
+  }
 
  private:
   virtual void Start() override { wait_for_message_ = true; }
@@ -159,10 +163,6 @@ class MessageReceiver : public MessageHandler {
     return false;
   }
   virtual void Send(std::unique_ptr<TypedMessage> message) override {}
-  virtual bool CanHandle(TypedMessage* message) const override {
-    assert(message);
-    return wait_for_message_ && (type == message->type());
-  }
   virtual void Handle(std::unique_ptr<TypedMessage> message) override {
     assert(message);
     if (!CanHandle(message.get())) {
