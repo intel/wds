@@ -58,7 +58,7 @@ class M5Handler final : public MessageReceiver<TypedMessage::M5> {
   }
 };
 
-class M7Handler final : public SequencedMessageSender {
+class M7Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
@@ -79,11 +79,11 @@ class PlayHandler : public MessageSequenceHandler {
   explicit PlayHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
     AddSequencedHandler(new M5Handler<WFD::TriggerMethod::PLAY>(init_params));
-    AddSequencedHandler(new M7Handler(init_params));
+    AddSequencedHandler(new M7Sender(init_params));
   }
 };
 
-class M8Handler final : public SequencedMessageSender {
+class M8Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
@@ -102,10 +102,10 @@ class M8Handler final : public SequencedMessageSender {
 TeardownHandler::TeardownHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
   AddSequencedHandler(new M5Handler<WFD::TriggerMethod::TEARDOWN>(init_params));
-  AddSequencedHandler(new M8Handler(init_params));
+  AddSequencedHandler(new M8Sender(init_params));
 }
 
-class M9Handler final : public SequencedMessageSender {
+class M9Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
@@ -126,7 +126,41 @@ class PauseHandler : public MessageSequenceHandler {
   explicit PauseHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
     AddSequencedHandler(new M5Handler<WFD::TriggerMethod::PAUSE>(init_params));
-    AddSequencedHandler(new M9Handler(init_params));
+    AddSequencedHandler(new M9Sender(init_params));
+  }
+};
+
+class M7SenderOptional final : public OptionalMessageSender<TypedMessage::M7> {
+ public:
+  M7SenderOptional(const InitParams& init_params)
+    : OptionalMessageSender<TypedMessage::M7>(init_params) {
+  }
+ private:
+  virtual bool HandleReply(Reply* reply) override {
+    return (reply->GetResponseCode() == 200);
+  }
+};
+
+class M8SenderOptional final : public OptionalMessageSender<TypedMessage::M8> {
+ public:
+  M8SenderOptional(const InitParams& init_params)
+    : OptionalMessageSender<TypedMessage::M8>(init_params) {
+  }
+ private:
+  virtual bool HandleReply(Reply* reply) override {
+    // todo: if successfull, switch to init state
+    return (reply->GetResponseCode() == 200);
+  }
+};
+
+class M9SenderOptional final : public OptionalMessageSender<TypedMessage::M9> {
+ public:
+  M9SenderOptional(const InitParams& init_params)
+    : OptionalMessageSender<TypedMessage::M9>(init_params) {
+  }
+ private:
+  virtual bool HandleReply(Reply* reply) override {
+    return (reply->GetResponseCode() == 200);
   }
 };
 
@@ -137,6 +171,11 @@ StreamingState::StreamingState(const InitParams& init_params)
   AddOptionalHandler(new PauseHandler(init_params));
   AddOptionalHandler(new M3Handler(init_params));
   AddOptionalHandler(new M4Handler(init_params));
+
+  // optional senders that handle sending play, pause and teardown
+  AddOptionalHandler(new M7SenderOptional(init_params));
+  AddOptionalHandler(new M8SenderOptional(init_params));
+  AddOptionalHandler(new M9SenderOptional(init_params));
 }
 
 StreamingState::~StreamingState() {

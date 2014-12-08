@@ -39,11 +39,14 @@ void Sink::on_connected() {
 }
 
 void Sink::Play() {
+  wfd_sink_->Play();
 }
 
 void Sink::Pause() {
+  wfd_sink_->Pause();
 }
 
 void Sink::Teardown() {
+  wfd_sink_->Teardown();
 }
 

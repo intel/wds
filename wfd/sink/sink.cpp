@@ -25,6 +25,11 @@
 #include "init_state.h"
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
+#include "wfd/parser/pause.h"
+#include "wfd/parser/play.h"
+#include "wfd/parser/teardown.h"
+#include "wfd/parser/triggermethod.h"
+#include "wfd/public/media_manager.h"
 #include "streaming_state.h"
 #include "wfd/common/typed_message.h"
 #include "wfd_session_state.h"
@@ -68,6 +73,8 @@ class SinkStateMachine : public MessageSequenceHandler {
    }
    SinkStateMachine(Peer::Delegate* sender, MediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
+
+   int GetNextCSeq() { return send_cseq_++; }
 };
 
 class SinkImpl final : public Sink, public RTSPInputHandler {
@@ -75,17 +82,28 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   SinkImpl(Delegate* delegate, MediaManager* mng);
 
  private:
-  // Source implementation.
+  // Sink implementation.
   virtual void Start() override;
   virtual void RTSPDataReceived(const std::string& message) override;
+  virtual bool Teardown() override;
+  virtual bool Play() override;
+  virtual bool Pause() override;
+
   // RTSPInputHandler
   virtual void MessageParsed(WFD::MessagePtr message) override;
 
-  std::unique_ptr<MessageHandler> state_machine_;
+  bool HandleCommand(std::unique_ptr<TypedMessage> command);
+
+  template <typename WfdMessage, typename TypedWfdMessage>
+  std::unique_ptr<TypedMessage> CreateCommand();
+
+  std::unique_ptr<SinkStateMachine> state_machine_;
+  MediaManager* manager_;
 };
 
 SinkImpl::SinkImpl(Delegate* delegate, MediaManager* mng)
-  : state_machine_(new SinkStateMachine(delegate, mng)) {
+  : state_machine_(new SinkStateMachine(delegate, mng)),
+    manager_(mng) {
 }
 
 void SinkImpl::Start() {
@@ -94,6 +112,37 @@ void SinkImpl::Start() {
 
 void SinkImpl::RTSPDataReceived(const std::string& message) {
   InputReceived(message);
+}
+
+template <typename WfdMessage, typename TypedWfdMessage>
+std::unique_ptr<TypedMessage> SinkImpl::CreateCommand() {
+  auto message = std::make_shared<WfdMessage>(manager_->PresentationUrl());
+  message->header().set_session(manager_->Session());
+  message->header().set_cseq(state_machine_->GetNextCSeq());
+  return std::unique_ptr<TypedMessage>(new TypedWfdMessage(message));
+}
+
+bool SinkImpl::HandleCommand(std::unique_ptr<TypedMessage> command) {
+  if (manager_->Session().empty() ||
+      manager_->PresentationUrl().empty())
+    return false;
+
+  if (!state_machine_->CanSend(command.get()))
+    return false;
+  state_machine_->Send(std::move(command));
+  return true;
+}
+
+bool SinkImpl::Teardown() {
+  return HandleCommand(CreateCommand<WFD::Teardown, wfd::M8>());
+}
+
+bool SinkImpl::Play() {
+  return HandleCommand(CreateCommand<WFD::Play, wfd::M7>());
+}
+
+bool SinkImpl::Pause() {
+  return HandleCommand(CreateCommand<WFD::Pause, wfd::M9>());
 }
 
 void SinkImpl::MessageParsed(WFD::MessagePtr message) {

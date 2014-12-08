@@ -37,6 +37,12 @@ class Peer {
   virtual ~Peer() {}
   virtual void Start() = 0;
   virtual void RTSPDataReceived(const std::string& data) = 0;
+  // These send M5 wfd_trigger_method messages for Peers that implement
+  // Source functionality or M7, M8 and M9 for Sink implementations
+  // return 'false' if message cannot be send at the moment.
+  virtual bool Teardown() = 0;
+  virtual bool Play() = 0;
+  virtual bool Pause() = 0;
 };
 
 }
