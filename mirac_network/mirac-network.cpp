@@ -245,7 +245,6 @@ unsigned short MiracNetwork::GetHostPort ()
 bool MiracNetwork::Receive (std::string &message)
 {
     int ec;
-    size_t eom;
     char nb[page_size];
 
     do {

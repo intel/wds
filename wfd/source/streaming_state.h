@@ -25,6 +25,7 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace source {
 
 // Streaming state for RTSP source.
 // Includes M8 message handling and optionally can handle M3, M4, M7, M9-M15
@@ -34,6 +35,7 @@ class StreamingState : public MessageSequenceWithOptionalSetHandler {
   virtual ~StreamingState();
 };
 
-}  // miracast
+}  // source
+}  // wfd
 
 #endif // STREAMING_STATE_H_

@@ -24,6 +24,8 @@
 #include <netinet/in.h> // htons()
 #include <gst/gst.h> // gst_init_get_option_group()
 
+#include <iostream>
+
 #include "sink.h"
 #include "connman-client.h"
 

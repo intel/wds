@@ -25,6 +25,7 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace sink {
 
 // Streaming state for RTSP sink.
 // Includes M8 message handling and optionally can handle M3, M4, M7 and M9
@@ -39,6 +40,7 @@ class TeardownHandler : public MessageSequenceHandler {
   explicit TeardownHandler(const InitParams& init_params);
 };
 
-}  // miracast
+}  // sink
+}  // wfd
 
 #endif // STREAMING_STATE_H_

@@ -25,7 +25,7 @@
 namespace wfd {
 
 class MediaManager {
- public:  
+ public:
   virtual ~MediaManager() {}
   virtual void Play() = 0;
   virtual void Pause() = 0;

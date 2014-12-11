@@ -1,7 +1,7 @@
 #FIXME in the future: with cmake 2.8.12 and up it's better
 #to use target_compile_options or add_compile_options
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -std=c++11 -ggdb3 -Wall")
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O0 -std=c99 -ggdb3 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fvisibility=hidden -fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -Wall")
 
 include_directories ("${PROJECT_SOURCE_DIR}/include" )
 
@@ -16,7 +16,7 @@ ADD_FLEX_BISON_DEPENDENCY(HeaderLexer Parser)
 FLEX_TARGET(ErrorLexer errorlexer.l  ${CMAKE_CURRENT_BINARY_DIR}/errorscanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(ErrorLexer Parser)
 
-add_library(wfdparser STATIC
+add_library(wfdparser OBJECT
     ${BISON_Parser_OUTPUTS}
     ${FLEX_MessageLexer_OUTPUTS}
     ${FLEX_ErrorLexer_OUTPUTS}
@@ -32,10 +32,12 @@ add_library(wfdparser STATIC
     preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp scanner.cpp
 )
 
-add_executable(wfd main.cpp)
-target_link_libraries (wfd wfdparser)
+add_executable(wfd main.cpp $<TARGET_OBJECTS:wfdparser>)
+set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
+target_link_libraries(wfd)
 
-add_executable(test-wfd tests.cpp)
-target_link_libraries (test-wfd wfdparser)
+add_executable(test-wfd tests.cpp $<TARGET_OBJECTS:wfdparser>)
+set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
+target_link_libraries (test-wfd)
 
 add_test(WfdTest test-wfd)

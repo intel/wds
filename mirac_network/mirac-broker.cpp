@@ -102,12 +102,6 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
     return G_SOURCE_REMOVE;
 }
 
-void MiracBroker::send(WFD::Message& message) const
-{
-     if (connection_ && !connection_->Send(message.to_string()))
-         g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
-}
-
 unsigned short MiracBroker::get_host_port() const
 {
     return network_->GetHostPort();

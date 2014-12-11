@@ -25,6 +25,7 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace source {
 
 // WFD session state for RTSP source.
 // Includes M5, M6, M7 messages handling and optionally can handle M3, M4, M8
@@ -52,6 +53,7 @@ class M7Handler final : public MessageReceiver<TypedMessage::M7> {
       TypedMessage* message) override;
 };
 
-}  // miracast
+}  // source
+}  // wfd
 
 #endif // WFD_SESSION_STATE_H_

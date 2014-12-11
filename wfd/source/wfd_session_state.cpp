@@ -30,6 +30,7 @@
 #include "wfd/common/typed_message.h"
 
 namespace wfd {
+namespace source {
 
 class M5Handler final : public SequencedMessageSender {
  public:
@@ -99,4 +100,5 @@ WfdSessionState::WfdSessionState(const InitParams& init_params)
 WfdSessionState::~WfdSessionState() {
 }
 
-}  // miracast
+}  // source
+}  // wfd

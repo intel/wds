@@ -33,6 +33,7 @@
 #include "wfd_session_state.h"
 
 namespace wfd {
+namespace sink {
 
 template <WFD::TriggerMethod::Method method>
 class M5Handler final : public MessageReceiver<TypedMessage::M5> {
@@ -178,4 +179,5 @@ StreamingState::StreamingState(const InitParams& init_params)
 StreamingState::~StreamingState() {
 }
 
-}  // miracast
+}  // sink
+}  // wfd

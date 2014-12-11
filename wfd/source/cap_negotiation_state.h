@@ -25,6 +25,7 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace source {
 
 // Capability negotiation state for RTSP source.
 // Includes M3 and M4 messages handling
@@ -34,6 +35,7 @@ class CapNegotiationState : public MessageSequenceHandler {
   virtual ~CapNegotiationState();
 };
 
-}  // miracast
+}  // source
+}  // wfd
 
 #endif // CAP_NEGOTIATION_STATE_H_

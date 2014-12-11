@@ -29,3 +29,4 @@ mirac_network/network-test
 desktop_source/desktop-source-test
 
 *.a
+*.so

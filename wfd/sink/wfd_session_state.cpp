@@ -32,6 +32,7 @@
 #include "wfd/parser/transportheader.h"
 
 namespace wfd {
+namespace sink {
 
 class M6Handler final : public SequencedMessageSender {
  public:
@@ -91,4 +92,5 @@ WfdSessionState::WfdSessionState(const InitParams& init_params)
 WfdSessionState::~WfdSessionState() {
 }
 
-}  // miracast
+}  // sink
+}  // wfd

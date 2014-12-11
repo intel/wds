@@ -44,6 +44,7 @@
 #include "wfd/parser/videoformats.h"
 
 namespace wfd {
+namespace sink {
 
 
 M3Handler::M3Handler(const InitParams& init_params)
@@ -157,4 +158,5 @@ CapNegotiationState::CapNegotiationState(const InitParams &init_params)
 CapNegotiationState::~CapNegotiationState() {
 }
 
-}  // miracast
+}  // sink
+}  // wfd

@@ -22,7 +22,6 @@
 #ifndef SINK_H_
 #define SINK_H_
 
-#include <string>
 #include "peer.h"
 
 namespace wfd {

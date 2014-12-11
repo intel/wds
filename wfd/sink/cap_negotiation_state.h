@@ -25,9 +25,9 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace sink {
 
-
-// Capability negotiation state for RTSP source.
+// Capability negotiation state for RTSP sink.
 // Includes M3 and M4 messages handling
 class CapNegotiationState : public MessageSequenceWithOptionalSetHandler {
  public:
@@ -47,6 +47,7 @@ class M3Handler final : public MessageReceiver<TypedMessage::M3> {
   virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override;
 };
 
-}  // miracast
+}  // sink
+}  // wfd
 
 #endif // CAP_NEGOTIATION_STATE_H_

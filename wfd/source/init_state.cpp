@@ -26,6 +26,7 @@
 #include "wfd/common/typed_message.h"
 
 namespace wfd {
+namespace source {
 
 class M1Handler final : public SequencedMessageSender {
  public:
@@ -77,4 +78,5 @@ InitState::InitState(const InitParams& init_params)
 InitState::~InitState() {
 }
 
-}  // miracast
+}  // source
+}  // wfd

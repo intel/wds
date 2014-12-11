@@ -28,6 +28,7 @@
 #include "wfd/common/typed_message.h"
 
 namespace wfd {
+namespace source {
 
 class M9Handler final : public MessageReceiver<TypedMessage::M9> {
  public:
@@ -68,4 +69,5 @@ StreamingState::StreamingState(const InitParams& init_params)
 StreamingState::~StreamingState() {
 }
 
-}  // miracast
+}  // source
+}  // wfd

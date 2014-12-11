@@ -29,9 +29,7 @@
 #include <memory>
 
 #include "wfd/public/peer.h"
-
 #include "mirac-network.hpp"
-#include "wfd/parser/driver.h"
 
 class MiracBrokerObserver
 {
@@ -53,7 +51,6 @@ class MiracBroker : public wfd::Peer::Delegate
         virtual void SendRTSPData(const std::string& data) override;
 
         virtual void got_message(const std::string& data) {}
-        void send(WFD::Message& message) const;
         virtual void on_connected() {};
 
     private:
@@ -69,9 +66,6 @@ class MiracBroker : public wfd::Peer::Delegate
 
         void handle_body(const std::string msg);
         void handle_header(const std::string msg);
-
-        WFD::Driver driver_;
-        std::shared_ptr<WFD::Message> message_;
 
         std::unique_ptr<MiracNetwork> network_;
         std::unique_ptr<MiracNetwork> connection_;

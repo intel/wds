@@ -25,6 +25,7 @@
 #include "init_state.h"
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
+#include "wfd/common/wfd_export.h"
 #include "wfd/parser/pause.h"
 #include "wfd/parser/play.h"
 #include "wfd/parser/teardown.h"
@@ -66,10 +67,10 @@ class SinkStateMachine : public MessageSequenceHandler {
  public:
    SinkStateMachine(const InitParams& init_params)
      : MessageSequenceHandler(init_params) {
-     AddSequencedHandler(new InitState(init_params));
-     AddSequencedHandler(new CapNegotiationState(init_params));
-     AddSequencedHandler(new WfdSessionState(init_params));
-     AddSequencedHandler(new StreamingState(init_params));
+     AddSequencedHandler(new sink::InitState(init_params));
+     AddSequencedHandler(new sink::CapNegotiationState(init_params));
+     AddSequencedHandler(new sink::WfdSessionState(init_params));
+     AddSequencedHandler(new sink::StreamingState(init_params));
    }
    SinkStateMachine(Peer::Delegate* sender, MediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
@@ -151,7 +152,7 @@ void SinkImpl::MessageParsed(WFD::MessagePtr message) {
     state_machine_->Handle(std::move(typed_message));
 }
 
-Sink* Sink::Create(Delegate* delegate, MediaManager* mng) {
+WFD_EXPORT Sink* Sink::Create(Delegate* delegate, MediaManager* mng) {
   return new SinkImpl(delegate, mng);
 }
 

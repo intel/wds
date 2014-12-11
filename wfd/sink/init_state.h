@@ -25,6 +25,7 @@
 #include "wfd/common/message_handler.h"
 
 namespace wfd {
+namespace sink {
 
 // Inital state for RTSP sink.
 // Includes M1 and M2 messages handling
@@ -34,6 +35,7 @@ class InitState : public MessageSequenceHandler {
   virtual ~InitState();
 };
 
-}  // miracast
+}  // sink
+}  // wfd
 
 #endif // INIT_STATE_H_

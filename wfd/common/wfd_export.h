@@ -19,23 +19,9 @@
  * 02110-1301 USA
  */
 
-#ifndef WFD_SESSION_STATE_H_
-#define WFD_SESSION_STATE_H_
+#ifndef WFD_EXPORT_H_
+#define WFD_EXPORT_H_
 
-#include "wfd/common/message_handler.h"
+#define WFD_EXPORT __attribute__((visibility("default")))
 
-namespace wfd {
-namespace sink {
-
-// WFD session state for RTSP sink.
-// Includes M6, M7, M8 messages handling and optionally can handle M3, M4
-class WfdSessionState : public MessageSequenceWithOptionalSetHandler {
- public:
-  WfdSessionState(const InitParams& init_params);
-  virtual ~WfdSessionState();
-};
-
-}  // sink
-}  // wfd
-
-#endif // WFD_SESSION_STATE_H_
+#endif  // WFD_EXPORT_H_

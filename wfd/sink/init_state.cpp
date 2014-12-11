@@ -26,6 +26,7 @@
 #include "wfd/common/typed_message.h"
 
 namespace wfd {
+namespace sink {
 
 class M1Handler final : public MessageReceiver<TypedMessage::M1> {
  public:
@@ -81,4 +82,5 @@ InitState::InitState(const InitParams& init_params)
 InitState::~InitState() {
 }
 
-}  // miracast
+}  // sink
+}  // wfd

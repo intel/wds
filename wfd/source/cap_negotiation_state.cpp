@@ -31,6 +31,7 @@
 #include "wfd/common/typed_message.h"
 
 namespace wfd {
+namespace source {
 
 class M3Handler final : public SequencedMessageSender {
  public:
@@ -102,4 +103,5 @@ CapNegotiationState::CapNegotiationState(const InitParams &init_params)
 CapNegotiationState::~CapNegotiationState() {
 }
 
-}  // miracast
+}  // source
+}  // wfd

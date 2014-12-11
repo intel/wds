@@ -21,7 +21,6 @@
 
 #include "wfd/public/source.h"
 
-#include <algorithm>
 
 #include "cap_negotiation_state.h"
 #include "init_state.h"
@@ -30,6 +29,7 @@
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
 #include "wfd/common/typed_message.h"
+#include "wfd/common/wfd_export.h"
 #include "wfd/parser/setparameter.h"
 
 namespace wfd {
@@ -77,10 +77,10 @@ class SourceStateMachine : public MessageSequenceHandler {
  public:
    SourceStateMachine(const InitParams& init_params)
      : MessageSequenceHandler(init_params) {
-     AddSequencedHandler(new InitState(init_params));
-     AddSequencedHandler(new CapNegotiationState(init_params));
-     AddSequencedHandler(new WfdSessionState(init_params));
-     AddSequencedHandler(new StreamingState(init_params));
+     AddSequencedHandler(new source::InitState(init_params));
+     AddSequencedHandler(new source::CapNegotiationState(init_params));
+     AddSequencedHandler(new source::WfdSessionState(init_params));
+     AddSequencedHandler(new source::StreamingState(init_params));
    }
 
    int GetNextCSeq() { return send_cseq_++; }
@@ -173,7 +173,7 @@ void SourceImpl::MessageParsed(WFD::MessagePtr message) {
     state_machine_->Handle(std::move(typed_message));
 }
 
-Source* Source::Create(Delegate* delegate, MediaManager* mng) {
+WFD_EXPORT Source* Source::Create(Delegate* delegate, MediaManager* mng) {
   return new SourceImpl(delegate, mng);
 }
 

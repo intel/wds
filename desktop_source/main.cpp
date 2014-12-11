@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <glib-unix.h>
 #include <netinet/in.h> // htons()
+#include <iostream>
 
 #include "mirac_broker_source.h"
 #include "mirac-gst-test-source.hpp"
