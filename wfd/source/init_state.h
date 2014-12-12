@@ -22,7 +22,7 @@
 #ifndef INIT_STATE_H_
 #define INIT_STATE_H_
 
-#include "message_handler.h"
+#include "wfd/common/message_handler.h"
 
 namespace wfd {
 

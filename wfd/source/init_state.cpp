@@ -21,9 +21,9 @@
 
 #include "init_state.h"
 
-#include "options.h"
-#include "reply.h"
-#include "typed_message.h"
+#include "wfd/parser/options.h"
+#include "wfd/parser/reply.h"
+#include "wfd/common/typed_message.h"
 
 namespace wfd {
 

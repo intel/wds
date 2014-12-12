@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #include "message_handler.h"
-#include "media_manager.h"
+#include "wfd/public/media_manager.h"
 
 namespace wfd {
 

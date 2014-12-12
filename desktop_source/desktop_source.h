@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "wfd/public/media_manager.h"
-#include "wfd/source/source.h"
+#include "wfd/public/source.h"
 
 #include "mirac-broker.hpp"
 #include "mirac-gst-test-source.hpp"

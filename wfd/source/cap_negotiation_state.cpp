@@ -21,14 +21,14 @@
 
 #include "cap_negotiation_state.h"
 
-#include "clientrtpports.h"
-#include "media_manager.h"
-#include "getparameter.h"
-#include "payload.h"
-#include "presentationurl.h"
-#include "reply.h"
-#include "setparameter.h"
-#include "typed_message.h"
+#include "wfd/parser/clientrtpports.h"
+#include "wfd/public/media_manager.h"
+#include "wfd/parser/getparameter.h"
+#include "wfd/parser/payload.h"
+#include "wfd/parser/presentationurl.h"
+#include "wfd/parser/reply.h"
+#include "wfd/parser/setparameter.h"
+#include "wfd/common/typed_message.h"
 
 namespace wfd {
 

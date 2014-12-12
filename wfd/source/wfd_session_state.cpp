@@ -21,13 +21,13 @@
 
 #include "wfd_session_state.h"
 
-#include "media_manager.h"
+#include "wfd/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "reply.h"
-#include "setparameter.h"
-#include "triggermethod.h"
-#include "typed_message.h"
+#include "wfd/parser/reply.h"
+#include "wfd/parser/setparameter.h"
+#include "wfd/parser/triggermethod.h"
+#include "wfd/common/typed_message.h"
 
 namespace wfd {
 

@@ -23,12 +23,12 @@
 
 #include <assert.h>
 
-#include "route.h"
-#include "connectortype.h"
-#include "standby.h"
-#include "idrrequest.h"
-#include "uibccapability.h"
-#include "uibcsetting.h"
+#include "wfd/parser/route.h"
+#include "wfd/parser/connectortype.h"
+#include "wfd/parser/standby.h"
+#include "wfd/parser/idrrequest.h"
+#include "wfd/parser/uibccapability.h"
+#include "wfd/parser/uibcsetting.h"
 
 namespace wfd {
 

@@ -24,9 +24,9 @@
 
 #include <memory>
 
-#include "message.h"
-#include "reply.h"
-#include "triggermethod.h"
+#include "wfd/parser/message.h"
+#include "wfd/parser/reply.h"
+#include "wfd/parser/triggermethod.h"
 
 namespace WFD {
   class ConnectorType;

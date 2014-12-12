@@ -21,15 +21,15 @@
 
 #include "streaming_state.h"
 
-#include "media_manager.h"
+#include "wfd/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "pause.h"
-#include "play.h"
-#include "reply.h"
-#include "teardown.h"
-#include "triggermethod.h"
-#include "typed_message.h"
+#include "wfd/parser/pause.h"
+#include "wfd/parser/play.h"
+#include "wfd/parser/reply.h"
+#include "wfd/parser/teardown.h"
+#include "wfd/parser/triggermethod.h"
+#include "wfd/common/typed_message.h"
 #include "wfd_session_state.h"
 
 namespace wfd {

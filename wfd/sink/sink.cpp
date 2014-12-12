@@ -19,14 +19,14 @@
  * 02110-1301 USA
  */
 
-#include "sink.h"
+#include "wfd/public/sink.h"
 
 #include "cap_negotiation_state.h"
 #include "init_state.h"
-#include "message_handler.h"
-#include "rtsp_input_handler.h"
+#include "wfd/common/message_handler.h"
+#include "wfd/common/rtsp_input_handler.h"
 #include "streaming_state.h"
-#include "typed_message.h"
+#include "wfd/common/typed_message.h"
 #include "wfd_session_state.h"
 
 namespace wfd {

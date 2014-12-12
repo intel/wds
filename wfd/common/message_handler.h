@@ -28,8 +28,8 @@
 #include <memory>
 #include <utility>
 
-#include "peer.h"
-#include "typed_message.h"
+#include "wfd/public/peer.h"
+#include "wfd/common/typed_message.h"
 
 namespace wfd {
 
