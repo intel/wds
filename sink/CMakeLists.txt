@@ -18,6 +18,6 @@ include_directories(${GIO_INCLUDE_DIRS})
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
-add_library(gst_wfd_sink STATIC mirac-sink.cpp)
+add_library(gst_wfd_sink STATIC sink.cpp sink_media_manager.cpp)
 add_executable(sink-test main.cpp)
-target_link_libraries (sink-test gst_wfd_sink mirac wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})
+target_link_libraries (sink-test gst_wfd_sink sink common mirac wfdparser p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})

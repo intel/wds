@@ -22,13 +22,14 @@
 #include <glib.h>
 #include <glib-unix.h>
 #include <netinet/in.h> // htons()
+#include <gst/gst.h> // gst_init_get_option_group()
 
-#include "mirac-sink.hpp"
+#include "sink.h"
 #include "connman-client.h"
 
 
 struct SinkAppData {
-    std::unique_ptr<MiracSink> sink;
+    std::unique_ptr<Sink> sink;
     std::unique_ptr<ConnmanClient> connman;
 
     std::string host;
@@ -45,7 +46,7 @@ static gboolean _sig_handler (gpointer data_ptr)
 }
 
 static void parse_input_and_call_sink(
-    const std::string& command, const std::unique_ptr<MiracSink> &sink) {
+    const std::string& command, const std::unique_ptr<Sink> &sink) {
     if (command == "teardown\n") {
         sink->Teardown();
         return;
@@ -92,7 +93,7 @@ static gboolean create_sink (gpointer data_ptr)
     SinkAppData* data = static_cast<SinkAppData*>(data_ptr);
 
     try {
-        data->sink.reset(new MiracSink (data->host.c_str(), data->port));
+        data->sink.reset(new Sink (data->host.c_str(), data->port));
         std::cout << "Running sink on port "<< data->sink->get_host_port() << std::endl;
         return G_SOURCE_REMOVE;
     } catch (const std::exception &x) {
