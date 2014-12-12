@@ -23,7 +23,7 @@
 
 #include <algorithm>
 
-#include "context_manager.h"
+#include "media_manager.h"
 #include "getparameter.h"
 #include "options.h"
 #include "reply.h"

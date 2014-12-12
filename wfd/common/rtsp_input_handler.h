@@ -19,34 +19,30 @@
  * 02110-1301 USA
  */
 
-#ifndef SOURCE_H_
-#define SOURCE_H_
+#ifndef RTSP_INPUT_HANDLER_H_
+#define RTSP_INPUT_HANDLER_H_
 
 #include <string>
+#include "driver.h"
 
 namespace wfd {
 
-class MediaManager;
+// An aux class to handle input buffer.
+class RTSPInputHandler {
+ protected:
+  virtual ~RTSPInputHandler() {}
 
-class Peer {
- public:
-  class Delegate {
-   public:
-    virtual void SendRTSPData(const std::string& data) = 0;
-   protected:
-    virtual ~Delegate() {}
-  };
-  virtual ~Peer() {}
-  virtual void Start() = 0;
-  virtual void RTSPDataReceived(const std::string& data) = 0;
-};
+  void InputReceived(const std::string& input);
+  virtual void MessageParsed(WFD::MessagePtr message) = 0;
 
-class Source : public Peer {
- public:
-  virtual ~Source() {}
-  static Source* Create(Peer::Delegate* delegate, MediaManager* mng);
+ private:
+  bool GetHeader(std::string& header);
+  bool GetPayload(std::string& payload, unsigned content_length);
+
+  WFD::Driver driver_;
+  std::string rtsp_recieve_buffer_;
 };
 
 }
 
-#endif // SOURCE_H_
+#endif // RTSP_INPUT_HANDLER_H_

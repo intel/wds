@@ -28,7 +28,7 @@
 #include <memory>
 #include <utility>
 
-#include "source.h"
+#include "peer.h"
 #include "typed_message.h"
 
 namespace wfd {

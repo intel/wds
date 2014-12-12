@@ -21,7 +21,7 @@
 
 #include "wfd_session_state.h"
 
-#include "context_manager.h"
+#include "media_manager.h"
 
 #include "cap_negotiation_state.h"
 #include "reply.h"

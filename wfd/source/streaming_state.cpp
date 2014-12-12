@@ -21,7 +21,7 @@
 
 #include "streaming_state.h"
 
-#include "context_manager.h"
+#include "media_manager.h"
 
 #include "cap_negotiation_state.h"
 #include "wfd_session_state.h"

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(wysiwidi)
 enable_testing()
-add_subdirectory(wfd_parser)
+add_subdirectory(wfd)
 add_subdirectory(p2p)
 add_subdirectory(mirac_network)
 add_subdirectory(sink)

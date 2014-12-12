@@ -23,13 +23,13 @@
 
 #include <algorithm>
 
-#include "driver.h"
-#include "init_state.h"
 #include "cap_negotiation_state.h"
+#include "init_state.h"
 #include "message_handler.h"
+#include "rtsp_input_handler.h"
 #include "streaming_state.h"
-#include "wfd_session_state.h"
 #include "typed_message.h"
+#include "wfd_session_state.h"
 
 namespace wfd {
 
@@ -72,7 +72,7 @@ std::unique_ptr<TypedMessage> CreateTypedMessage(WFD::MessagePtr message) {
 
 }
 
-class SourceStateMachine : public MessageSequenceHandler{
+class SourceStateMachine : public MessageSequenceHandler {
  public:
    SourceStateMachine(const InitParams& init_params)
      : MessageSequenceHandler(init_params) {
@@ -86,62 +86,6 @@ class SourceStateMachine : public MessageSequenceHandler{
    virtual void OnCompleted(MessageHandler* handler) override {}
    virtual void OnError(MessageHandler* handler) override {}
 };
-
-// An aux class to handle input buffer.
-class RTSPInputHandler {
- protected:
-  virtual ~RTSPInputHandler() {}
-
-  void InputReceived(const std::string& input);
-  virtual void MessageParsed(WFD::MessagePtr message) = 0;
-
- private:
-  bool GetHeader(std::string& header);
-  bool GetPayload(std::string& payload, unsigned content_length);
-
-  WFD::Driver driver_;
-  std::string rtsp_recieve_buffer_;
-};
-
-void RTSPInputHandler::InputReceived(const std::string& input) {
-  rtsp_recieve_buffer_ += input;
-  std::string buffer;
-
-  while(GetHeader(buffer)) {
-    driver_.parse_header(buffer);
-    WFD::MessagePtr rtsp_message = driver_.parsed_message();
-    if (!rtsp_message.get()) {
-      // TODO : handle an invalid input.
-      rtsp_recieve_buffer_.clear();
-      return;
-    }
-    uint content_length = rtsp_message->header().content_length();
-    if (content_length && GetPayload(buffer, content_length))
-      driver_.parse_payload(buffer);
-      MessageParsed(rtsp_message);
-  }
-}
-
-bool RTSPInputHandler::GetHeader(std::string& header) {
-  size_t eom = rtsp_recieve_buffer_.find("\r\n\r\n");
-  if (eom == std::string::npos) {
-    rtsp_recieve_buffer_.clear();
-    return false;
-  }
-
-  header = rtsp_recieve_buffer_.substr(0, eom + 4);
-  rtsp_recieve_buffer_.erase(0, eom + 4);
-  return true;
-}
-
-bool RTSPInputHandler::GetPayload(std::string& payload, unsigned content_length) {
-  if (rtsp_recieve_buffer_.size() < content_length)
-      return false;
-
-  payload = rtsp_recieve_buffer_.substr(0, content_length);
-  rtsp_recieve_buffer_.erase(0, content_length);
-  return true;
-}
 
 class SourceImpl final : public Source, public RTSPInputHandler {
  public:
