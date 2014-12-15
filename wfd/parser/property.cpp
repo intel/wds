@@ -22,7 +22,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 Property::Property(PropertyType type)
     : type_(type),
@@ -42,4 +42,4 @@ std::string Property::to_string() const {
   return std::string();
 }
 
-}  // namespace WFD
+}  // namespace wfd

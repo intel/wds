@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class AVFormatChangeTiming: public Property {
 public:
@@ -42,6 +42,6 @@ public:
   unsigned long long int dts_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // AVFORMATCHANGETIMING_H_

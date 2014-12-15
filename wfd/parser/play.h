@@ -25,15 +25,15 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
-class Play : public Message {
+class Play : public Request {
  public:
     explicit Play(const std::string& request_uri);
     virtual ~Play();
     virtual std::string to_string() const override;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // PLAY_H_

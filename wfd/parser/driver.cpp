@@ -27,29 +27,18 @@
 #include <cctype>
 #include <sstream>
 
-namespace WFD {
+namespace wfd {
 
-Driver::Driver() {
+Driver::~Driver() {
 }
 
-void Driver::parse_header(const std::string& message) {
-  message_.reset();
-  parse(message);
-}
-
-void Driver::parse_payload(const std::string& message) {
-  if (!message_)
-    return;
-  parse(message);
-}
-
-void Driver::parse(const std::string& message) {
-  std::istringstream in(message);
+void Driver::Parse(const std::string& input, Message*& message) {
+  std::istringstream in(input);
   if (!in.good())
     return;
 
-  scanner_.reset(new Scanner(&in, *this));
-  parser_.reset(new Parser(*scanner_, *this));
+  scanner_.reset(new Scanner(&in, message));
+  parser_.reset(new Parser(*scanner_, message));
 
   // todo: remove, just for testing
   //scanner_->set_debug(1);
@@ -58,17 +47,5 @@ void Driver::parse(const std::string& message) {
   parser_->parse();
 }
 
-void Driver::set_message(Message* message) {
-  message_.reset(message);
-}
-
-void Driver::set_payload(Payload* payload) {
-  if (message_)
-    message_->set_payload(payload);
-}
-
-Driver::~Driver(){
-}
-
-} // namespace WFD
+} // namespace wfd
 

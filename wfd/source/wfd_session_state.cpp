@@ -27,7 +27,6 @@
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/parser/triggermethod.h"
-#include "wfd/common/typed_message.h"
 
 namespace wfd {
 namespace source {
@@ -37,30 +36,29 @@ class M5Handler final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
 
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto set_param =
-        std::make_shared<WFD::SetParameter>("rtsp://localhost/wfd1.0");
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
     set_param->header().set_cseq(send_cseq_++);
     set_param->payload().add_property(
-        std::shared_ptr<WFD::Property>(new WFD::TriggerMethod(WFD::TriggerMethod::SETUP)));
-    return std::unique_ptr<TypedMessage>(new M5(set_param));
+        std::shared_ptr<wfd::Property>(new TriggerMethod(TriggerMethod::SETUP)));
+    return std::unique_ptr<Message>(set_param);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 
 };
 
-class M6Handler final : public MessageReceiver<TypedMessage::M6> {
+class M6Handler final : public MessageReceiver<Request::M6> {
  public:
   M6Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M6>(init_params) {
+    : MessageReceiver<Request::M6>(init_params) {
   }
 
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(
-      TypedMessage* message) override {
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+  virtual std::unique_ptr<Reply> HandleMessage(
+      Message* message) override {
+    auto reply = std::unique_ptr<Reply>(new Reply(200));
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
     return std::move(reply);
@@ -68,24 +66,24 @@ class M6Handler final : public MessageReceiver<TypedMessage::M6> {
 };
 
 M7Handler::M7Handler(const InitParams& init_params)
-  : MessageReceiver<TypedMessage::M7>(init_params) {
+  : MessageReceiver<Request::M7>(init_params) {
 }
 
-std::unique_ptr<WFD::Reply> M7Handler::HandleMessage(
-    TypedMessage* message) {
+std::unique_ptr<Reply> M7Handler::HandleMessage(
+    Message* message) {
   if (!manager_->IsPaused())
     return nullptr; // FIXME : Shouldn't we just send error code?
   manager_->Play();
-  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+  return std::unique_ptr<Reply>(new Reply(200));
 }
 
 M8Handler::M8Handler(const InitParams& init_params)
-  : MessageReceiver<TypedMessage::M8>(init_params) {
+  : MessageReceiver<Request::M8>(init_params) {
 }
 
-std::unique_ptr<WFD::Reply> M8Handler::HandleMessage(TypedMessage* message) {
+std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
   manager_->Teardown(); // FIXME : make proper reset.
-  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+  return std::unique_ptr<Reply>(new Reply(200));
 }
 
 WfdSessionState::WfdSessionState(const InitParams& init_params)

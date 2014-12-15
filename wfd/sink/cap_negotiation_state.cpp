@@ -39,7 +39,6 @@
 #include "wfd/parser/setparameter.h"
 #include "wfd/parser/standbyresumecapability.h"
 #include "wfd/parser/triggermethod.h"
-#include "wfd/common/typed_message.h"
 #include "wfd/parser/uibccapability.h"
 #include "wfd/parser/videoformats.h"
 
@@ -48,60 +47,60 @@ namespace sink {
 
 
 M3Handler::M3Handler(const InitParams& init_params)
-  : MessageReceiver<TypedMessage::M3>(init_params) {
+  : MessageReceiver<Request::M3>(init_params) {
 }
 
-std::unique_ptr<WFD::Reply> M3Handler::HandleMessage(TypedMessage* message) {
-  auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
+  auto reply = std::unique_ptr<Reply>(new Reply(200));
   auto props = message->payload().get_parameter_properties();
-  for (auto it = props.begin(); it != props.end(); it++) {
-      std::shared_ptr<WFD::Property> new_prop;
-      if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_AUDIO_CODECS]){
+  for (auto it = props.begin(); it != props.end(); ++it) {
+      std::shared_ptr<wfd::Property> new_prop;
+      if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_AUDIO_CODECS]){
           // declare that we support absolutely everything, let gstreamer deal with it
-          auto codec_lpcm = new WFD::AudioCodec (WFD::AudioFormat::LPCM, WFD::AudioFormat::Modes(3), 0);
-          auto codec_aac = new WFD::AudioCodec (WFD::AudioFormat::AAC, WFD::AudioFormat::Modes(15), 0);
-          auto codec_ac3 = new WFD::AudioCodec (WFD::AudioFormat::AC3, WFD::AudioFormat::Modes(7), 0);
-          auto codec_list = std::vector<WFD::AudioCodec>();
+          auto codec_lpcm = new wfd::AudioCodec (wfd::AudioFormat::LPCM, wfd::AudioFormat::Modes(3), 0);
+          auto codec_aac = new wfd::AudioCodec (wfd::AudioFormat::AAC, wfd::AudioFormat::Modes(15), 0);
+          auto codec_ac3 = new wfd::AudioCodec (wfd::AudioFormat::AC3, wfd::AudioFormat::Modes(7), 0);
+          auto codec_list = std::vector<wfd::AudioCodec>();
           codec_list.push_back(*codec_lpcm);
           codec_list.push_back(*codec_aac);
           codec_list.push_back(*codec_ac3);
-          new_prop.reset(new WFD::AudioCodecs(codec_list));
+          new_prop.reset(new wfd::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_VIDEO_FORMATS]){
-          auto codec_list = WFD::H264Codecs();
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_VIDEO_FORMATS]){
+          auto codec_list = wfd::H264Codecs();
           // again, declare that we support absolutely everything, let gstreamer deal with it
-          auto codec_cbp = new WFD::H264Codec(1, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
-          auto codec_chp = new WFD::H264Codec(2, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
+          auto codec_cbp = new wfd::H264Codec(1, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
+          auto codec_chp = new wfd::H264Codec(2, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
           codec_list.push_back(*codec_cbp);
           codec_list.push_back(*codec_chp);
-          new_prop.reset(new WFD::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
+          new_prop.reset(new wfd::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_3D_FORMATS]){
-          new_prop.reset(new WFD::Formats3d());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_3D_FORMATS]){
+          new_prop.reset(new wfd::Formats3d());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONTENT_PROTECTION]){
-          new_prop.reset(new WFD::ContentProtection());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CONTENT_PROTECTION]){
+          new_prop.reset(new wfd::ContentProtection());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_DISPLAY_EDID]){
-          new_prop.reset(new WFD::DisplayEdid());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_DISPLAY_EDID]){
+          new_prop.reset(new wfd::DisplayEdid());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_COUPLED_SINK]){
-          new_prop.reset(new WFD::CoupledSink());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_COUPLED_SINK]){
+          new_prop.reset(new wfd::CoupledSink());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CLIENT_RTP_PORTS]){
-          new_prop.reset(new WFD::ClientRtpPorts(manager_->RtpPort(), 0));
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CLIENT_RTP_PORTS]){
+          new_prop.reset(new wfd::ClientRtpPorts(manager_->RtpPort(), 0));
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_I2C]){
-          new_prop.reset(new WFD::I2C(0));
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_I2C]){
+          new_prop.reset(new wfd::I2C(0));
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_UIBC_CAPABILITY]){
-          new_prop.reset(new WFD::UIBCCapability());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_UIBC_CAPABILITY]){
+          new_prop.reset(new wfd::UIBCCapability());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_CONNECTOR_TYPE]){
-          new_prop.reset(new WFD::ConnectorType());
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CONNECTOR_TYPE]){
+          new_prop.reset(new wfd::ConnectorType());
           reply->payload().add_property(new_prop);
-      } else if (*it == WFD::PropertyName::name[WFD::PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
-          new_prop.reset(new WFD::StandbyResumeCapability(false));
+      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
+          new_prop.reset(new wfd::StandbyResumeCapability(false));
           reply->payload().add_property(new_prop);
       } else {
           std::cout << "** GET_PARAMETER: Property not supported" << std::endl;
@@ -113,31 +112,31 @@ std::unique_ptr<WFD::Reply> M3Handler::HandleMessage(TypedMessage* message) {
 
 
 M4Handler::M4Handler(const InitParams& init_params)
-  : MessageReceiver<TypedMessage::M4>(init_params) {
+  : MessageReceiver<Request::M4>(init_params) {
 }
 
-std::unique_ptr<WFD::Reply> M4Handler::HandleMessage(TypedMessage* message) {
+std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto property =
-      static_cast<WFD::PresentationUrl*>(message->payload().get_property(WFD::WFD_PRESENTATION_URL).get());
+      static_cast<wfd::PresentationUrl*>(message->payload().get_property(wfd::WFD_PRESENTATION_URL).get());
 
   // presentation URL is the only thing we care about
   // support for other parameters can be added later as needed
   manager_->SetPresentationUrl(property->presentation_url_1());
-  return std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+  return std::unique_ptr<Reply>(new Reply(200));
 }
 
-class M5Handler final : public MessageReceiver<TypedMessage::M5> {
+class M5Handler final : public MessageReceiver<Request::M5> {
  public:
   M5Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M5>(init_params) {
+    : MessageReceiver<Request::M5>(init_params) {
   }
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override {
+  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
     auto property =
-        static_cast<WFD::TriggerMethod*>(message->payload().get_property(WFD::WFD_TRIGGER_METHOD).get());
+        static_cast<wfd::TriggerMethod*>(message->payload().get_property(wfd::WFD_TRIGGER_METHOD).get());
 
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
+    auto reply = std::unique_ptr<Reply>(new Reply(200));
     reply->header().set_cseq(message->cseq());
-    if (property->method() != WFD::TriggerMethod::SETUP) {
+    if (property->method() != wfd::TriggerMethod::SETUP) {
       reply->set_response_code(303);
     }
 

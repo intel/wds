@@ -22,10 +22,10 @@
 
 #include "setup.h"
 
-namespace WFD {
+namespace wfd {
 
 Setup::Setup(const std::string& request_uri)
- : Message(MessageTypeSetup, request_uri) {
+ : Request(Request::MethodSetup, request_uri) {
 }
 
 Setup::~Setup() {
@@ -38,4 +38,4 @@ std::string Setup::to_string() const {
   return ret + Message::to_string();
 }
 
-} /* namespace WFD */
+} /* namespace wfd */

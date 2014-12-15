@@ -53,19 +53,19 @@ void MessageSequenceHandler::Reset() {
   }
 }
 
-bool MessageSequenceHandler::CanSend(TypedMessage* message) const {
+bool MessageSequenceHandler::CanSend(Message* message) const {
   return current_handler_->CanSend(message);
 }
 
-void MessageSequenceHandler::Send(std::unique_ptr<TypedMessage> message) {
+void MessageSequenceHandler::Send(std::unique_ptr<Message> message) {
   current_handler_->Send(std::move(message));
 }
 
-bool MessageSequenceHandler::CanHandle(TypedMessage* message) const {
+bool MessageSequenceHandler::CanHandle(Message* message) const {
   return current_handler_->CanHandle(message);
 }
 
-void MessageSequenceHandler::Handle(std::unique_ptr<TypedMessage> message) {
+void MessageSequenceHandler::Handle(std::unique_ptr<Message> message) {
   current_handler_->Handle(std::move(message));
 }
 
@@ -121,7 +121,7 @@ void MessageSequenceWithOptionalSetHandler::Reset() {
     handler->Reset();
 }
 
-bool MessageSequenceWithOptionalSetHandler::CanSend(TypedMessage* message) const {
+bool MessageSequenceWithOptionalSetHandler::CanSend(Message* message) const {
   for (MessageHandler* handler : optional_handlers_)
     if (handler->CanSend(message))
       return true;
@@ -132,7 +132,7 @@ bool MessageSequenceWithOptionalSetHandler::CanSend(TypedMessage* message) const
   return false;
 }
 
-void MessageSequenceWithOptionalSetHandler::Send(std::unique_ptr<TypedMessage> message) {
+void MessageSequenceWithOptionalSetHandler::Send(std::unique_ptr<Message> message) {
   for (MessageHandler* handler : optional_handlers_) {
     if (handler->CanSend(message.get())) {
       handler->Send(std::move(message));
@@ -148,7 +148,7 @@ void MessageSequenceWithOptionalSetHandler::Send(std::unique_ptr<TypedMessage> m
   observer_->OnError(this);
 }
 
-bool MessageSequenceWithOptionalSetHandler::CanHandle(TypedMessage* message) const {
+bool MessageSequenceWithOptionalSetHandler::CanHandle(Message* message) const {
   if (MessageSequenceHandler::CanHandle(message))
     return true;
 
@@ -159,7 +159,7 @@ bool MessageSequenceWithOptionalSetHandler::CanHandle(TypedMessage* message) con
   return false;
 }
 
-void MessageSequenceWithOptionalSetHandler::Handle(std::unique_ptr<TypedMessage> message) {
+void MessageSequenceWithOptionalSetHandler::Handle(std::unique_ptr<Message> message) {
   if (MessageSequenceHandler::CanHandle(message.get())) {
      MessageSequenceHandler::Handle(std::move(message));
      return;
@@ -207,23 +207,23 @@ MessageReceiverBase::MessageReceiverBase(const InitParams& init_params)
 
 MessageReceiverBase::~MessageReceiverBase() {}
 
-bool MessageReceiverBase::CanHandle(TypedMessage* message) const {
+bool MessageReceiverBase::CanHandle(Message* message) const {
   assert(message);
   return wait_for_message_;
 }
 
 void MessageReceiverBase::Start() { wait_for_message_ = true; }
 void MessageReceiverBase::Reset() { wait_for_message_ = false; }
-bool MessageReceiverBase::CanSend(TypedMessage* message) const { return false; }
-void MessageReceiverBase::Send(std::unique_ptr<TypedMessage> message) {}
-void MessageReceiverBase::Handle(std::unique_ptr<TypedMessage> message) {
+bool MessageReceiverBase::CanSend(Message* message) const { return false; }
+void MessageReceiverBase::Send(std::unique_ptr<Message> message) {}
+void MessageReceiverBase::Handle(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanHandle(message.get())) {
     observer_->OnError(this);
     return;
   }
   wait_for_message_ = false;
-  std::unique_ptr<WFD::Reply> reply = HandleMessage(message.get());
+  std::unique_ptr<Reply> reply = HandleMessage(message.get());
   if (!reply) {
     observer_->OnError(this);
     return;
@@ -245,23 +245,23 @@ void MessageSenderBase::Reset() {
     cseq_queue_.pop();
 }
 
-void MessageSenderBase::Send(std::unique_ptr<TypedMessage> message) {
+void MessageSenderBase::Send(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanSend(message.get())) {
     observer_->OnError(this);
     return;
   }
   cseq_queue_.push(message->cseq()); // TODO : Add timeout check for reply.
-  sender_->SendRTSPData(message->message()->to_string());
+  sender_->SendRTSPData(message->to_string());
 }
 
-bool MessageSenderBase::CanHandle(TypedMessage* message) const {
+bool MessageSenderBase::CanHandle(Message* message) const {
   assert(message);
-  return (message->type() == TypedMessage::Reply) && !cseq_queue_.empty() &&
+  return message->is_reply() && !cseq_queue_.empty() &&
          (message->cseq() == cseq_queue_.front());
 }
 
-void MessageSenderBase::Handle(std::unique_ptr<TypedMessage> message) {
+void MessageSenderBase::Handle(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanHandle(message.get())) {
     observer_->OnError(this);
@@ -277,7 +277,7 @@ void MessageSenderBase::Handle(std::unique_ptr<TypedMessage> message) {
   }
 }
 
-SequencedMessageSender::SequencedMessageSender(const InitParams &init_params)
+SequencedMessageSender::SequencedMessageSender(const InitParams& init_params)
   : MessageSenderBase(init_params),
     to_be_send_(nullptr) {
 }
@@ -296,7 +296,7 @@ void SequencedMessageSender::Reset() {
   MessageSenderBase::Reset();
 }
 
-bool SequencedMessageSender::CanSend(TypedMessage* message) const {
+bool SequencedMessageSender::CanSend(Message* message) const {
   return message && (message == to_be_send_);
 }
 

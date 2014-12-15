@@ -22,7 +22,7 @@
 
 #include "i2c.h"
 
-namespace WFD {
+namespace wfd {
 
 I2C::I2C(int port) : Property(WFD_I2C), port_(port) {
 }
@@ -32,8 +32,8 @@ I2C::~I2C() {
 
 std::string I2C::to_string() const {
   std::string ret = PropertyName::wfd_I2C + std::string(SEMICOLON)
-    + std::string(SPACE) + (is_supported() ? std::to_string(port()) : WFD::NONE);
+    + std::string(SPACE) + (is_supported() ? std::to_string(port()) : wfd::NONE);
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

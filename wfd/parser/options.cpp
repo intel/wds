@@ -22,10 +22,10 @@
 
 #include "options.h"
 
-namespace WFD {
+namespace wfd {
 
 Options::Options(const std::string& request_uri)
-  : Message(MessageTypeOptions, request_uri) {
+  : Request(Request::MethodOptions, request_uri) {
 }
 
 Options::~Options() {
@@ -38,4 +38,4 @@ std::string Options::to_string() const {
   return ret + Message::to_string();
 }
 
-} // namespace WFD
+} // namespace wfd

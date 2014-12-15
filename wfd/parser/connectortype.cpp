@@ -24,7 +24,7 @@
 
 #include "macros.h"
 
-namespace WFD {
+namespace wfd {
 
 ConnectorType::ConnectorType()
   : Property(WFD_CONNECTOR_TYPE, true) {
@@ -43,7 +43,7 @@ std::string ConnectorType::to_string() const {
     + std::string(SPACE);
 
   if (is_none()) {
-    ret += WFD::NONE;
+    ret += wfd::NONE;
   } else {
     MAKE_HEX_STRING_2(connector_type, connector_type_);
     ret += connector_type;
@@ -52,4 +52,4 @@ std::string ConnectorType::to_string() const {
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

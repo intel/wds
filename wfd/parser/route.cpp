@@ -22,7 +22,7 @@
 
 #include "route.h"
 
-namespace WFD {
+namespace wfd {
 
 namespace {
 const char primary[] = "primary";
@@ -43,4 +43,4 @@ std::string Route::to_string() const {
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

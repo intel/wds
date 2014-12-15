@@ -25,12 +25,11 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
 class Reply: public Message {
  public:
   explicit Reply(int response_code = 200);
-  Reply(const Reply& other) = default;
   virtual ~Reply();
 
   int response_code() const { return response_code_; }
@@ -42,6 +41,6 @@ class Reply: public Message {
   int response_code_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // REPLY_H_

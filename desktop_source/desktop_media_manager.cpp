@@ -41,7 +41,7 @@ std::string DesktopMediaManager::PresentationUrl() const {
   return std::string();
 }
 
-void DesktopMediaManager::SetSession(std::string& session) {
+void DesktopMediaManager::SetSession(const std::string& session) {
 }
 
 std::string DesktopMediaManager::Session() const {

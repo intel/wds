@@ -23,7 +23,7 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-namespace WFD {
+namespace wfd {
 
 const char SEMICOLON[] = ":";
 const char SPACE[] = " ";
@@ -130,6 +130,6 @@ namespace MethodName {
                               ORG_WFA_WFD1_0 };
 }
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // CONSTANTS_H_

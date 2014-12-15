@@ -22,7 +22,7 @@
 
 #include "idrrequest.h"
 
-namespace WFD {
+namespace wfd {
 
 IDRRequest::IDRRequest() : Property(WFD_IDR_REQUEST) {
 }
@@ -34,4 +34,4 @@ std::string IDRRequest::to_string() const {
   return std::string("wfd_idr_request");
 }
 
-}  // namespace WFD
+}  // namespace wfd

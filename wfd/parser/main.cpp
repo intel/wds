@@ -24,15 +24,15 @@
 
 int  main(const int argc, const char **argv)
 {
-  WFD::Driver driver;
+  wfd::Driver driver;
+  wfd::Message* wfd_message = nullptr;
   std::string message_header("RTSP/1.0 200 OK\nCSeq: 2\r\n"
                              "Date: Sun, Aug 21 2011 04:20:53 GMT\r\n"
                              "Public: org.wfa.wfd1.0, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER\r\n"
                              "Require: org.wfa.wfd1.0");
-  driver.parse_header(message_header);
+  driver.Parse(message_header, wfd_message);
   std::string message_payload("wfd_audio_codecs: LPCM 00000003 00, AC3 00000003 02");
-  driver.parse_payload(message_payload);
+  driver.Parse(message_payload, wfd_message);
 
-  std::shared_ptr<WFD::Message> wfd_message(driver.parsed_message());
   std::cout << wfd_message->to_string() << std::endl;
 }

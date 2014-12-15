@@ -23,22 +23,23 @@
 
 namespace wfd {
 
+// FIXME : re-write in more robust way (handle granular input).
 void RTSPInputHandler::InputReceived(const std::string& input) {
   rtsp_recieve_buffer_ += input;
   std::string buffer;
 
   while(GetHeader(buffer)) {
-    driver_.parse_header(buffer);
-    WFD::MessagePtr rtsp_message = driver_.parsed_message();
-    if (!rtsp_message.get()) {
+    Message* message = nullptr;
+    driver_.Parse(buffer, message);
+    if (!message) {
       // TODO : handle an invalid input.
       rtsp_recieve_buffer_.clear();
       return;
     }
-    uint content_length = rtsp_message->header().content_length();
+    uint content_length = message->header().content_length();
     if (content_length && GetPayload(buffer, content_length))
-      driver_.parse_payload(buffer);
-      MessageParsed(rtsp_message);
+      driver_.Parse(buffer, message);
+    MessageParsed(std::unique_ptr<Message>(message));
   }
 }
 

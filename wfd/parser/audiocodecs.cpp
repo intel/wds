@@ -26,7 +26,7 @@
 
 #include "macros.h"
 
-namespace WFD {
+namespace wfd {
 
 AudioCodec::AudioCodec(const AudioFormat::Type& audio_format,
     const AudioFormat::Modes& audio_modes, unsigned short latency) {
@@ -101,10 +101,10 @@ std::string AudioCodecs::to_string() const {
       ++i;
     }
   } else {
-    ret += WFD::NONE;
+    ret += wfd::NONE;
   }
 
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

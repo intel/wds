@@ -28,7 +28,7 @@
 #include <vector>
 #include <bitset>
 
-namespace WFD {
+namespace wfd {
 
 namespace AudioFormat {
   enum Type {
@@ -84,6 +84,6 @@ class AudioCodecs: public Property {
   std::vector<AudioCodec> audio_codecs_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // AUDIOCODECS_H_

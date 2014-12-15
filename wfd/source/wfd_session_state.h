@@ -35,22 +35,22 @@ class WfdSessionState : public MessageSequenceWithOptionalSetHandler {
   virtual ~WfdSessionState();
 };
 
-class M8Handler final : public MessageReceiver<TypedMessage::M8> {
+class M8Handler final : public MessageReceiver<Request::M8> {
  public:
   M8Handler(const InitParams& init_params);
 
  private:
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(
-      TypedMessage* message) override;
+  virtual std::unique_ptr<Reply> HandleMessage(
+      Message* message) override;
 };
 
-class M7Handler final : public MessageReceiver<TypedMessage::M7> {
+class M7Handler final : public MessageReceiver<Request::M7> {
  public:
   M7Handler(const InitParams& init_params);
 
  private:
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(
-      TypedMessage* message) override;
+  virtual std::unique_ptr<Reply> HandleMessage(
+      Message* message) override;
 };
 
 }  // source

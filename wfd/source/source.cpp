@@ -28,7 +28,6 @@
 #include "wfd_session_state.h"
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
-#include "wfd/common/typed_message.h"
 #include "wfd/common/wfd_export.h"
 #include "wfd/parser/setparameter.h"
 
@@ -36,39 +35,44 @@ namespace wfd {
 
 namespace {
 
-std::unique_ptr<TypedMessage> CreateTypedMessage(WFD::MessagePtr message) {
-  switch(message->type()) {
-  case WFD::Message::MessageTypeReply:
-    return std::unique_ptr<TypedMessage>(new Reply(message));
-  case WFD::Message::MessageTypeOptions:
-    return std::unique_ptr<TypedMessage>(new M2(message));
-  case WFD::Message::MessageTypeSetup:
-    return std::unique_ptr<TypedMessage>(new M6(message));
-  case WFD::Message::MessageTypePlay:
-    return std::unique_ptr<TypedMessage>(new M7(message));
-  case WFD::Message::MessageTypeTeardown:
-    return std::unique_ptr<TypedMessage>(new M8(message));
-  case WFD::Message::MessageTypePause:
-    return std::unique_ptr<TypedMessage>(new M9(message));
-  case WFD::Message::MessageTypeSetParameter:
-    if (message->payload().has_property(WFD::WFD_ROUTE))
-      return std::unique_ptr<TypedMessage>(new M10(message));
-    else if (message->payload().has_property(WFD::WFD_CONNECTOR_TYPE))
-      return std::unique_ptr<TypedMessage>(new M11(message));
-    else if (message->payload().has_property(WFD::WFD_STANDBY))
-      return std::unique_ptr<TypedMessage>(new M12(message));
-    else if (message->payload().has_property(WFD::WFD_IDR_REQUEST))
-      return std::unique_ptr<TypedMessage>(new M13(message));
-    else if (message->payload().has_property(WFD::WFD_UIBC_CAPABILITY))
-      return std::unique_ptr<TypedMessage>(new M14(message));
-    else if (message->payload().has_property(WFD::WFD_UIBC_SETTING))
-      return std::unique_ptr<TypedMessage>(new M15(message));
+bool InitializeRequestId(Request* request) {
+  Request::ID id;
+  switch(request->method()) {
+  case Request::MethodOptions:
+    id = Request::M2;
+    break;
+  case Request::MethodSetup:
+    id = Request::M6;
+    break;
+  case Request::MethodPlay:
+    id = Request::M7;
+    break;
+  case Request::MethodTeardown:
+    id = Request::M8;
+    break;
+  case Request::MethodPause:
+    id = Request::M9;
+    break;
+  case Request::MethodSetParameter:
+    if (request->payload().has_property(WFD_ROUTE))
+      id = Request::M10;
+    else if (request->payload().has_property(WFD_CONNECTOR_TYPE))
+      id = Request::M11;
+    else if (request->payload().has_property(WFD_STANDBY))
+      id = Request::M12;
+    else if (request->payload().has_property(WFD_IDR_REQUEST))
+      id = Request::M13;
+    else if (request->payload().has_property(WFD_UIBC_CAPABILITY))
+      id = Request::M14;
+    else if (request->payload().has_property(WFD_UIBC_SETTING))
+      id = Request::M15;
+    break;
   default:
-      break;
-      // TODO: warning.
+    // TODO: warning.
+    return false;
   }
-
-  return nullptr;
+  request->set_id(id);
+  return true;
 }
 
 }
@@ -103,7 +107,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   virtual void OnError(MessageHandler* handler) override;
 
   // RTSPInputHandler
-  virtual void MessageParsed(WFD::MessagePtr message) override;
+  virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
   std::unique_ptr<SourceStateMachine> state_machine_;
 };
@@ -122,20 +126,21 @@ void SourceImpl::RTSPDataReceived(const std::string& message) {
 
 namespace  {
 
-std::unique_ptr<TypedMessage> CreateM5(int send_cseq, WFD::TriggerMethod::Method method) {
-  auto set_param =
-      std::make_shared<WFD::SetParameter>("rtsp://localhost/wfd1.0");
+std::unique_ptr<Message> CreateM5(int send_cseq, wfd::TriggerMethod::Method method) {
+  auto set_param = std::unique_ptr<Request>(
+      new SetParameter("rtsp://localhost/wfd1.0"));
   set_param->header().set_cseq(send_cseq);
   set_param->payload().add_property(
-      std::shared_ptr<WFD::Property>(new WFD::TriggerMethod(method)));
-  return std::unique_ptr<TypedMessage>(new M5(set_param));
+      std::shared_ptr<wfd::Property>(new TriggerMethod(method)));
+  set_param->set_id(Request::M5);
+  return std::move(set_param);
 }
 
 }
 
 bool SourceImpl::Teardown() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     WFD::TriggerMethod::TEARDOWN);
+                     wfd::TriggerMethod::TEARDOWN);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -145,7 +150,7 @@ bool SourceImpl::Teardown() {
 
 bool SourceImpl::Play() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     WFD::TriggerMethod::PLAY);
+                     wfd::TriggerMethod::PLAY);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -155,7 +160,7 @@ bool SourceImpl::Play() {
 
 bool SourceImpl::Pause() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     WFD::TriggerMethod::PAUSE);
+                     wfd::TriggerMethod::PAUSE);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -167,10 +172,10 @@ void SourceImpl::OnCompleted(MessageHandler* handler) {}
 
 void SourceImpl::OnError(MessageHandler* handler) {}
 
-void SourceImpl::MessageParsed(WFD::MessagePtr message) {
-  auto typed_message = CreateTypedMessage(message);
-  if (typed_message)
-    state_machine_->Handle(std::move(typed_message));
+void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
+  if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
+    return; // FIXME : Report error.
+  state_machine_->Handle(std::move(message));
 }
 
 WFD_EXPORT Source* Source::Create(Delegate* delegate, MediaManager* mng) {

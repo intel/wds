@@ -24,7 +24,7 @@
 
 #include "genericproperty.h"
 
-namespace WFD {
+namespace wfd {
 
 GenericProperty::GenericProperty() : Property(WFD_GENERIC) {
 }
@@ -42,4 +42,4 @@ std::string GenericProperty::to_string() const{
   return key_ + ": " + value_;
 }
 
-}  // namespace WFD
+}  // namespace wfd

@@ -31,30 +31,19 @@
 #include "payload.h"
 #include "parser.tab.hpp"
 
-namespace WFD {
-
+namespace wfd {
 
 class Driver {
  public:
-  Driver();
-  virtual ~Driver();
+  ~Driver();
 
-  void parse_header(const std::string& message);
-  void parse_payload(const std::string& message);
-  std::shared_ptr<Message> parsed_message() const { return message_; }
-
- private:
-  friend class Parser;
-  void set_message(Message* message);
-  void set_payload(Payload* payload);
-  void parse(const std::string& message);
+  void Parse(const std::string& input, Message*& message /*out*/);
 
  private:
   std::unique_ptr<Parser> parser_;
   std::unique_ptr<Scanner> scanner_;
-  std::shared_ptr<Message> message_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // DRIVER_H_

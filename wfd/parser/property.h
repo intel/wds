@@ -28,7 +28,7 @@
 
 #include "constants.h"
 
-namespace WFD {
+namespace wfd {
 
 class Property {
  public:
@@ -47,6 +47,6 @@ class Property {
   bool is_none_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // PROPERTY_H_

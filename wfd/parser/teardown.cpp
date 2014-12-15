@@ -22,10 +22,10 @@
 
 #include "teardown.h"
 
-namespace WFD {
+namespace wfd {
 
 Teardown::Teardown(const std::string& request_uri)
- : Message(MessageTypeTeardown, request_uri) {
+ : Request(Request::MethodTeardown, request_uri) {
 }
 
 Teardown::~Teardown() {
@@ -38,4 +38,4 @@ std::string Teardown::to_string() const {
   return ret + Message::to_string();
 }
 
-} /* namespace WFD */
+} /* namespace wfd */

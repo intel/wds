@@ -25,15 +25,15 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
-class Pause : public Message {
+class Pause : public Request {
  public:
     explicit Pause(const std::string& request_uri);
     virtual ~Pause();
     virtual std::string to_string() const override;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // PAUSE_H_

@@ -24,7 +24,7 @@
 
 #include "macros.h"
 
-namespace WFD {
+namespace wfd {
 
 PreferredDisplayMode::PreferredDisplayMode(
     unsigned int p_clock,unsigned short h,
@@ -83,4 +83,4 @@ std::string PreferredDisplayMode::to_string() const {
 PreferredDisplayMode::~PreferredDisplayMode() {
 }
 
-}  // namespace WFD
+}  // namespace wfd

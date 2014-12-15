@@ -22,7 +22,7 @@
 
 #include "payload.h"
 
-namespace WFD {
+namespace wfd {
 
 Payload::Payload() {
 }
@@ -43,7 +43,7 @@ Payload::Payload(const PropertyErrorMap& property_errors)
 Payload::~Payload() {
 }
 
-std::shared_ptr<WFD::Property> Payload::get_property(std::string name) const
+std::shared_ptr<wfd::Property> Payload::get_property(std::string name) const
 {
   auto property = properties_.find(name);
   if (property != properties_.end())
@@ -51,16 +51,16 @@ std::shared_ptr<WFD::Property> Payload::get_property(std::string name) const
   return nullptr;
 }
 
-std::shared_ptr<WFD::Property> Payload::get_property(WFD::PropertyType type) const
+std::shared_ptr<wfd::Property> Payload::get_property(wfd::PropertyType type) const
 {
   if (type == WFD_GENERIC)
     return nullptr;
 
-  return get_property(WFD::PropertyName::name[type]);
+  return get_property(wfd::PropertyName::name[type]);
 }
 
-bool Payload::has_property(WFD::PropertyType type) const {
-  return properties_.find(WFD::PropertyName::name[type]) != properties_.end();
+bool Payload::has_property(wfd::PropertyType type) const {
+  return properties_.find(wfd::PropertyName::name[type]) != properties_.end();
 }
 
 void Payload::add_property(const std::shared_ptr<Property>& property) {
@@ -76,7 +76,7 @@ const PropertyMap& Payload::properties() const {
   return properties_;
 }
 
-std::shared_ptr<WFD::PropertyErrors> Payload::get_property_error(std::string name) const
+std::shared_ptr<wfd::PropertyErrors> Payload::get_property_error(std::string name) const
 {
   auto property_error = property_errors_.find(name);
   if (property_error != property_errors_.end())
@@ -84,15 +84,15 @@ std::shared_ptr<WFD::PropertyErrors> Payload::get_property_error(std::string nam
   return nullptr;
 }
 
-std::shared_ptr<WFD::PropertyErrors> Payload::get_property_error(WFD::PropertyType type) const
+std::shared_ptr<wfd::PropertyErrors> Payload::get_property_error(wfd::PropertyType type) const
 {
   if (type == WFD_GENERIC)
     return nullptr;
 
-  return get_property_error(WFD::PropertyName::name[type]);
+  return get_property_error(wfd::PropertyName::name[type]);
 }
 
-void Payload::add_property_error(const std::shared_ptr<WFD::PropertyErrors>& errors) {
+void Payload::add_property_error(const std::shared_ptr<wfd::PropertyErrors>& errors) {
   if (errors->type() == WFD_GENERIC) {
     property_errors_[errors->generic_property_name()] = errors;
   } else {
@@ -105,7 +105,7 @@ const PropertyErrorMap& Payload::property_errors() const {
 }
 
 void Payload::add_get_parameter_property(const PropertyType& type) {
-  request_properties_.push_back(WFD::PropertyName::name[type]);
+  request_properties_.push_back(wfd::PropertyName::name[type]);
 }
 
 void Payload::add_get_parameter_property(const std::string& generic_property) {
@@ -147,4 +147,4 @@ std::string Payload::to_string() const {
   return ret;
 }
 
-} // namespace WFD
+} // namespace wfd

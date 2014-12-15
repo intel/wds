@@ -33,13 +33,13 @@ class RTSPInputHandler {
   virtual ~RTSPInputHandler() {}
 
   void InputReceived(const std::string& input);
-  virtual void MessageParsed(WFD::MessagePtr message) = 0;
+  virtual void MessageParsed(std::unique_ptr<Message> message) = 0;
 
  private:
   bool GetHeader(std::string& header);
   bool GetPayload(std::string& payload, unsigned content_length);
 
-  WFD::Driver driver_;
+  Driver driver_;
   std::string rtsp_recieve_buffer_;
 };
 

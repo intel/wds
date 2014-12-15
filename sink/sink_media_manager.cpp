@@ -53,7 +53,7 @@ std::string SinkMediaManager::PresentationUrl() const {
   return presentation_url_;
 }
 
-void SinkMediaManager::SetSession(std::string& session) {
+void SinkMediaManager::SetSession(const std::string& session) {
   session_ = session;
 }
 

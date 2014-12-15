@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class DisplayEdid: public Property {
  public:
@@ -42,6 +42,6 @@ class DisplayEdid: public Property {
   std::string edid_payload_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // DISPLAYEDID_H_

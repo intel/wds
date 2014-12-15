@@ -28,54 +28,81 @@
 #include "header.h"
 #include "payload.h"
 
-namespace WFD {
+namespace wfd {
 
 class Message {
-
  public:
-
-  enum MessageType {
-    MessageTypeOptions = 1,
-    MessageTypeSetParameter,
-    MessageTypeGetParameter,
-    MessageTypeSetup,
-    MessageTypePlay,
-    MessageTypeTeardown,
-    MessageTypePause,
-    MessageTypeReply
-  };
-
- public:
-  Message(MessageType type, const std::string& request_uri = std::string());
+  explicit Message(bool is_reply);
   virtual ~Message();
 
-  MessageType type() const;
+  bool is_reply() const { return is_reply_; }
+  bool is_request() const { return !is_reply_; }
 
-  bool is_reply() const { return type() == MessageTypeReply; }
-  bool is_request() const { return !is_reply(); }
+  int cseq() const;
 
-  const std::string& request_uri() const { return request_uri_; }
-  void set_request_uri(const std::string& request_uri);
+  void set_header(std::unique_ptr<Header> header) {
+    header_ = std::move(header);
+  }
 
-  void set_header(Header* header);
-  Header& header() const;
+  Header& header();
 
-  void set_payload(Payload* payload);
-  Payload& payload() const;
+  void set_payload(std::unique_ptr<Payload> payload) {
+    payload_ = std::move(payload);
+  }
+
+  Payload& payload();
 
   virtual std::string to_string() const;
 
  protected:
-  MessageType type_;
+  std::unique_ptr<Header> header_;
+  std::unique_ptr<Payload> payload_;
 
  private:
-  std::string request_uri_;
-  mutable std::unique_ptr<Header> header_;
-  mutable std::unique_ptr<Payload> payload_;
+  bool is_reply_;
 };
 
-typedef std::shared_ptr<Message> MessagePtr;
+class Request : public Message {
+ public:
+  enum ID {
+      UNKNOWN, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, M13, M14,
+      M15, M16
+  };
 
-}  // namespace WFD
+  enum RTSPMethod {
+    MethodOptions = 1,
+    MethodSetParameter,
+    MethodGetParameter,
+    MethodSetup,
+    MethodPlay,
+    MethodTeardown,
+    MethodPause
+  };
+
+  Request(RTSPMethod method, const std::string& request_uri = std::string());
+  virtual ~Request();
+
+  const std::string& request_uri() const { return request_uri_; }
+  void set_request_uri(const std::string& request_uri) {
+    request_uri_ = request_uri;
+  }
+
+  ID id() const { return id_; }
+  void set_id(ID id) { id_ = id; }
+
+  RTSPMethod method() const { return method_; }
+  void set_method(RTSPMethod method) { method_ = method; }
+
+ private:
+  ID id_;
+  RTSPMethod method_;
+  std::string request_uri_;
+};
+
+inline Request* ToRequest(Message* message) {
+  return static_cast<Request*>(message);
+}
+
+}  // namespace wfd
 
 #endif  // MESSAGE_H_

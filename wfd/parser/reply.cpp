@@ -22,7 +22,7 @@
 
 #include "reply.h"
 
-namespace WFD {
+namespace wfd {
 
 namespace {
   const char kRTSPHeader[] = "RTSP/1.0 ";
@@ -30,7 +30,7 @@ namespace {
 }
 
 Reply::Reply(int response_code)
-: Message(MessageTypeReply),
+: Message(true /* is_reply */),
   response_code_(response_code) {
 }
 
@@ -44,4 +44,4 @@ std::string Reply::to_string() const {
   return ret + Message::to_string();
 }
 
-}  // namespace WFD
+}  // namespace wfd
