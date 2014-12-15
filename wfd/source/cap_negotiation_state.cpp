@@ -85,7 +85,7 @@ std::unique_ptr<TypedMessage> M4Handler::CreateMessage() {
       std::shared_ptr<WFD::Property>(new WFD::ClientRtpPorts(1028,0)));
   set_param->payload().add_property(
       std::shared_ptr<WFD::Property>(new WFD::PresentationUrl(
-          "rtsp://192.168.173.1/wfd1.0/streamid=0",
+          "rtsp://127.0.0.1/wfd1.0/streamid=0",
           "")));
   return std::unique_ptr<M4>(new M4(set_param));
 }
