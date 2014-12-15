@@ -26,22 +26,64 @@
 
 namespace wfd {
 
+/**
+ * Peer interface.
+ *
+ * Peer is a base class for sink and source state machines.
+ */
 class Peer {
  public:
+  /**
+   * Delegate interface.
+   *
+   * Implementation of Delegate interface is responsible for sending serialized
+   * RTSP messages over the TCP/IP connection.
+   */
   class Delegate {
    public:
+    /**
+     * Sends RTSP data over the network
+     */
     virtual void SendRTSPData(const std::string& data) = 0;
    protected:
     virtual ~Delegate() {}
   };
   virtual ~Peer() {}
+
+  /**
+   * Starts wfd state machine (source or sink)
+   */
   virtual void Start() = 0;
+
+  /**
+   * Whenever RTSP data is received, this method should be called, so that
+   * the state machine could decide action based on current state.
+   */
   virtual void RTSPDataReceived(const std::string& data) = 0;
-  // These send M5 wfd_trigger_method messages for Peers that implement
+
+  // Following methods:
+  // @see Teardown()
+  // @see Play()
+  // @see Pause()
+  // send M5 wfd_trigger_method messages for Peers that implement
   // Source functionality or M7, M8 and M9 for Sink implementations
-  // return 'false' if message cannot be send at the moment.
+
+  /**
+   * Sends RTSP teardown request.
+   * @return true if request can be sent, false otherwise.
+   */
   virtual bool Teardown() = 0;
+
+  /**
+   * Sends RTSP play request.
+   * @return true if request can be sent, false otherwise.
+   */
   virtual bool Play() = 0;
+
+  /**
+   * Sends RTSP pause request.
+   * @return true if request can be sent, false otherwise.
+   */
   virtual bool Pause() = 0;
 };
 

@@ -61,7 +61,7 @@ class M7Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrl());
+    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrls().first);
     play->header().set_session(manager_->Session());
     play->header().set_cseq (send_cseq_++);
     return std::unique_ptr<M7>(new M7(play));
@@ -86,7 +86,7 @@ class M8Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto teardown = std::make_shared<WFD::Teardown>(manager_->PresentationUrl());
+    auto teardown = std::make_shared<WFD::Teardown>(manager_->PresentationUrls().first);
     teardown->header().set_session(manager_->Session());
     teardown->header().set_cseq (send_cseq_++);
     return std::unique_ptr<M8>(new M8(teardown));
@@ -108,7 +108,7 @@ class M9Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto pause = std::make_shared<WFD::Pause>(manager_->PresentationUrl());
+    auto pause = std::make_shared<WFD::Pause>(manager_->PresentationUrls().first);
     pause->header().set_session(manager_->Session());
     pause->header().set_cseq (send_cseq_++);
     return std::unique_ptr<M9>(new M9(pause));

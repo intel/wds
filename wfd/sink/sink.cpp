@@ -117,7 +117,7 @@ void SinkImpl::RTSPDataReceived(const std::string& message) {
 
 template <typename WfdMessage, typename TypedWfdMessage>
 std::unique_ptr<TypedMessage> SinkImpl::CreateCommand() {
-  auto message = std::make_shared<WfdMessage>(manager_->PresentationUrl());
+  auto message = std::make_shared<WfdMessage>(manager_->PresentationUrls().first);
   message->header().set_session(manager_->Session());
   message->header().set_cseq(state_machine_->GetNextCSeq());
   return std::unique_ptr<TypedMessage>(new TypedWfdMessage(message));
@@ -125,7 +125,7 @@ std::unique_ptr<TypedMessage> SinkImpl::CreateCommand() {
 
 bool SinkImpl::HandleCommand(std::unique_ptr<TypedMessage> command) {
   if (manager_->Session().empty() ||
-      manager_->PresentationUrl().empty())
+      manager_->PresentationUrls().first.empty())
     return false;
 
   if (!state_machine_->CanSend(command.get()))

@@ -13,10 +13,11 @@ class DesktopMediaManager : public wfd::MediaManager {
   virtual void Pause() override;
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
-  virtual void SetRtpPorts(int port1, int port2) override;
-  virtual int RtpPort() const override;
-  virtual void SetPresentationUrl(const std::string& url) override;
-  virtual std::string PresentationUrl() const override;
+  virtual void SetRtpPorts(int port0, int port1) override;
+  virtual std::pair<int, int> RtpPorts() const override;
+  virtual void SetPresentationUrls(const std::string& url0,
+      const std::string& url1) override;
+  virtual std::pair<std::string, std::string> PresentationUrls() const override;
   virtual void SetSession(std::string& session) override;
   virtual std::string Session() const override;
 
