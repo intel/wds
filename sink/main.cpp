@@ -108,12 +108,12 @@ int main (int argc, char *argv[])
 {
     SinkAppData data;
     gchar* hostname_option = NULL;
-    data.port = 8080;
+    data.port = 7236;
 
     GOptionEntry main_entries[] =
     {
         { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname_option, "Specify optional hostname, local host by default", "host"},
-        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &(data.port), "Specify optional RTSP port number, 8080 by default", "rtsp_port"},
+        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &(data.port), "Specify optional RTSP port number, 7236 by default", "rtsp_port"},
         { NULL }
     };
 

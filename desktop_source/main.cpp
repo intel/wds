@@ -92,7 +92,7 @@ static gboolean _user_input_handler (
 int main (int argc, char *argv[])
 {
     SourceAppData data;
-    data.port = 8080;
+    data.port = 7236;
 
     GOptionEntry main_entries[] =
     {
