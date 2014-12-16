@@ -39,9 +39,9 @@ class M6Handler final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto setup = std::make_shared<WFD::Setup>(manager_->PresentationUrl());
+    auto setup = std::make_shared<WFD::Setup>(manager_->PresentationUrls().first);
     auto transport = new WFD::TransportHeader();
-    transport->set_client_port(manager_->RtpPort());
+    transport->set_client_port(manager_->RtpPorts().first);
 
     setup->header().set_transport(transport);
     setup->header().set_cseq(send_cseq_++);
@@ -66,7 +66,7 @@ class M7Handler final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrl());
+    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrls().first);
     play->header().set_session(manager_->Session());
     play->header().set_cseq(send_cseq_++);
     play->header().set_require_wfd_support(true);

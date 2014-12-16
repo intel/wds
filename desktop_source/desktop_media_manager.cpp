@@ -30,15 +30,16 @@ void DesktopMediaManager::SetRtpPorts(int port1, int port2) {
   gst_pipeline_->SetState(GST_STATE_READY);
 }
 
-int DesktopMediaManager::RtpPort() const {
-  return gst_pipeline_->UdpSourcePort();
+std::pair<int, int> DesktopMediaManager::RtpPorts() const {
+  return std::make_pair(gst_pipeline_->UdpSourcePort(), 0);
 }
 
-void DesktopMediaManager::SetPresentationUrl(const std::string& url) {
+void DesktopMediaManager::SetPresentationUrls(const std::string& url0,
+    const std::string& url1) {
 }
 
-std::string DesktopMediaManager::PresentationUrl() const {
-  return std::string();
+std::pair<std::string, std::string> DesktopMediaManager::PresentationUrls() const {
+  return std::pair<std::string, std::string>();
 }
 
 void DesktopMediaManager::SetSession(std::string& session) {
