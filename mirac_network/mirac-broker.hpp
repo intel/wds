@@ -28,8 +28,8 @@
 #include <glib.h>
 #include <memory>
 
+#include "wfd/public/peer.h"
 #include "mirac-network.hpp"
-#include "driver.h"
 
 class MiracBrokerObserver
 {
@@ -37,7 +37,7 @@ class MiracBrokerObserver
         virtual ~MiracBrokerObserver();
 };
 
-class MiracBroker
+class MiracBroker : public wfd::Peer::Delegate
 {
     public:
         MiracBroker (const std::string& listen_port);
@@ -47,8 +47,10 @@ class MiracBroker
         std::string get_peer_address() const;
 
     protected:
-        virtual void got_message(std::shared_ptr<WFD::Message> message) = 0;
-        void send(WFD::Message& message) const;
+        // wfd::Peer::Delegate
+        virtual void SendRTSPData(const std::string& data) override;
+
+        virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};
 
     private:
@@ -64,9 +66,6 @@ class MiracBroker
 
         void handle_body(const std::string msg);
         void handle_header(const std::string msg);
-
-        WFD::Driver driver_;
-        std::shared_ptr<WFD::Message> message_;
 
         std::unique_ptr<MiracNetwork> network_;
         std::unique_ptr<MiracNetwork> connection_;

@@ -53,6 +53,15 @@ void MiracGstTestSource::SetState(GstState state)
     }
 }
 
+GstState MiracGstTestSource::GetState() const
+{
+    if (!gst_elem)
+        return GST_STATE_NULL;
+    GstState result;
+    gst_element_get_state (gst_elem, &result, NULL, GST_CLOCK_TIME_NONE);
+    return result;
+}
+
 int MiracGstTestSource::UdpSourcePort()
 {
     if (gst_elem == NULL)

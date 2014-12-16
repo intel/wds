@@ -245,13 +245,12 @@ unsigned short MiracNetwork::GetHostPort ()
 bool MiracNetwork::Receive (std::string &message)
 {
     int ec;
-    size_t eom;
     char nb[page_size];
 
     do {
         ec = recv(handle, nb, page_size, 0);
         if (ec > 0)
-            recv_buf.append(nb, ec);
+            message.append(nb, ec);
         else if (ec < 0)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -262,11 +261,6 @@ bool MiracNetwork::Receive (std::string &message)
             throw MiracConnectionLostException( __FUNCTION__);
     } while (ec > 0);
 
-    eom = recv_buf.find("\r\n\r\n");
-    if (eom == std::string::npos)
-        return false;
-    message = recv_buf.substr(0, eom + 4);
-    recv_buf.erase(0, eom + 4);
     return true;
 }
 
