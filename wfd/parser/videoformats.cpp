@@ -24,7 +24,7 @@
 
 #include "macros.h"
 
-namespace WFD {
+namespace wfd {
 
 
 H264Codec::H264Codec(unsigned char profile, unsigned char level,
@@ -107,7 +107,7 @@ std::string VideoFormats::to_string() const {
       + std::string(SEMICOLON)+ std::string(SPACE);
 
   if (is_none())
-    return ret + WFD::NONE;
+    return ret + wfd::NONE;
 
   MAKE_HEX_STRING_2(native, native_);
   MAKE_HEX_STRING_2(preferred_display_mode, preferred_display_mode_);
@@ -127,4 +127,4 @@ std::string VideoFormats::to_string() const {
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

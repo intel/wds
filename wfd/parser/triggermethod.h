@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class TriggerMethod : public Property {
  public:
@@ -47,6 +47,6 @@ class TriggerMethod : public Property {
   TriggerMethod::Method method_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // TRIGGERMETHOD_H_

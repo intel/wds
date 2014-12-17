@@ -1,7 +1,7 @@
 %option debug
 %option nodefault
 %option c++
-%option yyclass="WFD::HeaderScanner"
+%option yyclass="wfd::HeaderScanner"
 %option prefix="Hdr_"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state
@@ -27,7 +27,7 @@
 
 #include <string>
 #include "headerscanner.h"
-typedef WFD::Parser::token token;
+typedef wfd::Parser::token token;
 #define yyterminate() return(token::END)
 %}
 

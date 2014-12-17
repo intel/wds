@@ -25,15 +25,15 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
-class Options: public Message {
+class Options: public Request {
   public:
     explicit Options(const std::string& request_uri);
     virtual ~Options();
     virtual std::string to_string() const override;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // OPTIONS_H_

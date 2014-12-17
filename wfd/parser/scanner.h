@@ -29,29 +29,29 @@
 
 class yyFlexLexer;
 
-namespace WFD {
+namespace wfd {
 
 class BaseLexer {
  public:
-  BaseLexer() : yylval(nullptr) {}
+  BaseLexer() = default;
   virtual ~BaseLexer();
-  virtual int yylex(WFD::Parser::semantic_type *lval);
+  virtual int yylex(Parser::semantic_type *lval);
 
  protected:
   virtual int yylex() = 0;
-  WFD::Parser::semantic_type *yylval;
+  Parser::semantic_type *yylval;
 };
 
 class Scanner {
 public:
-  Scanner(std::istream *in, const WFD::Driver& driver);
+  Scanner(std::istream* in, Message*& message);
   virtual ~Scanner();
-  virtual int yylex(WFD::Parser::semantic_type *lval);
+  virtual int yylex(Parser::semantic_type* lval);
 
  private:
   std::unique_ptr<BaseLexer> lexer_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif // SCANNER_H

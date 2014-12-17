@@ -3,7 +3,7 @@
 %debug 
 %verbose
 %defines
-%define api.namespace {WFD}
+%define api.namespace {wfd}
 %define parser_class_name {Parser}
 %start start
 
@@ -17,7 +17,7 @@
    #include "uibcsetting.h"
    #include "uibccapability.h"
    
-   namespace WFD {
+   namespace wfd {
       class Driver;
       class Scanner;
       class Message;
@@ -34,7 +34,7 @@
 }
 
 %parse-param { Scanner& scanner  }
-%parse-param { Driver& driver  }
+%parse-param { Message*& message  }
 
 %code {
 /*
@@ -115,7 +115,7 @@
    Property* property;
    std::vector<unsigned short>* error_list;
    PropertyErrors* property_errors;
-   std::map<WFD::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
+   std::map<wfd::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
    std::vector<H264Codec>* codecs;
    H264Codec* codec;
    std::vector<H264Codec3d>* codecs_3d;
@@ -329,11 +329,11 @@ start: message
 
 message:
     command headers {
-      $1->set_header($2);
-      driver.set_message($1);
+      message = $1;
+      $1->set_header(std::unique_ptr<Header>($2));
     }
   | payload {
-      driver.set_payload($1);
+      message->set_payload(std::unique_ptr<Payload>($1));
     }
   | error {
       std::cerr << "Unknown message" << std::endl;
@@ -501,14 +501,14 @@ wfd_methods:
   ;
 
 wfd_method: 
-    WFD_OPTIONS { $$ = WFD::OPTIONS; }
-  | WFD_SET_PARAMETER { $$ = WFD::SET_PARAMETER; }
-  | WFD_GET_PARAMETER { $$ = WFD::GET_PARAMETER; }
-  | WFD_SETUP { $$ = WFD::SETUP; }
-  | WFD_PLAY { $$ = WFD::PLAY; }
-  | WFD_TEARDOWN { $$ = WFD::TEARDOWN; }
-  | WFD_PAUSE { $$ = WFD::PAUSE; }
-  | WFD_TAG { $$ = WFD::ORG_WFA_WFD_1_0; }
+    WFD_OPTIONS { $$ = wfd::OPTIONS; }
+  | WFD_SET_PARAMETER { $$ = wfd::SET_PARAMETER; }
+  | WFD_GET_PARAMETER { $$ = wfd::GET_PARAMETER; }
+  | WFD_SETUP { $$ = wfd::SETUP; }
+  | WFD_PLAY { $$ = wfd::PLAY; }
+  | WFD_TEARDOWN { $$ = wfd::TEARDOWN; }
+  | WFD_PAUSE { $$ = wfd::PAUSE; }
+  | WFD_TAG { $$ = wfd::ORG_WFA_WFD_1_0; }
   ;
   
 wfd_ows: 
@@ -1093,7 +1093,7 @@ wfd_connector_type:
 
 %%
 
-void WFD::Parser::error(const std::string &err_message)
+void wfd::Parser::error(const std::string &err_message)
 {
-  driver.set_message(nullptr);
+  message = nullptr;
 }

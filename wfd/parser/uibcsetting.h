@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class UIBCSetting : public Property {
  public:
@@ -39,6 +39,6 @@ class UIBCSetting : public Property {
   bool is_enabled_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // UIBCSETTING_H_

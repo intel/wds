@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class StandbyResumeCapability: public Property {
 public:
@@ -35,6 +35,6 @@ public:
   virtual std::string to_string() const override;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // STANDBYRESUMECAPABILITY_H_

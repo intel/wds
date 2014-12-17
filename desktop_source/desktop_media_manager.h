@@ -17,7 +17,7 @@ class DesktopMediaManager : public wfd::MediaManager {
   virtual int RtpPort() const override;
   virtual void SetPresentationUrl(const std::string& url) override;
   virtual std::string PresentationUrl() const override;
-  virtual void SetSession(std::string& session) override;
+  virtual void SetSession(const std::string& session) override;
   virtual std::string Session() const override;
 
  private:

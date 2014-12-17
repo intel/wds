@@ -29,30 +29,29 @@
 #include "wfd/parser/reply.h"
 #include "wfd/parser/teardown.h"
 #include "wfd/parser/triggermethod.h"
-#include "wfd/common/typed_message.h"
 #include "wfd_session_state.h"
 
 namespace wfd {
 namespace sink {
 
-template <WFD::TriggerMethod::Method method>
-class M5Handler final : public MessageReceiver<TypedMessage::M5> {
+template <TriggerMethod::Method method>
+class M5Handler final : public MessageReceiver<Request::M5> {
  public:
   explicit M5Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M5>(init_params) {
+    : MessageReceiver<Request::M5>(init_params) {
   }
 
-  virtual bool CanHandle(TypedMessage* message) const override {
-    if (!MessageReceiver<TypedMessage::M5>::CanHandle(message))
+  virtual bool CanHandle(Message* message) const override {
+    if (!MessageReceiver<Request::M5>::CanHandle(message))
       return false;
 
     auto property =
-      static_cast<WFD::TriggerMethod*>(message->payload().get_property(WFD::WFD_TRIGGER_METHOD).get());
+      static_cast<TriggerMethod*>(message->payload().get_property(WFD_TRIGGER_METHOD).get());
     return  method == property->method();
   }
 
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) override {
-    return std::unique_ptr<WFD::Reply>(new WFD::Reply());
+  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
+    return std::unique_ptr<Reply>(new Reply());
   }
 };
 
@@ -60,15 +59,15 @@ class M7Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrl());
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    Play* play = new Play(manager_->PresentationUrl());
     play->header().set_session(manager_->Session());
     play->header().set_cseq (send_cseq_++);
-    return std::unique_ptr<M7>(new M7(play));
+    return std::unique_ptr<Message>(play);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 
@@ -76,30 +75,30 @@ class PlayHandler : public MessageSequenceHandler {
  public:
   explicit PlayHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-    AddSequencedHandler(new M5Handler<WFD::TriggerMethod::PLAY>(init_params));
+    AddSequencedHandler(new M5Handler<TriggerMethod::PLAY>(init_params));
     AddSequencedHandler(new M7Sender(init_params));
   }
 };
 
 class M8Sender final : public SequencedMessageSender {
  public:
-    using SequencedMessageSender::SequencedMessageSender;
+  using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto teardown = std::make_shared<WFD::Teardown>(manager_->PresentationUrl());
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    Teardown* teardown = new Teardown(manager_->PresentationUrl());
     teardown->header().set_session(manager_->Session());
     teardown->header().set_cseq (send_cseq_++);
-    return std::unique_ptr<M8>(new M8(teardown));
+    return std::unique_ptr<Message>(teardown);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (!manager_->Session().empty() && (reply->GetResponseCode() == 200));
+    return (!manager_->Session().empty() && (reply->response_code() == 200));
   }
 };
 
 TeardownHandler::TeardownHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(new M5Handler<WFD::TriggerMethod::TEARDOWN>(init_params));
+  AddSequencedHandler(new M5Handler<wfd::TriggerMethod::TEARDOWN>(init_params));
   AddSequencedHandler(new M8Sender(init_params));
 }
 
@@ -107,15 +106,15 @@ class M9Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto pause = std::make_shared<WFD::Pause>(manager_->PresentationUrl());
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    Pause* pause = new Pause(manager_->PresentationUrl());
     pause->header().set_session(manager_->Session());
     pause->header().set_cseq (send_cseq_++);
-    return std::unique_ptr<M9>(new M9(pause));
+    return std::unique_ptr<Message>(pause);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 
@@ -123,42 +122,42 @@ class PauseHandler : public MessageSequenceHandler {
  public:
   explicit PauseHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-    AddSequencedHandler(new M5Handler<WFD::TriggerMethod::PAUSE>(init_params));
+    AddSequencedHandler(new M5Handler<TriggerMethod::PAUSE>(init_params));
     AddSequencedHandler(new M9Sender(init_params));
   }
 };
 
-class M7SenderOptional final : public OptionalMessageSender<TypedMessage::M7> {
+class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
  public:
   M7SenderOptional(const InitParams& init_params)
-    : OptionalMessageSender<TypedMessage::M7>(init_params) {
+    : OptionalMessageSender<Request::M7>(init_params) {
   }
  private:
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 
-class M8SenderOptional final : public OptionalMessageSender<TypedMessage::M8> {
+class M8SenderOptional final : public OptionalMessageSender<Request::M8> {
  public:
   M8SenderOptional(const InitParams& init_params)
-    : OptionalMessageSender<TypedMessage::M8>(init_params) {
+    : OptionalMessageSender<Request::M8>(init_params) {
   }
  private:
   virtual bool HandleReply(Reply* reply) override {
     // todo: if successfull, switch to init state
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 
-class M9SenderOptional final : public OptionalMessageSender<TypedMessage::M9> {
+class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
  public:
   M9SenderOptional(const InitParams& init_params)
-    : OptionalMessageSender<TypedMessage::M9>(init_params) {
+    : OptionalMessageSender<Request::M9>(init_params) {
   }
  private:
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 

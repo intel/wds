@@ -27,22 +27,21 @@
 
 #include "reply.h"
 
-namespace WFD {
+namespace wfd {
 
 BaseLexer::~BaseLexer() {
 }
 
-int BaseLexer::yylex(WFD::Parser::semantic_type *lval) {
+int BaseLexer::yylex(Parser::semantic_type *lval) {
   yylval = lval;
   return( yylex() );
 }
 
-Scanner::Scanner(std::istream *in, const WFD::Driver& driver) {
-  auto message = driver.parsed_message();
+Scanner::Scanner(std::istream* in, Message*& message) {
   if (!message) {
     lexer_.reset(new HeaderScanner(in));
   } else if (message->is_reply()) {
-    auto reply = std::static_pointer_cast<Reply>(message);
+    Reply* reply = static_cast<Reply*>(message);
     if (reply->response_code() == 303)
       lexer_.reset(new ErrorScanner(in));
     else
@@ -56,8 +55,8 @@ Scanner::Scanner(std::istream *in, const WFD::Driver& driver) {
 Scanner::~Scanner() {
 }
 
-int Scanner::yylex(WFD::Parser::semantic_type *lval) {
+int Scanner::yylex(Parser::semantic_type *lval) {
   return lexer_->yylex(lval);
 }
 
-} /* namespace WFD */
+} /* namespace wfd */

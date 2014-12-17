@@ -22,39 +22,29 @@
 
 #include "message.h"
 
-namespace WFD {
+#include <cassert>
 
-Message::Message(MessageType type, const std::string& request_uri)
-  : type_(type),
-    request_uri_(request_uri) {
+namespace wfd {
+
+Message::Message(bool is_reply)
+  : is_reply_(is_reply) {
 }
 
 Message::~Message() {
 }
 
-Message::MessageType Message::type() const {
-  return type_;
+int Message::cseq() const {
+  assert(header_);
+  return header_->cseq();
 }
 
-void Message::set_request_uri(const std::string& request_uri) {
-  request_uri_ = request_uri;
-}
-
-void Message::set_header(Header* header) {
-  header_.reset(header);
-}
-
-Header& Message::header() const {
+Header& Message::header() {
   if (!header_)
     header_.reset(new Header());
   return *header_;
 }
 
-void Message::set_payload(Payload* payload) {
-  payload_.reset(payload);
-}
-
-Payload& Message::payload() const {
+Payload& Message::payload() {
   if (!payload_)
     payload_.reset(new Payload());
   return *payload_;
@@ -65,7 +55,6 @@ std::string Message::to_string() const {
   if (payload_)
     ret = payload_->to_string();
 
-
   if (header_) {
     header_->set_content_length (ret.length());
     ret = header_->to_string() + ret;
@@ -74,4 +63,15 @@ std::string Message::to_string() const {
   return ret;
 }
 
-} // namespace WFD
+Request::Request(RTSPMethod method, const std::string& request_uri)
+  : Message(false),
+    id_(UNKNOWN),
+    method_(method),
+    request_uri_(request_uri) {
+}
+
+Request::~Request() {
+}
+
+
+} // namespace wfd

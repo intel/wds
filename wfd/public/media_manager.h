@@ -35,7 +35,7 @@ class MediaManager {
   virtual int RtpPort() const = 0;
   virtual void SetPresentationUrl(const std::string& url) = 0;
   virtual std::string PresentationUrl() const = 0;
-  virtual void SetSession(std::string& session) = 0;
+  virtual void SetSession(const std::string& session) = 0;
   virtual std::string Session() const = 0;
 };
 

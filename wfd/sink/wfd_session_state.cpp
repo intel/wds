@@ -28,7 +28,6 @@
 #include "wfd/parser/play.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setup.h"
-#include "wfd/common/typed_message.h"
 #include "wfd/parser/transportheader.h"
 
 namespace wfd {
@@ -38,21 +37,21 @@ class M6Handler final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto setup = std::make_shared<WFD::Setup>(manager_->PresentationUrl());
-    auto transport = new WFD::TransportHeader();
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    auto setup = new Setup(manager_->PresentationUrl());
+    auto transport = new TransportHeader();
     transport->set_client_port(manager_->RtpPort());
 
     setup->header().set_transport(transport);
     setup->header().set_cseq(send_cseq_++);
     setup->header().set_require_wfd_support(true);
 
-    return std::unique_ptr<M6>(new M6(setup));
+    return std::unique_ptr<Message>(setup);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    std::string session_id = reply->message()->header().session();
-    if(reply->GetResponseCode() == 200 && !session_id.empty()) {
+    const std::string& session_id = reply->header().session();
+    if(reply->response_code() == 200 && !session_id.empty()) {
       manager_->SetSession(session_id);
       return true;
     }
@@ -65,17 +64,17 @@ class M7Handler final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto play = std::make_shared<WFD::Play>(manager_->PresentationUrl());
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    Play* play = new Play(manager_->PresentationUrl());
     play->header().set_session(manager_->Session());
     play->header().set_cseq(send_cseq_++);
     play->header().set_require_wfd_support(true);
 
-    return std::unique_ptr<M7>(new M7(play));
+    return std::unique_ptr<Message>(play);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 
@@ -92,5 +91,5 @@ WfdSessionState::WfdSessionState(const InitParams& init_params)
 WfdSessionState::~WfdSessionState() {
 }
 
-}  // sink
-}  // wfd
+}  // namespace sink
+}  // namespace wfd

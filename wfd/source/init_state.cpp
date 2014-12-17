@@ -23,47 +23,43 @@
 
 #include "wfd/parser/options.h"
 #include "wfd/parser/reply.h"
-#include "wfd/common/typed_message.h"
 
 namespace wfd {
 namespace source {
 
 class M1Handler final : public SequencedMessageSender {
  public:
-//  M1Handler(Peer::Delegate* sender, MediaManager* manager, Observer* observer)
-//    : SequencedMessageSender(manager, observer) {
-//  }
-    using SequencedMessageSender::SequencedMessageSender;
+  using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() override {
-    auto options = std::make_shared<WFD::Options>("*");
+  virtual std::unique_ptr<Message> CreateMessage() override {
+    Options* options = new Options("*");
     options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
-    return std::unique_ptr<M1>(new M1(options));
+    return std::unique_ptr<Message>(options);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 
 };
 
-class M2Handler final : public MessageReceiver<TypedMessage::M2> {
+class M2Handler final : public MessageReceiver<Request::M2> {
  public:
   M2Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M2>(init_params) {
+    : MessageReceiver<Request::M2>(init_params) {
   }
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(
-      TypedMessage* message) override {
-    auto reply = std::unique_ptr<WFD::Reply>(new WFD::Reply(200));
-    std::vector<WFD::Method> supported_methods;
-    supported_methods.push_back(WFD::ORG_WFA_WFD_1_0);
-    supported_methods.push_back(WFD::GET_PARAMETER);
-    supported_methods.push_back(WFD::SET_PARAMETER);
-    supported_methods.push_back(WFD::PLAY);
-    supported_methods.push_back(WFD::PAUSE);
-    supported_methods.push_back(WFD::SETUP);
-    supported_methods.push_back(WFD::TEARDOWN);
+  virtual std::unique_ptr<Reply> HandleMessage(
+      Message* message) override {
+    auto reply = std::unique_ptr<Reply>(new Reply(200));
+    std::vector<wfd::Method> supported_methods;
+    supported_methods.push_back(ORG_WFA_WFD_1_0);
+    supported_methods.push_back(GET_PARAMETER);
+    supported_methods.push_back(SET_PARAMETER);
+    supported_methods.push_back(PLAY);
+    supported_methods.push_back(PAUSE);
+    supported_methods.push_back(SETUP);
+    supported_methods.push_back(TEARDOWN);
     reply->header().set_supported_methods(supported_methods);
     return std::move(reply);
   }

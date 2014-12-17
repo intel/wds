@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-namespace WFD {
+namespace wfd {
 
 namespace {
   const char* name[] = {"HDCP2.0", "HDCP2.1"};
@@ -55,11 +55,11 @@ std::string ContentProtection::to_string() const {
     + std::string(SEMICOLON) + std::string(SPACE);
 
   if (is_none())
-    ret += WFD::NONE;
+    ret += wfd::NONE;
   else
     ret += name[hdcp_spec()] + std::string(SPACE)
         + port_prefix + std::to_string(port_);
   return ret;
 }
 
-}  // namespace WFD
+}  // namespace wfd

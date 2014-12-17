@@ -27,7 +27,7 @@
 
 #include <vector>
 
-namespace WFD {
+namespace wfd {
 
 struct H264Codec {
  public:
@@ -53,7 +53,7 @@ struct H264Codec {
   int max_vres_;
 };
 
-typedef std::vector<WFD::H264Codec> H264Codecs;
+typedef std::vector<wfd::H264Codec> H264Codecs;
 
 class VideoFormats: public Property {
 
@@ -76,6 +76,6 @@ public:
   H264Codecs h264_codecs_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // VIDEOFORMATS_H_

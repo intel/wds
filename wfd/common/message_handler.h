@@ -28,8 +28,9 @@
 #include <memory>
 #include <utility>
 
+#include "wfd/parser/message.h"
+#include "wfd/parser/reply.h"
 #include "wfd/public/peer.h"
-#include "wfd/common/typed_message.h"
 
 namespace wfd {
 
@@ -57,11 +58,11 @@ class MessageHandler {
   virtual void Start() = 0;
   virtual void Reset() = 0;
 
-  virtual bool CanSend(TypedMessage* message) const = 0;
-  virtual void Send(std::unique_ptr<TypedMessage> message) = 0;
+  virtual bool CanSend(Message* message) const = 0;
+  virtual void Send(std::unique_ptr<Message> message) = 0;
 
-  virtual bool CanHandle(TypedMessage* message) const = 0;
-  virtual void Handle(std::unique_ptr<TypedMessage> message) = 0;
+  virtual bool CanHandle(Message* message) const = 0;
+  virtual void Handle(std::unique_ptr<Message> message) = 0;
 
   void set_observer(Observer* observer) {
     assert(observer);
@@ -93,11 +94,11 @@ class MessageSequenceHandler : public MessageHandler,
   virtual void Start() override;
   virtual void Reset() override;
 
-  virtual bool CanSend(TypedMessage* message) const override;
-  virtual void Send(std::unique_ptr<TypedMessage> message) override;
+  virtual bool CanSend(Message* message) const override;
+  virtual void Send(std::unique_ptr<Message> message) override;
 
-  virtual bool CanHandle(TypedMessage* message) const override;
-  virtual void Handle(std::unique_ptr<TypedMessage> message) override;
+  virtual bool CanHandle(Message* message) const override;
+  virtual void Handle(std::unique_ptr<Message> message) override;
 
  protected:
   void AddSequencedHandler(MessageHandler* handler);
@@ -115,10 +116,10 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
   virtual ~MessageSequenceWithOptionalSetHandler();
   virtual void Start() override;
   virtual void Reset() override;
-  virtual bool CanSend(TypedMessage* message) const override;
-  virtual void Send(std::unique_ptr<TypedMessage> message) override;
-  virtual bool CanHandle(TypedMessage* message) const override;
-  virtual void Handle(std::unique_ptr<TypedMessage> message) override;
+  virtual bool CanSend(Message* message) const override;
+  virtual void Send(std::unique_ptr<Message> message) override;
+  virtual bool CanHandle(Message* message) const override;
+  virtual void Handle(std::unique_ptr<Message> message) override;
 
  protected:
   void AddOptionalHandler(MessageHandler* handler);
@@ -143,29 +144,29 @@ class MessageReceiverBase : public MessageHandler {
   virtual ~MessageReceiverBase();
 
  protected:
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(TypedMessage* message) = 0;
-  virtual bool CanHandle(TypedMessage* message) const override;
+  virtual std::unique_ptr<wfd::Reply> HandleMessage(Message* message) = 0;
+  virtual bool CanHandle(Message* message) const override;
 
  private:
   virtual void Start() override;
   virtual void Reset() override;
-  virtual bool CanSend(TypedMessage* message) const override;
-  virtual void Send(std::unique_ptr<TypedMessage> message) override;
-  virtual void Handle(std::unique_ptr<TypedMessage> message) override;
+  virtual bool CanSend(Message* message) const override;
+  virtual void Send(std::unique_ptr<Message> message) override;
+  virtual void Handle(std::unique_ptr<Message> message) override;
 
   bool wait_for_message_;
 };
 
-template <TypedMessage::Type type>
+template <Request::ID id>
 class MessageReceiver : public MessageReceiverBase {
-  static_assert(type != TypedMessage::Reply,
-                "MessageSender class should be used");
  public:
   using MessageReceiverBase::MessageReceiverBase;
 
  protected:
-  virtual bool CanHandle(TypedMessage* message) const override {
-    return MessageReceiverBase::CanHandle(message) && (type == message->type());
+  virtual bool CanHandle(Message* message) const override {
+    assert(message->is_request());
+    return MessageReceiverBase::CanHandle(message) &&
+           id == ToRequest(message)->id();
   }
 };
 
@@ -176,18 +177,18 @@ class MessageSenderBase : public MessageHandler {
 
  protected:
   virtual bool HandleReply(Reply* reply) = 0;
-  virtual void Send(std::unique_ptr<TypedMessage> message) override;
+  virtual void Send(std::unique_ptr<Message> message) override;
   virtual void Reset() override;
 
  private:
-  virtual bool CanHandle(TypedMessage* message) const override;
-  virtual void Handle(std::unique_ptr<TypedMessage> message) override;
+  virtual bool CanHandle(Message* message) const override;
+  virtual void Handle(std::unique_ptr<Message> message) override;
 
   std::queue<int> cseq_queue_;
 };
 
 // To be used for optional senders.
-template <TypedMessage::Type type>
+template <Request::ID id>
 class OptionalMessageSender : public MessageSenderBase {
  public:
   using MessageSenderBase::MessageSenderBase;
@@ -196,9 +197,10 @@ class OptionalMessageSender : public MessageSenderBase {
 
  private:
   virtual void Start() override {}
-  virtual bool CanSend(TypedMessage* message) const override {
+  virtual bool CanSend(Message* message) const override {
     assert(message);
-    return message->type() == type;
+    assert(message->is_request());
+    return ToRequest(message)->id() == id;
   }
 };
 
@@ -209,14 +211,14 @@ class SequencedMessageSender : public MessageSenderBase {
   virtual ~SequencedMessageSender();
 
  protected:
-  virtual std::unique_ptr<TypedMessage> CreateMessage() = 0;
+  virtual std::unique_ptr<Message> CreateMessage() = 0;
 
  private:
   virtual void Start() override;
   virtual void Reset() override;
-  virtual bool CanSend(TypedMessage* message) const override;
+  virtual bool CanSend(Message* message) const override;
 
-  TypedMessage* to_be_send_;
+  Message* to_be_send_;
 };
 
 }  // namespace wfd

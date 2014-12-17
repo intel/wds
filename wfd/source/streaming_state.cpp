@@ -25,35 +25,34 @@
 #include "cap_negotiation_state.h"
 #include "wfd_session_state.h"
 #include "wfd/parser/reply.h"
-#include "wfd/common/typed_message.h"
 
 namespace wfd {
 namespace source {
 
-class M9Handler final : public MessageReceiver<TypedMessage::M9> {
+class M9Handler final : public MessageReceiver<Request::M9> {
  public:
   M9Handler(const InitParams& init_params)
-    : MessageReceiver<TypedMessage::M9>(init_params) {
+    : MessageReceiver<Request::M9>(init_params) {
   }
 
-  virtual std::unique_ptr<WFD::Reply> HandleMessage(
-      TypedMessage* message) override {
+  virtual std::unique_ptr<Reply> HandleMessage(
+      Message* message) override {
     int response_code = 406;
     if (!manager_->IsPaused()) {
       manager_->Pause();
       response_code = 200;
     }
-    return std::unique_ptr<WFD::Reply>(new WFD::Reply(response_code));
+    return std::unique_ptr<Reply>(new Reply(response_code));
   }
 };
 
-class M5Sender final : public OptionalMessageSender<TypedMessage::M5> {
+class M5Sender final : public OptionalMessageSender<Request::M5> {
  public:
   M5Sender(const InitParams& init_params)
-    : OptionalMessageSender<TypedMessage::M5>(init_params) {
+    : OptionalMessageSender<Request::M5>(init_params) {
   }
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->GetResponseCode() == 200);
+    return (reply->response_code() == 200);
   }
 };
 

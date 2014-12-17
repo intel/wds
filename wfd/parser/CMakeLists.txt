@@ -36,8 +36,8 @@ add_executable(wfd main.cpp $<TARGET_OBJECTS:wfdparser>)
 set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
 target_link_libraries(wfd)
 
-add_executable(test-wfd tests.cpp $<TARGET_OBJECTS:wfdparser>)
-set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
-target_link_libraries (test-wfd)
+#add_executable(test-wfd tests.cpp $<TARGET_OBJECTS:wfdparser>)
+#set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
+#target_link_libraries (test-wfd)
 
-add_test(WfdTest test-wfd)
+#add_test(WfdTest test-wfd)

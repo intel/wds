@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class ContentProtection: public Property {
  public:
@@ -48,6 +48,6 @@ class ContentProtection: public Property {
   unsigned int port_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // CONTENTPROTECTION_H_

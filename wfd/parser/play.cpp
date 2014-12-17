@@ -22,10 +22,10 @@
 
 #include "play.h"
 
-namespace WFD {
+namespace wfd {
 
 Play::Play(const std::string& request_uri)
- : Message(MessageTypePlay, request_uri) {
+ : Request(Request::MethodPlay, request_uri) {
 }
 
 Play::~Play() {
@@ -38,4 +38,4 @@ std::string Play::to_string() const {
   return ret + Message::to_string();
 }
 
-} /* namespace WFD */
+} /* namespace wfd */

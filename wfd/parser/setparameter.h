@@ -25,15 +25,15 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
-class SetParameter : public Message {
+class SetParameter : public Request {
  public:
     explicit SetParameter(const std::string& request_uri);
     virtual ~SetParameter();
     virtual std::string to_string() const override;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // SETPARAMETER_H_

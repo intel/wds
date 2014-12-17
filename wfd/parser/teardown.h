@@ -25,15 +25,15 @@
 
 #include "message.h"
 
-namespace WFD {
+namespace wfd {
 
-class Teardown : public Message {
+class Teardown : public Request {
  public:
     explicit Teardown(const std::string& request_uri);
     virtual ~Teardown();
     virtual std::string to_string() const override;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // TEARDOWN_H_

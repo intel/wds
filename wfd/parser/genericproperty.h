@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace WFD {
+namespace wfd {
 
 class GenericProperty: public Property {
   public:
@@ -43,6 +43,6 @@ class GenericProperty: public Property {
     std::string value_;
 };
 
-}  // namespace WFD
+}  // namespace wfd
 
 #endif  // GENERIC_PROPERTY_H_

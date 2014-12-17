@@ -150,6 +150,6 @@ class InformationElement {
     std::map<SubelementId, P2P::Subelement*> subelements_;
 };
 
-} // namespace WFD
+} // namespace wfd
 
 #endif // INFORMATION_ELEMENT_H_

@@ -32,7 +32,6 @@
 #include "wfd/parser/triggermethod.h"
 #include "wfd/public/media_manager.h"
 #include "streaming_state.h"
-#include "wfd/common/typed_message.h"
 #include "wfd_session_state.h"
 
 namespace wfd {
@@ -40,25 +39,28 @@ namespace wfd {
 namespace {
 
 // todo: check mandatory parameters for each message
-std::unique_ptr<TypedMessage> CreateTypedMessage(WFD::MessagePtr message) {
-  switch(message->type()) {
-  case WFD::Message::MessageTypeReply:
-    return std::unique_ptr<TypedMessage>(new Reply(message));
-  case WFD::Message::MessageTypeOptions:
-    return std::unique_ptr<TypedMessage>(new M1(message));
-  case WFD::Message::MessageTypeGetParameter:
-    return std::unique_ptr<TypedMessage>(new M3(message));
-  case WFD::Message::MessageTypeSetParameter:
-    if (message->payload().has_property(WFD::WFD_PRESENTATION_URL))
-      return std::unique_ptr<TypedMessage>(new M4(message));
-    if (message->payload().has_property(WFD::WFD_TRIGGER_METHOD))
-      return std::unique_ptr<TypedMessage>(new M5(message));
+bool InitializeRequestId(Request* request) {
+  Request::ID id;
+  switch(request->method()) {
+  case Request::MethodOptions:
+    id = Request::M1;
+    break;
+  case Request::MethodGetParameter:
+    id = Request::M3;
+    break;
+  case Request::MethodSetParameter:
+    if (request->payload().has_property(WFD_PRESENTATION_URL))
+      id = Request::M4;
+    else if (request->payload().has_property(WFD_TRIGGER_METHOD))
+      id = Request::M5;
+    break;
   default:
-      break;
-      // TODO: warning.
+    // TODO: warning.
+    return false;
   }
 
-  return nullptr;
+  request->set_id(id);
+  return true;
 }
 
 }
@@ -91,12 +93,12 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   virtual bool Pause() override;
 
   // RTSPInputHandler
-  virtual void MessageParsed(WFD::MessagePtr message) override;
+  virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
-  bool HandleCommand(std::unique_ptr<TypedMessage> command);
+  bool HandleCommand(std::unique_ptr<Message> command);
 
-  template <typename WfdMessage, typename TypedWfdMessage>
-  std::unique_ptr<TypedMessage> CreateCommand();
+  template <class WfdMessage, Request::ID id>
+  std::unique_ptr<Message> CreateCommand();
 
   std::unique_ptr<SinkStateMachine> state_machine_;
   MediaManager* manager_;
@@ -115,15 +117,16 @@ void SinkImpl::RTSPDataReceived(const std::string& message) {
   InputReceived(message);
 }
 
-template <typename WfdMessage, typename TypedWfdMessage>
-std::unique_ptr<TypedMessage> SinkImpl::CreateCommand() {
-  auto message = std::make_shared<WfdMessage>(manager_->PresentationUrl());
+template <class WfdMessage, Request::ID id>
+std::unique_ptr<Message> SinkImpl::CreateCommand() {
+  auto message = new WfdMessage(manager_->PresentationUrl());
   message->header().set_session(manager_->Session());
   message->header().set_cseq(state_machine_->GetNextCSeq());
-  return std::unique_ptr<TypedMessage>(new TypedWfdMessage(message));
+  message->set_id(id);
+  return std::unique_ptr<Message>(message);
 }
 
-bool SinkImpl::HandleCommand(std::unique_ptr<TypedMessage> command) {
+bool SinkImpl::HandleCommand(std::unique_ptr<Message> command) {
   if (manager_->Session().empty() ||
       manager_->PresentationUrl().empty())
     return false;
@@ -135,21 +138,21 @@ bool SinkImpl::HandleCommand(std::unique_ptr<TypedMessage> command) {
 }
 
 bool SinkImpl::Teardown() {
-  return HandleCommand(CreateCommand<WFD::Teardown, wfd::M8>());
+  return HandleCommand(CreateCommand<wfd::Teardown, Request::M8>());
 }
 
 bool SinkImpl::Play() {
-  return HandleCommand(CreateCommand<WFD::Play, wfd::M7>());
+  return HandleCommand(CreateCommand<wfd::Play, Request::M7>());
 }
 
 bool SinkImpl::Pause() {
-  return HandleCommand(CreateCommand<WFD::Pause, wfd::M9>());
+  return HandleCommand(CreateCommand<wfd::Pause, Request::M9>());
 }
 
-void SinkImpl::MessageParsed(WFD::MessagePtr message) {
-  auto typed_message = CreateTypedMessage(message);
-  if (typed_message)
-    state_machine_->Handle(std::move(typed_message));
+void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
+  if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
+    return; // FIXME : Report error.
+  state_machine_->Handle(std::move(message));
 }
 
 WFD_EXPORT Sink* Sink::Create(Delegate* delegate, MediaManager* mng) {

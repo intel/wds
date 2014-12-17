@@ -23,10 +23,10 @@
 #include "setparameter.h"
 #include "triggermethod.h"
 
-namespace WFD {
+namespace wfd {
 
 SetParameter::SetParameter(const std::string& request_uri)
- : Message(MessageTypeSetParameter, request_uri) {
+ : Request(Request::MethodSetParameter, request_uri) {
 }
 
 SetParameter::~SetParameter() {
@@ -39,4 +39,4 @@ std::string SetParameter::to_string() const {
   return ret + Message::to_string();
 }
 
-} /* namespace WFD */
+} /* namespace wfd */
