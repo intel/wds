@@ -194,12 +194,14 @@ class OptionalMessageSender : public MessageSenderBase {
 
   virtual ~OptionalMessageSender() {}
 
- private:
-  virtual void Start() override {}
+ protected:
   virtual bool CanSend(Message* message) const override {
     assert(message);
     return message->is_request() && ToRequest(message)->id() == id;
   }
+
+ private:
+  virtual void Start() override {}
 };
 
 // To be used for sequensed senders.

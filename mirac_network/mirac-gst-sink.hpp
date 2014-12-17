@@ -3,8 +3,6 @@
  *
  * Copyright (C) 2014 Intel Corporation.
  *
- * Contact: Alexander Kanavin <alex.kanavin@gmail.com>
- *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -25,7 +23,7 @@
 #define MIRAC_GST_SINK_HPP
 
 #include <gst/gst.h>
-
+#include <string>
 
 class MiracGstSink
 {
@@ -33,9 +31,15 @@ public:
     MiracGstSink(std::string hostname, int port);
     ~MiracGstSink ();
 
+    void Play();
+    void Pause();
+    bool IsPaused() const;
+    void Teardown();
+
     int sink_udp_port();
 
 private:
+    bool IsInState(GstState state) const;
     GstElement* gst_elem;
 };
 
