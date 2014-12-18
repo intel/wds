@@ -147,16 +147,16 @@ static bool test_valid_options ()
   std::string header("OPTIONS * RTSP/1.0\r\n"
                      "CSeq: 0\r\n"
                      "Require: org.wfa.wfd1.0\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeOptions);
-  ASSERT_EQUAL(wfd_message->header().cseq(), 0);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 0);
-  ASSERT_EQUAL(wfd_message->header().require_wfd_support(), true);
-
-  ASSERT_EQUAL (wfd_message->to_string(), header);
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodOptions);
+  ASSERT_EQUAL(request->header().cseq(), 0);
+  ASSERT_EQUAL(request->header().content_length(), 0);
+  ASSERT_EQUAL(request->header().require_wfd_support(), true);
+  ASSERT_EQUAL (request->to_string(), header);
 
   return true;
 }
@@ -168,20 +168,18 @@ static bool test_valid_options_reply ()
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 1\r\n"
                      "Public: org.wfa.wfd1.0, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-
-  std::shared_ptr<wfd::Reply> reply = std::dynamic_pointer_cast<wfd::Reply>(wfd_message);
+  wfd::Reply* reply = static_cast<wfd::Reply*>(message);
   ASSERT(reply != NULL);
-
   ASSERT_EQUAL(reply->response_code(), 200);
-  ASSERT_EQUAL(reply->type(), wfd::Message::MessageTypeReply);
   ASSERT_EQUAL(reply->header().cseq(), 1);
   ASSERT_EQUAL(reply->header().content_length(), 0);
 
-  std::vector<wfd::Method> methods = wfd_message->header().supported_methods();
+  std::vector<wfd::Method> methods = message->header().supported_methods();
   static const wfd::Method expected[] = { wfd::Method::ORG_WFA_WFD_1_0,
                                           wfd::Method::SETUP,
                                           wfd::Method::TEARDOWN,
@@ -209,19 +207,22 @@ static bool test_valid_extra_properties ()
                      "CSeq: 2\r\n"
                      "Content-Length: 72\r\n"
                      "My-Header: 123 testing testing\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
 
-  GenericHeaderMap gen_headers = driver.parsed_message()->header().generic_headers();
+  GenericHeaderMap gen_headers = message->header().generic_headers();
   auto extra_header_it = gen_headers.find("My-Header");
   ASSERT(extra_header_it != gen_headers.end())
   ASSERT_EQUAL(extra_header_it->second, "123 testing testing");
-  ASSERT_EQUAL(driver.parsed_message()->header().content_length(), 72);
+  ASSERT_EQUAL(message->header().content_length(), 72);
 
-  std::string message("nonstandard_property: 1!!1! non standard value\r\n"
+  std::string payload_buffer("nonstandard_property: 1!!1! non standard value\r\n"
                       "wfd_audio_codecs: none\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
+  driver.Parse(payload_buffer, message);
 
-  auto payload = driver.parsed_message()->payload();
+  auto payload = message->payload();
   std::shared_ptr<wfd::Property> property;
 
   ASSERT_NO_EXCEPTION (property =
@@ -230,10 +231,10 @@ static bool test_valid_extra_properties ()
 
   ASSERT_NO_EXCEPTION (property =
       payload.get_property("nonstandard_property"));
-  auto extra_property = std::static_pointer_cast<wfd::GenericProperty> (property);
+  auto extra_property = std::static_pointer_cast<wfd::GenericProperty>(property);
   ASSERT_EQUAL(extra_property->value(), "1!!1! non standard value");
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -245,13 +246,18 @@ static bool test_valid_extra_errors ()
   std::string header("RTSP/1.0 303 OK\r\n"
                      "CSeq: 0\r\n"
                      "Content-Length: 55\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
 
-  std::string message("wfd_audio_codecs: 103\r\n"
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+
+  std::string payload_buffer("wfd_audio_codecs: 103\r\n"
                       "nonstandard_property: 101, 102\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
 
-  auto payload = driver.parsed_message()->payload();
+  auto payload = message->payload();
   std::shared_ptr<wfd::PropertyErrors> error;
 
   ASSERT_EQUAL (payload.property_errors().size(), 2);
@@ -267,7 +273,7 @@ static bool test_valid_extra_errors ()
   ASSERT_EQUAL(error->error_codes()[0], 101);
   ASSERT_EQUAL(error->error_codes()[1], 102);
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -280,18 +286,25 @@ static bool test_valid_extra_properties_in_get ()
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 40\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  std::string message("nonstandard_property\r\n"
-                      "wfd_audio_codecs\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
 
-  auto properties = driver.parsed_message()->payload().get_parameter_properties();
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodGetParameter);
+
+  std::string payload_buffer("nonstandard_property\r\n"
+                      "wfd_audio_codecs\r\n");
+  driver.Parse(payload_buffer, message);
+
+  auto properties = message->payload().get_parameter_properties();
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_AUDIO_CODECS));
   ASSERT_EQUAL(properties.size(), 2);
   ASSERT_EQUAL(properties[0], "nonstandard_property");
   ASSERT_EQUAL(properties[1], "wfd_audio_codecs");
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -304,7 +317,7 @@ static bool test_valid_get_parameter ()
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 213\r\n\r\n");
-  std::string message("wfd_client_rtp_ports\r\n"
+  std::string payload_buffer("wfd_client_rtp_ports\r\n"
                       "wfd_audio_codecs\r\n"
                       "wfd_video_formats\r\n"
                       "wfd_3d_video_formats\r\n"
@@ -314,19 +327,22 @@ static bool test_valid_get_parameter ()
                       "wfd_uibc_capability\r\n"
                       "wfd_standby_resume_capability\r\n"
                       "wfd_content_protection\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeGetParameter);
-  ASSERT_EQUAL(wfd_message->request_uri(), "rtsp://localhost/wfd1.0");
-  ASSERT_EQUAL(wfd_message->header().cseq(), 2);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 213);
-  ASSERT_EQUAL(wfd_message->header().content_type(), "text/parameters");
-  ASSERT_EQUAL(wfd_message->header().require_wfd_support(), false);
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodGetParameter);
+  ASSERT_EQUAL(request->request_uri(), "rtsp://localhost/wfd1.0");
+  ASSERT_EQUAL(message->header().cseq(), 2);
+  ASSERT_EQUAL(message->header().content_length(), 213);
+  ASSERT_EQUAL(message->header().content_type(), "text/parameters");
+  ASSERT_EQUAL(message->header().require_wfd_support(), false);
 
-  std::vector<std::string> properties = wfd_message->payload().get_parameter_properties();
+  std::vector<std::string> properties = message->payload().get_parameter_properties();
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_CLIENT_RTP_PORTS));
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_CLIENT_RTP_PORTS));
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_AUDIO_CODECS));
@@ -339,7 +355,7 @@ static bool test_valid_get_parameter ()
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_CONTENT_PROTECTION));
 
-  ASSERT_EQUAL (wfd_message->to_string(), header + message)
+  ASSERT_EQUAL (message->to_string(), header + payload_buffer)
 
   return true;
 }
@@ -352,7 +368,7 @@ static bool test_valid_get_parameter_reply_with_all_none ()
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 483\r\n\r\n");
   // not a real-world message, just a collection of all properties
-  std::string message("wfd_3d_video_formats: none\r\n"
+  std::string payload_buffer("wfd_3d_video_formats: none\r\n"
                       "wfd_I2C: none\r\n"
                       "wfd_audio_codecs: none\r\n"
                       "wfd_av_format_change_timing: 000000000F 00000000FF\r\n"
@@ -368,14 +384,15 @@ static bool test_valid_get_parameter_reply_with_all_none ()
                       "wfd_uibc_capability: none\r\n"
                       "wfd_uibc_setting: disable\r\n"
                       "wfd_video_formats: none\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeReply);
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
 
-  std::shared_ptr<wfd::Reply> reply = std::dynamic_pointer_cast<wfd::Reply>(wfd_message);
+  wfd::Reply* reply = static_cast<wfd::Reply*>(message);
   ASSERT(reply != NULL);
   ASSERT_EQUAL(reply->response_code(), 200);
   ASSERT_EQUAL(reply->header().cseq(), 2);
@@ -383,7 +400,7 @@ static bool test_valid_get_parameter_reply_with_all_none ()
   ASSERT_EQUAL(reply->header().content_type(), "text/parameters");
   ASSERT_EQUAL(reply->header().supported_methods().size(), 0);
 
-  auto payload = wfd_message->payload();
+  auto payload = reply->payload();
   std::shared_ptr<wfd::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
@@ -452,7 +469,7 @@ static bool test_valid_get_parameter_reply_with_all_none ()
   auto uibc_setting = std::static_pointer_cast<wfd::UIBCSetting> (prop);
   ASSERT_EQUAL(uibc_setting->is_enabled(), false);
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -464,7 +481,7 @@ static bool test_valid_get_parameter_reply ()
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 535\r\n\r\n");
-  std::string message("wfd_3d_video_formats: 80 00 03 0F 0000000000000005 00 0001 1401 13 none none\r\n"
+  std::string payload_buffer("wfd_3d_video_formats: 80 00 03 0F 0000000000000005 00 0001 1401 13 none none\r\n"
                       "wfd_I2C: 404\r\n"
                       "wfd_audio_codecs: LPCM 00000003 00, AAC 00000001 00\r\n"
                       "wfd_client_rtp_ports: RTP/AVP/UDP;unicast 19000 0 mode=play\r\n"
@@ -475,14 +492,14 @@ static bool test_valid_get_parameter_reply ()
                       "wfd_standby_resume_capability: supported\r\n"
                       "wfd_uibc_capability: none\r\n"
                       "wfd_video_formats: 40 00 02 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 none none, 01 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 none none\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeReply);
-
-  std::shared_ptr<wfd::Reply> reply = std::dynamic_pointer_cast<wfd::Reply>(wfd_message);
+  wfd::Reply* reply = static_cast<wfd::Reply*>(message);
   ASSERT(reply != NULL);
   ASSERT_EQUAL(reply->response_code(), 200);
   ASSERT_EQUAL(reply->header().cseq(), 2);
@@ -490,7 +507,7 @@ static bool test_valid_get_parameter_reply ()
   ASSERT_EQUAL(reply->header().content_type(), "text/parameters");
   ASSERT_EQUAL(reply->header().supported_methods().size(), 0);
 
-  auto payload = wfd_message->payload();
+  auto payload = message->payload();
   std::shared_ptr<wfd::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
@@ -563,7 +580,7 @@ static bool test_valid_get_parameter_reply ()
       payload.get_property(wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
   ASSERT(!prop->is_none());
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -575,12 +592,16 @@ static bool test_invalid_property_value ()
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 1187\r\n");
-  std::string message("wfd_uibc_capability: none and something completely different\r\n");
+  std::string payload_buffer("wfd_uibc_capability: none and something completely different\r\n");
 
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
 
-  ASSERT_EXCEPTION (driver.parse_payload(message));
- 
+  driver.Parse(payload_buffer, message);
+  ASSERT(message == NULL);
+
   return true;
 }
 
@@ -591,24 +612,27 @@ static bool test_case_insensitivity ()
   std::string invalid_header("OptionS * RTSP/1.0\r\n"
                              "CSeq: 0\r\n"
                              "Require: org.wfa.wfd1.0\r\n\r\n");
-  ASSERT_EXCEPTION (driver.parse_header(invalid_header));
+  wfd::Message* message = nullptr;
+  driver.Parse(invalid_header, message);
+  ASSERT(message == NULL);
 
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSEQ: 2\r\n"
                      "Content-Type: tEXT/parameters\r\n"
                      "Content-LENGTH: 1187\r\n");
-  std::string message("wfd_uibc_capABILITY: noNE\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
+  std::string payload_buffer("wfd_uibc_capABILITY: noNE\r\n\r\n");
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
 
-  ASSERT_EQUAL(wfd_message->header().cseq(), 2);
-  ASSERT_EQUAL(wfd_message->header().content_type(), "tEXT/parameters");
-  ASSERT_EQUAL(wfd_message->header().content_length(), 1187);
+  ASSERT_EQUAL(message->header().cseq(), 2);
+  ASSERT_EQUAL(message->header().content_type(), "tEXT/parameters");
+  ASSERT_EQUAL(message->header().content_length(), 1187);
 
-  auto payload = wfd_message->payload();
+  auto payload = message->payload();
   std::shared_ptr<wfd::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
@@ -627,25 +651,23 @@ static bool test_valid_get_parameter_reply_with_errors ()
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 42\r\n\r\n");
-  std::string message("wfd_audio_codecs: 415, 457\r\n"
+  std::string payload_buffer("wfd_audio_codecs: 415, 457\r\n"
                       "wfd_I2C: 404\r\n");
 
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
 
-  auto wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeReply);
-
-  auto reply = std::static_pointer_cast<wfd::Reply>(wfd_message);
+  wfd::Reply* reply = static_cast<wfd::Reply*>(message);
   ASSERT(reply != NULL);
   ASSERT_EQUAL(reply->response_code(), 303);
 
-  auto payload = wfd_message->payload();
+  auto payload = message->payload();
   std::shared_ptr<wfd::PropertyErrors> error;
-
   ASSERT_EQUAL (payload.property_errors().size(), 2);
-
   ASSERT_NO_EXCEPTION(error =
       payload.get_property_error(wfd::PropertyType::WFD_AUDIO_CODECS));
   ASSERT_EQUAL(error->error_codes().size(), 2);
@@ -657,7 +679,7 @@ static bool test_valid_get_parameter_reply_with_errors ()
   ASSERT_EQUAL(error->error_codes().size(), 1);
   ASSERT_EQUAL(error->error_codes()[0], 404);
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -670,23 +692,26 @@ static bool test_valid_set_parameter ()
                      "CSeq: 3\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 275\r\n\r\n");
-  std::string message("wfd_audio_codecs: AAC 00000001 00\r\n"
+  std::string payload_buffer("wfd_audio_codecs: AAC 00000001 00\r\n"
                       "wfd_client_rtp_ports: RTP/AVP/UDP;unicast 19000 0 mode=play\r\n"
                       "wfd_presentation_url: rtsp://192.168.173.1/wfd1.0/streamid=0 none\r\n"
                       "wfd_trigger_method: SETUP\r\n"
                       "wfd_video_formats: 00 00 02 04 00000020 00000000 00000000 00 0000 0000 11 none none\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
-  ASSERT_NO_EXCEPTION (driver.parse_payload(message));
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeSetParameter);
-  ASSERT_EQUAL(wfd_message->request_uri(), "rtsp://localhost/wfd1.0");
-  ASSERT_EQUAL(wfd_message->header().cseq(), 3);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 275);
-  ASSERT_EQUAL(wfd_message->header().require_wfd_support(), false);
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  driver.Parse(payload_buffer, message);
+  ASSERT(message != NULL);
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodSetParameter);
+  ASSERT_EQUAL(request->request_uri(), "rtsp://localhost/wfd1.0");
+  ASSERT_EQUAL(request->header().cseq(), 3);
+  ASSERT_EQUAL(request->header().content_length(), 275);
+  ASSERT_EQUAL(request->header().require_wfd_support(), false);
 
-  auto payload = wfd_message->payload();
+  auto payload = request->payload();
   std::shared_ptr<wfd::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
@@ -719,7 +744,7 @@ static bool test_valid_set_parameter ()
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_PRESENTATION_URL));
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header + message);
+  ASSERT_EQUAL(request->to_string(), header + payload_buffer);
 
   return true;
 }
@@ -728,27 +753,29 @@ static bool test_valid_setup ()
 {
   wfd::Driver driver;
 
-  std::string message("SETUP rtsp://10.82.24.140/wfd1.0/streamid=0 RTSP/1.0\r\n"
+  std::string header("SETUP rtsp://10.82.24.140/wfd1.0/streamid=0 RTSP/1.0\r\n"
                       "CSeq: 4\r\n"
                       "Transport: RTP/AVP/UDP;unicast;client_port=19000\r\n"
                       "User-Agent: SEC-WDH/ME29\r\n"
                       "\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(message));
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypeSetup);
-  ASSERT_EQUAL(wfd_message->request_uri(), "rtsp://10.82.24.140/wfd1.0/streamid=0");
-  ASSERT_EQUAL(wfd_message->header().cseq(), 4);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 0);
-  ASSERT_EQUAL(wfd_message->header().require_wfd_support(), false);
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodSetup);
+  ASSERT_EQUAL(request->request_uri(), "rtsp://10.82.24.140/wfd1.0/streamid=0");
+  ASSERT_EQUAL(request->header().cseq(), 4);
+  ASSERT_EQUAL(request->header().content_length(), 0);
+  ASSERT_EQUAL(request->header().require_wfd_support(), false);
 
-  ASSERT_EQUAL(wfd_message->header().transport().client_port(), 19000);
-  ASSERT_EQUAL(wfd_message->header().transport().client_supports_rtcp(), false);
-  ASSERT_EQUAL(wfd_message->header().transport().server_port(), 0);
-  ASSERT_EQUAL(wfd_message->header().transport().server_supports_rtcp(), false);
+  ASSERT_EQUAL(request->header().transport().client_port(), 19000);
+  ASSERT_EQUAL(request->header().transport().client_supports_rtcp(), false);
+  ASSERT_EQUAL(request->header().transport().server_port(), 0);
+  ASSERT_EQUAL(request->header().transport().server_supports_rtcp(), false);
 
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), message);
+  ASSERT_EQUAL(request->to_string(), header);
 
   return true;
 }
@@ -761,27 +788,26 @@ static bool test_valid_setup_reply ()
                      "CSeq: 4\r\n"
                      "Session: 6B8B4567;timeout=30\r\n"
                      "Transport: RTP/AVP/UDP;unicast;client_port=19000;server_port=5000-5001\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-
-  std::shared_ptr<wfd::Reply> reply = std::dynamic_pointer_cast<wfd::Reply>(wfd_message);
+  wfd::Reply* reply = static_cast<wfd::Reply*>(message);
   ASSERT(reply != NULL);
 
   ASSERT_EQUAL(reply->response_code(), 200);
-  ASSERT_EQUAL(reply->type(), wfd::Message::MessageTypeReply);
-  ASSERT_EQUAL(wfd_message->header().cseq(), 4);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 0);
-  ASSERT_EQUAL(wfd_message->header().session(), "6B8B4567");
-  ASSERT_EQUAL(wfd_message->header().timeout(), 30);
+  ASSERT_EQUAL(reply->header().cseq(), 4);
+  ASSERT_EQUAL(reply->header().content_length(), 0);
+  ASSERT_EQUAL(reply->header().session(), "6B8B4567");
+  ASSERT_EQUAL(reply->header().timeout(), 30);
 
-  ASSERT_EQUAL(wfd_message->header().transport().client_port(), 19000);
-  ASSERT_EQUAL(wfd_message->header().transport().client_supports_rtcp(), false);
-  ASSERT_EQUAL(wfd_message->header().transport().server_port(), 5000);
-  ASSERT_EQUAL(wfd_message->header().transport().server_supports_rtcp(), true);
+  ASSERT_EQUAL(reply->header().transport().client_port(), 19000);
+  ASSERT_EQUAL(reply->header().transport().client_supports_rtcp(), false);
+  ASSERT_EQUAL(reply->header().transport().server_port(), 5000);
+  ASSERT_EQUAL(reply->header().transport().server_supports_rtcp(), true);
 
-  ASSERT_EQUAL(wfd_message->to_string(), header);
+  ASSERT_EQUAL(reply->to_string(), header);
 
   return true;
 }
@@ -794,18 +820,19 @@ static bool test_valid_play ()
                      "CSeq: 5\r\n"
                      "Session: 6B8B4567\r\n"
                      "User-Agent: SEC-WDH/ME29\r\n\r\n");
-  ASSERT_NO_EXCEPTION (driver.parse_header(header));
+  wfd::Message* message = nullptr;
+  driver.Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  wfd::Request* request = wfd::ToRequest(message);
+  ASSERT_EQUAL(request->method(), wfd::Request::MethodPlay);
+  ASSERT_EQUAL(request->request_uri(), "rtsp://localhost/wfd1.0");
+  ASSERT_EQUAL(request->header().cseq(), 5);
+  ASSERT_EQUAL(request->header().content_length(), 0);
+  ASSERT_EQUAL(request->header().require_wfd_support(), false);
+  ASSERT_EQUAL(request->header().session(), "6B8B4567");
 
-  std::shared_ptr<wfd::Message> wfd_message(driver.parsed_message());
-  ASSERT(wfd_message != NULL);
-  ASSERT_EQUAL(wfd_message->type(), wfd::Message::MessageTypePlay);
-  ASSERT_EQUAL(wfd_message->request_uri(), "rtsp://localhost/wfd1.0");
-  ASSERT_EQUAL(wfd_message->header().cseq(), 5);
-  ASSERT_EQUAL(wfd_message->header().content_length(), 0);
-  ASSERT_EQUAL(wfd_message->header().require_wfd_support(), false);
-  ASSERT_EQUAL(wfd_message->header().session(), "6B8B4567");
-
-  ASSERT_EQUAL(driver.parsed_message()->to_string(), header);
+  ASSERT_EQUAL(request->to_string(), header);
 
   return true;
 }
