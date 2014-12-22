@@ -164,8 +164,7 @@ class MessageReceiver : public MessageReceiverBase {
 
  protected:
   virtual bool CanHandle(Message* message) const override {
-    assert(message->is_request());
-    return MessageReceiverBase::CanHandle(message) &&
+    return MessageReceiverBase::CanHandle(message) && message->is_request() &&
            id == ToRequest(message)->id();
   }
 };
@@ -195,13 +194,14 @@ class OptionalMessageSender : public MessageSenderBase {
 
   virtual ~OptionalMessageSender() {}
 
- private:
-  virtual void Start() override {}
+ protected:
   virtual bool CanSend(Message* message) const override {
     assert(message);
-    assert(message->is_request());
-    return ToRequest(message)->id() == id;
+    return message->is_request() && ToRequest(message)->id() == id;
   }
+
+ private:
+  virtual void Start() override {}
 };
 
 // To be used for sequensed senders.

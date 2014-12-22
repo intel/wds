@@ -3,8 +3,6 @@
  *
  * Copyright (C) 2014 Intel Corporation.
  *
- * Contact: Alexander Kanavin <alex.kanavin@gmail.com>
- *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -21,9 +19,9 @@
  * 02110-1301 USA
  */
 
-#include <iostream>
-
 #include "mirac-gst-sink.hpp"
+
+#include <cassert>
 
 void _set_udp_caps(GstElement *playbin, GstElement *source, gpointer    user_data)
 {
@@ -37,18 +35,22 @@ void _set_udp_caps(GstElement *playbin, GstElement *source, gpointer    user_dat
     gst_caps_unref(caps);
 }
 
-MiracGstSink::MiracGstSink (std::string hostname, int port)
-{
-    std::string gst_pipeline;
+MiracGstSink::MiracGstSink (std::string hostname, int port) {
+  // todo (shalamov): move out pipeline initialization
+  // from constructor, otherwise we can't check error conditions
+  std::string gst_pipeline;
 
-    std::string url =  "udp://" + (!hostname.empty() ? hostname  : "::") + (port > 0 ? ":" + std::to_string(port) : ":");
-    gst_pipeline = "playbin uri=" + url;
+  std::string url =  "udp://" + (!hostname.empty() ? hostname  : "::") + (port > 0 ? ":" + std::to_string(port) : ":");
+  gst_pipeline = "playbin uri=" + url;
 
-    gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
-    if (gst_elem) {
-        g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
-        gst_element_set_state (gst_elem, GST_STATE_PLAYING);
-    }
+  // todo (shalamov): GError is not checked
+  gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
+  if (gst_elem) {
+      // todo (shalamov): add check whether handler id is > 0
+      g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
+      // todo (shalamov): add check for return value
+      gst_element_set_state (gst_elem, GST_STATE_PLAYING);
+  }
 }
 
 int MiracGstSink::sink_udp_port() {
@@ -66,10 +68,44 @@ int MiracGstSink::sink_udp_port() {
     return port;
 }
 
-MiracGstSink::~MiracGstSink ()
-{
-    if (gst_elem) {
-        gst_element_set_state (gst_elem, GST_STATE_NULL);
-        gst_object_unref (GST_OBJECT (gst_elem));
-    }
+void MiracGstSink::Play() {
+  assert(gst_elem);
+  if(!IsInState(GST_STATE_PLAYING)) {
+    gst_element_set_state(gst_elem, GST_STATE_PLAYING);
+    IsInState(GST_STATE_PLAYING);
+  }
+}
+
+void MiracGstSink::Pause() {
+  assert(gst_elem);
+  if(!IsPaused()) {
+    gst_element_set_state(gst_elem, GST_STATE_PAUSED);
+    IsPaused();
+  }
+}
+
+void MiracGstSink::Teardown() {
+  assert(gst_elem);
+  if(!IsInState(GST_STATE_READY)) {
+    gst_element_set_state(gst_elem, GST_STATE_READY);
+    IsInState(GST_STATE_READY);
+  }
+}
+
+bool MiracGstSink::IsPaused() const {
+  return IsInState(GST_STATE_PAUSED);
+}
+
+bool MiracGstSink::IsInState(GstState state) const {
+  assert(gst_elem);
+  GstState current_state;
+  gst_element_get_state(gst_elem, &current_state, NULL, GST_CLOCK_TIME_NONE);
+  return current_state == state;
+}
+
+MiracGstSink::~MiracGstSink () {
+  if (gst_elem) {
+    gst_element_set_state (gst_elem, GST_STATE_NULL);
+    gst_object_unref (GST_OBJECT (gst_elem));
+  }
 }

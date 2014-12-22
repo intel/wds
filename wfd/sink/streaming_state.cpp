@@ -67,7 +67,11 @@ class M7Sender final : public SequencedMessageSender {
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    if (reply->response_code() == 200) {
+      manager_->Play();
+      return true;
+    }
+    return false;
   }
 };
 
@@ -92,7 +96,11 @@ class M8Sender final : public SequencedMessageSender {
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (!manager_->Session().empty() && (reply->response_code() == 200));
+    if (!manager_->Session().empty() && (reply->response_code() == 200)) {
+      manager_->Teardown();
+      return true;
+    }
+    return false;
   }
 };
 
@@ -114,7 +122,11 @@ class M9Sender final : public SequencedMessageSender {
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    if (reply->response_code() == 200) {
+      manager_->Pause();
+      return true;
+    }
+    return false;
   }
 };
 
@@ -134,7 +146,18 @@ class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
   }
  private:
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    if (reply->response_code() == 200) {
+      manager_->Play();
+      return true;
+    }
+    return false;
+  }
+
+  virtual bool CanSend(Message* message) const override {
+    if (OptionalMessageSender<Request::M7>::CanSend(message)
+        && manager_->IsPaused())
+      return true;
+    return false;
   }
 };
 
@@ -146,7 +169,12 @@ class M8SenderOptional final : public OptionalMessageSender<Request::M8> {
  private:
   virtual bool HandleReply(Reply* reply) override {
     // todo: if successfull, switch to init state
-    return (reply->response_code() == 200);
+    if (reply->response_code() == 200) {
+      manager_->Teardown();
+      return true;
+    }
+
+    return false;
   }
 };
 
@@ -157,7 +185,18 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
   }
  private:
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    if (reply->response_code() == 200) {
+      manager_->Pause();
+      return true;
+    }
+    return false;
+  }
+
+  virtual bool CanSend(Message* message) const override {
+    if (OptionalMessageSender<Request::M9>::CanSend(message)
+        && !manager_->IsPaused())
+      return true;
+    return false;
   }
 };
 

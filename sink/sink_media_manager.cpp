@@ -26,16 +26,19 @@ SinkMediaManager::SinkMediaManager(const std::string& hostname)
 }
 
 void SinkMediaManager::Play() {
+  gst_pipeline_->Play();
 }
 
 void SinkMediaManager::Pause() {
+  gst_pipeline_->Pause();
 }
 
 void SinkMediaManager::Teardown() {
+  gst_pipeline_->Teardown();
 }
 
 bool SinkMediaManager::IsPaused() const {
-  return true;
+  return gst_pipeline_->IsPaused();
 }
 
 void SinkMediaManager::SetRtpPorts(int port1, int port2) {
