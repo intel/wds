@@ -106,6 +106,8 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   virtual void OnCompleted(MessageHandler* handler) override;
   virtual void OnError(MessageHandler* handler) override;
 
+  virtual void OnTimerEvent(uint timer_id) override;
+
   // RTSPInputHandler
   virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
@@ -122,6 +124,11 @@ void SourceImpl::Start() {
 
 void SourceImpl::RTSPDataReceived(const std::string& message) {
   InputReceived(message);
+}
+
+void SourceImpl::OnTimerEvent(uint timer_id) {
+  if (state_machine_->HandleTimeoutEvent(timer_id))
+    state_machine_->Reset();
 }
 
 namespace  {

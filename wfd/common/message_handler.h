@@ -64,6 +64,9 @@ class MessageHandler {
   virtual bool CanHandle(Message* message) const = 0;
   virtual void Handle(std::unique_ptr<Message> message) = 0;
 
+  // For handlers that require timeout
+  virtual bool HandleTimeoutEvent(uint timer_id) const { return false; }
+
   void set_observer(Observer* observer) {
     assert(observer);
     observer_ = observer;
@@ -100,6 +103,8 @@ class MessageSequenceHandler : public MessageHandler,
   virtual bool CanHandle(Message* message) const override;
   virtual void Handle(std::unique_ptr<Message> message) override;
 
+  virtual bool HandleTimeoutEvent(uint timer_id) const override;
+
  protected:
   void AddSequencedHandler(MessageHandler* handler);
   // MessageHandler::Observer implementation.
@@ -120,6 +125,8 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
   virtual void Send(std::unique_ptr<Message> message) override;
   virtual bool CanHandle(Message* message) const override;
   virtual void Handle(std::unique_ptr<Message> message) override;
+
+  virtual bool HandleTimeoutEvent(uint timer_id) const override;
 
  protected:
   void AddOptionalHandler(MessageHandler* handler);
@@ -178,11 +185,18 @@ class MessageSenderBase : public MessageHandler {
   virtual bool HandleReply(Reply* reply) = 0;
   virtual void Send(std::unique_ptr<Message> message) override;
   virtual void Reset() override;
+  virtual bool HandleTimeoutEvent(uint timer_id) const override;
+
 
  private:
   virtual bool CanHandle(Message* message) const override;
   virtual void Handle(std::unique_ptr<Message> message) override;
 
+  virtual int GetResponseTimeout() const;
+  void SetTimer();
+  void ReleaseTimer();
+
+  uint timer_id_;
   std::queue<int> cseq_queue_;
 };
 

@@ -27,6 +27,7 @@
 namespace wfd {
 
 int MessageHandler::send_cseq_ = 1;
+const int kDefaultTimeoutValue = 5;
 
 MessageSequenceHandler::MessageSequenceHandler(const InitParams& init_params)
   : MessageHandler(init_params),
@@ -97,6 +98,10 @@ void MessageSequenceHandler::OnError(MessageHandler* handler) {
   assert(handler == current_handler_);
   handler->Reset();
   observer_->OnError(this);
+}
+
+bool MessageSequenceHandler::HandleTimeoutEvent(uint timer_id) const {
+  return current_handler_->HandleTimeoutEvent(timer_id);
 }
 
 MessageSequenceWithOptionalSetHandler::MessageSequenceWithOptionalSetHandler(
@@ -200,6 +205,13 @@ void MessageSequenceWithOptionalSetHandler::OnError(MessageHandler* handler) {
   observer_->OnError(this);
 }
 
+bool MessageSequenceWithOptionalSetHandler::HandleTimeoutEvent(uint timer_id) const {
+  for (MessageHandler* handler : optional_handlers_)
+    if (handler->HandleTimeoutEvent(timer_id))
+      return true;
+  return MessageSequenceHandler::HandleTimeoutEvent(timer_id);
+}
+
 // MessageReceiverBase
 MessageReceiverBase::MessageReceiverBase(const InitParams& init_params)
   : MessageHandler(init_params),
@@ -234,15 +246,18 @@ void MessageReceiverBase::Handle(std::unique_ptr<Message> message) {
 }
 
 MessageSenderBase::MessageSenderBase(const InitParams& init_params)
-  : MessageHandler(init_params) {
+  : MessageHandler(init_params),
+    timer_id_(0) {
 }
 
 MessageSenderBase::~MessageSenderBase() {
+  ReleaseTimer();
 }
 
 void MessageSenderBase::Reset() {
   while (!cseq_queue_.empty())
     cseq_queue_.pop();
+  ReleaseTimer();
 }
 
 void MessageSenderBase::Send(std::unique_ptr<Message> message) {
@@ -251,8 +266,9 @@ void MessageSenderBase::Send(std::unique_ptr<Message> message) {
     observer_->OnError(this);
     return;
   }
-  cseq_queue_.push(message->cseq()); // TODO : Add timeout check for reply.
+  cseq_queue_.push(message->cseq());
   sender_->SendRTSPData(message->to_string());
+  SetTimer();
 }
 
 bool MessageSenderBase::CanHandle(Message* message) const {
@@ -272,9 +288,30 @@ void MessageSenderBase::Handle(std::unique_ptr<Message> message) {
   if (!HandleReply(static_cast<Reply*>(message.get())))
     observer_->OnError(this);
 
+  ReleaseTimer();
+
   if (cseq_queue_.empty()) {
     observer_->OnCompleted(this);
   }
+}
+
+bool MessageSenderBase::HandleTimeoutEvent(uint timer_id) const {
+  return timer_id_ == timer_id;
+}
+
+void MessageSenderBase::SetTimer() {
+  uint timer_id = sender_->CreateTimer(GetResponseTimeout());
+  if (timer_id > 0)
+    timer_id_ = timer_id;
+}
+
+void MessageSenderBase::ReleaseTimer() {
+  sender_->ReleaseTimer(timer_id_);
+  timer_id_ = 0;
+}
+
+int MessageSenderBase::GetResponseTimeout() const {
+  return kDefaultTimeoutValue;
 }
 
 SequencedMessageSender::SequencedMessageSender(const InitParams& init_params)

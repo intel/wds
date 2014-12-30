@@ -1,9 +1,7 @@
 /*
- * This file is part of XXX
+ * This file is part of wysiwidi
  *
  * Copyright (C) 2014 Intel Corporation.
- *
- * Contact: Jussi Kukkonen <jussi.kukkonen@intel.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +25,8 @@
 
 #include <glib.h>
 #include <memory>
+#include <map>
+#include <vector>
 
 #include "wfd/public/peer.h"
 #include "mirac-network.hpp"
@@ -45,10 +45,14 @@ class MiracBroker : public wfd::Peer::Delegate
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
         std::string get_peer_address() const;
+        virtual wfd::Peer* Peer() const = 0;
+        void OnTimeout(uint timer_id);
 
     protected:
         // wfd::Peer::Delegate
         virtual void SendRTSPData(const std::string& data) override;
+        virtual uint CreateTimer(int seconds);
+        virtual void ReleaseTimer(uint timer_id);
 
         virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};
@@ -69,6 +73,7 @@ class MiracBroker : public wfd::Peer::Delegate
 
         std::unique_ptr<MiracNetwork> network_;
         std::unique_ptr<MiracNetwork> connection_;
+        std::vector<uint> timers_;
 };
 
 

@@ -38,6 +38,9 @@ class Sink : public MiracBroker {
   void Pause();
   void Teardown();
 
+ protected:
+  virtual wfd::Peer* Peer() const override;
+
  private:
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;

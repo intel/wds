@@ -95,6 +95,8 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   // RTSPInputHandler
   virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
+  virtual void OnTimerEvent(uint timer_id) override;
+
   bool HandleCommand(std::unique_ptr<Message> command);
 
   template <class WfdMessage, Request::ID id>
@@ -157,6 +159,11 @@ void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
 
 WFD_EXPORT Sink* Sink::Create(Delegate* delegate, MediaManager* mng) {
   return new SinkImpl(delegate, mng);
+}
+
+void SinkImpl::OnTimerEvent(uint timer_id) {
+  if (state_machine_->HandleTimeoutEvent(timer_id))
+    state_machine_->Reset();
 }
 
 }  // namespace wfd
