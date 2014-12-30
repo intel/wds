@@ -13,8 +13,9 @@ class DesktopMediaManager : public wfd::MediaManager {
   virtual void Pause() override;
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
-  virtual void SetRtpPorts(int port1, int port2) override;
-  virtual int RtpPort() const override;
+  virtual void SetSinkRtpPorts(int port1, int port2) override;
+  virtual std::pair<int,int> SinkRtpPorts() const override;
+  virtual int SourceRtpPort() const override;
   virtual void SetPresentationUrl(const std::string& url) override;
   virtual std::string PresentationUrl() const override;
   virtual void SetSession(const std::string& session) override;
@@ -23,6 +24,9 @@ class DesktopMediaManager : public wfd::MediaManager {
  private:
   std::string hostname_;
   std::unique_ptr<MiracGstTestSource> gst_pipeline_;
+
+  int sink_port1_;
+  int sink_port2_;
 };
 
 #endif // DESKTOP_MEDIA_MANAGER_H_
