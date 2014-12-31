@@ -35,6 +35,7 @@ namespace wfd {
 
 class Driver {
  public:
+  Driver() = default;
   ~Driver();
 
   void Parse(const std::string& input, Message*& message /*out*/);
