@@ -61,13 +61,6 @@ class M6Handler final : public MessageReceiver<Request::M6> {
     auto reply = std::unique_ptr<Reply>(new Reply(200));
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
-
-    auto transport = new TransportHeader();
-    // we assume here that there is no coupled secondary sink
-    transport->set_client_port(manager_->SinkRtpPorts().first);
-    transport->set_server_port(manager_->SourceRtpPort());
-    reply->header().set_transport(transport);
-
     return std::move(reply);
   }
 };
