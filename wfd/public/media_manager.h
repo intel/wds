@@ -31,9 +31,8 @@ class MediaManager {
   virtual void Pause() = 0;
   virtual void Teardown() = 0;
   virtual bool IsPaused() const = 0;
-  virtual void SetSinkRtpPorts(int port1, int port2) = 0;
-  virtual std::pair<int,int> SinkRtpPorts() const = 0;
-  virtual int SourceRtpPort() const = 0;
+  virtual void SetRtpPorts(int port1, int port2) = 0;
+  virtual int RtpPort() const = 0;
   virtual void SetPresentationUrl(const std::string& url) = 0;
   virtual std::string PresentationUrl() const = 0;
   virtual void SetSession(const std::string& session) = 0;

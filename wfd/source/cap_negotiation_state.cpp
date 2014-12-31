@@ -70,7 +70,7 @@ bool M3Handler::HandleReply(Reply* reply) {
   auto prop = reply->payload().get_property(WFD_CLIENT_RTP_PORTS);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
   assert(ports);
-  manager_->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
+  manager_->SetRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
   return true;
 }
 
@@ -78,7 +78,7 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
   set_param->header().set_cseq(send_cseq_++);
   set_param->payload().add_property(
-      std::shared_ptr<Property>(new ClientRtpPorts(manager_->SinkRtpPorts().first,manager_->SinkRtpPorts().second)));
+      std::shared_ptr<Property>(new ClientRtpPorts(1028,0)));
   set_param->payload().add_property(
       std::shared_ptr<Property>(new PresentationUrl(
           "rtsp://127.0.0.1/wfd1.0/streamid=0",
