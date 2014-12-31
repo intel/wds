@@ -40,7 +40,8 @@ class M6Handler final : public SequencedMessageSender {
   virtual std::unique_ptr<Message> CreateMessage() override {
     auto setup = new Setup(manager_->PresentationUrl());
     auto transport = new TransportHeader();
-    transport->set_client_port(manager_->RtpPort());
+    // we assume here that there is no coupled secondary sink
+    transport->set_client_port(manager_->SinkRtpPorts().first);
 
     setup->header().set_transport(transport);
     setup->header().set_cseq(send_cseq_++);
