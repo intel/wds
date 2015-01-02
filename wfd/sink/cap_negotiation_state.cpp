@@ -88,8 +88,8 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new wfd::CoupledSink());
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CLIENT_RTP_PORTS]){
-          new_prop.reset(new wfd::ClientRtpPorts(ToSinkMediaManager(manager_)->SinkRtpPorts().first,
-                                                 ToSinkMediaManager(manager_)->SinkRtpPorts().second));
+          new_prop.reset(new wfd::ClientRtpPorts(ToSinkMediaManager(manager_)->ListeningRtpPorts().first,
+                                                 ToSinkMediaManager(manager_)->ListeningRtpPorts().second));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_I2C]){
           new_prop.reset(new wfd::I2C(0));

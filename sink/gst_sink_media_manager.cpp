@@ -41,7 +41,7 @@ bool GstSinkMediaManager::IsPaused() const {
   return gst_pipeline_->IsPaused();
 }
 
-std::pair<int,int> GstSinkMediaManager::SinkRtpPorts() const {
+std::pair<int,int> GstSinkMediaManager::ListeningRtpPorts() const {
   return std::pair<int,int>(gst_pipeline_->sink_udp_port(), 0);
 }
 

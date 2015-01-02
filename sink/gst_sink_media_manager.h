@@ -35,7 +35,7 @@ class GstSinkMediaManager : public wfd::SinkMediaManager {
   virtual void Pause() override;
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
-  virtual std::pair<int,int> SinkRtpPorts() const override;
+  virtual std::pair<int,int> ListeningRtpPorts() const override;
   virtual void SetPresentationUrl(const std::string& url) override;
   virtual std::string PresentationUrl() const override;
   virtual void SetSession(const std::string& session) override;

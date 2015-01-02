@@ -35,7 +35,7 @@ class MediaManager {
 
 class SinkMediaManager : public MediaManager {
  public:
-  virtual std::pair<int,int> SinkRtpPorts() const = 0;
+  virtual std::pair<int,int> ListeningRtpPorts() const = 0;
   virtual void SetPresentationUrl(const std::string& url) = 0;
   virtual std::string PresentationUrl() const = 0;
   virtual void SetSession(const std::string& session) = 0;

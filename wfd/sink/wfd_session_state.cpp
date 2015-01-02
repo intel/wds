@@ -41,7 +41,7 @@ class M6Handler final : public SequencedMessageSender {
     auto setup = new Setup(ToSinkMediaManager(manager_)->PresentationUrl());
     auto transport = new TransportHeader();
     // we assume here that there is no coupled secondary sink
-    transport->set_client_port(ToSinkMediaManager(manager_)->SinkRtpPorts().first);
+    transport->set_client_port(ToSinkMediaManager(manager_)->ListeningRtpPorts().first);
 
     setup->header().set_transport(transport);
     setup->header().set_cseq(send_cseq_++);
