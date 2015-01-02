@@ -19,25 +19,23 @@
  * 02110-1301 USA
  */
 
-#ifndef SINK_MEDIA_MANAGER_H_
-#define SINK_MEDIA_MANAGER_H_
+#ifndef GST_SINK_MEDIA_MANAGER_H_
+#define GST_SINK_MEDIA_MANAGER_H_
 
 #include <memory>
 
 #include "wfd/public/media_manager.h"
 #include "mirac-gst-sink.hpp"
 
-class SinkMediaManager : public wfd::MediaManager {
+class GstSinkMediaManager : public wfd::SinkMediaManager {
  public:
-  explicit SinkMediaManager(const std::string& hostname);
+  explicit GstSinkMediaManager(const std::string& hostname);
 
   virtual void Play() override;
   virtual void Pause() override;
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
-  virtual void SetSinkRtpPorts(int port1, int port2) override;
-  virtual std::pair<int,int> SinkRtpPorts() const override;
-  virtual int SourceRtpPort() const override;
+  virtual std::pair<int,int> ListeningRtpPorts() const override;
   virtual void SetPresentationUrl(const std::string& url) override;
   virtual std::string PresentationUrl() const override;
   virtual void SetSession(const std::string& session) override;
@@ -50,4 +48,4 @@ class SinkMediaManager : public wfd::MediaManager {
   std::unique_ptr<MiracGstSink> gst_pipeline_;
 };
 
-#endif // SINK_MEDIA_MANAGER_H_
+#endif // GST_SINK_MEDIA_MANAGER_H_

@@ -39,17 +39,3 @@ std::pair<int, int> DesktopMediaManager::SinkRtpPorts() const {
 int DesktopMediaManager::SourceRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
-
-void DesktopMediaManager::SetPresentationUrl(const std::string& url) {
-}
-
-std::string DesktopMediaManager::PresentationUrl() const {
-  return std::string();
-}
-
-void DesktopMediaManager::SetSession(const std::string& session) {
-}
-
-std::string DesktopMediaManager::Session() const {
-  return std::string();
-}

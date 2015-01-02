@@ -20,7 +20,7 @@
  */
 
 #include "sink.h"
-#include "sink_media_manager.h"
+#include "gst_sink_media_manager.h"
 
 Sink::Sink(const std::string& host, int rtsp_port)
   : MiracBroker(host.c_str(), std::to_string(rtsp_port)) {
@@ -33,7 +33,7 @@ void Sink::got_message(const std::string& message) {
 }
 
 void Sink::on_connected() {
-  media_manager_.reset(new SinkMediaManager(get_peer_address()));
+  media_manager_.reset(new GstSinkMediaManager(get_peer_address()));
   wfd_sink_.reset(wfd::Sink::Create(this, media_manager_.get()));
   wfd_sink_->Start();
 }

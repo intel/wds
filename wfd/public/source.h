@@ -26,12 +26,12 @@
 
 namespace wfd {
 
-class MediaManager;
+class SourceMediaManager;
 
 class Source : public Peer {
  public:
   virtual ~Source() {}
-  static Source* Create(Peer::Delegate* delegate, MediaManager* mng);
+  static Source* Create(Peer::Delegate* delegate, SourceMediaManager* mng);
 };
 
 }

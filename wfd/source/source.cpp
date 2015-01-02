@@ -30,6 +30,7 @@
 #include "wfd/common/rtsp_input_handler.h"
 #include "wfd/common/wfd_export.h"
 #include "wfd/parser/setparameter.h"
+#include "wfd/public/media_manager.h"
 
 namespace wfd {
 
@@ -92,7 +93,7 @@ class SourceStateMachine : public MessageSequenceHandler {
 
 class SourceImpl final : public Source, public RTSPInputHandler, public MessageHandler::Observer {
  public:
-  SourceImpl(Delegate* delegate, MediaManager* mng);
+  SourceImpl(Delegate* delegate, SourceMediaManager* mng);
 
  private:
   // Source implementation.
@@ -114,7 +115,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   std::unique_ptr<SourceStateMachine> state_machine_;
 };
 
-SourceImpl::SourceImpl(Delegate* delegate, MediaManager* mng)
+SourceImpl::SourceImpl(Delegate* delegate, SourceMediaManager* mng)
   : state_machine_(new SourceStateMachine({delegate, mng, this})) {
 }
 
@@ -185,7 +186,7 @@ void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
   state_machine_->Handle(std::move(message));
 }
 
-WFD_EXPORT Source* Source::Create(Delegate* delegate, MediaManager* mng) {
+WFD_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng) {
   return new SourceImpl(delegate, mng);
 }
 

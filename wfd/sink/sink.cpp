@@ -74,7 +74,7 @@ class SinkStateMachine : public MessageSequenceHandler {
      AddSequencedHandler(new sink::WfdSessionState(init_params));
      AddSequencedHandler(new sink::StreamingState(init_params));
    }
-   SinkStateMachine(Peer::Delegate* sender, MediaManager* mng)
+   SinkStateMachine(Peer::Delegate* sender, SinkMediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
 
    int GetNextCSeq() { return send_cseq_++; }
@@ -82,7 +82,7 @@ class SinkStateMachine : public MessageSequenceHandler {
 
 class SinkImpl final : public Sink, public RTSPInputHandler {
  public:
-  SinkImpl(Delegate* delegate, MediaManager* mng);
+  SinkImpl(Delegate* delegate, SinkMediaManager* mng);
 
  private:
   // Sink implementation.
@@ -103,10 +103,10 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   std::unique_ptr<Message> CreateCommand();
 
   std::unique_ptr<SinkStateMachine> state_machine_;
-  MediaManager* manager_;
+  SinkMediaManager* manager_;
 };
 
-SinkImpl::SinkImpl(Delegate* delegate, MediaManager* mng)
+SinkImpl::SinkImpl(Delegate* delegate, SinkMediaManager* mng)
   : state_machine_(new SinkStateMachine(delegate, mng)),
     manager_(mng) {
 }
@@ -157,7 +157,7 @@ void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
   state_machine_->Handle(std::move(message));
 }
 
-WFD_EXPORT Sink* Sink::Create(Delegate* delegate, MediaManager* mng) {
+WFD_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
   return new SinkImpl(delegate, mng);
 }
 
