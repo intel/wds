@@ -1,9 +1,7 @@
 /*
- * This file is part of XXX
+ * This file is part of wysiwidi
  *
  * Copyright (C) 2014 Intel Corporation.
- *
- * Contact: Jussi Laako <jussi.laako@linux.intel.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,8 +20,16 @@
  */
 
 #include <glib-unix.h>
+#include <algorithm>
 
 #include "mirac-broker.hpp"
+
+struct TimerCallbackData {
+  TimerCallbackData(MiracBroker* delegate)
+    : delegate_(delegate), timer_id_(0) {}
+  MiracBroker* delegate_;
+  uint timer_id_;
+};
 
 /* static C callback wrapper */
 gboolean MiracBroker::send_cb (gint fd, GIOCondition condition, gpointer data_ptr)
@@ -140,3 +146,40 @@ void MiracBroker::SendRTSPData(const std::string& data) {
     if (connection_ && !connection_->Send(data))
         g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
 }
+
+static gboolean on_timeout(gpointer user_data) {
+  TimerCallbackData* data = static_cast<TimerCallbackData*>(user_data);
+  data->delegate_->OnTimeout(data->timer_id_);
+  delete data;
+  return FALSE;
+}
+
+void MiracBroker::OnTimeout(uint timer_id) {
+  if (std::find(timers_.begin(), timers_.end(), timer_id) != timers_.end())
+    Peer()->OnTimerEvent(timer_id);
+}
+
+uint MiracBroker::CreateTimer(int seconds) {
+  TimerCallbackData* data = new TimerCallbackData(this);
+  uint timer_id = g_timeout_add_seconds(
+                        seconds,
+                        on_timeout,
+                        data);
+  if (timer_id > 0) {
+    data->timer_id_ = timer_id;
+    timers_.push_back(timer_id);
+  } else {
+    delete data;
+  }
+
+  return timer_id;
+}
+
+void MiracBroker::ReleaseTimer(uint timer_id) {
+  if (timer_id > 0) {
+    auto it = std::find(timers_.begin(), timers_.end(), timer_id);
+    if (it != timers_.end() )
+      timers_.erase(it);
+  }
+}
+

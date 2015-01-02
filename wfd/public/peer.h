@@ -26,14 +26,23 @@
 
 namespace wfd {
 
+class MessageSenderBase;
+
 class Peer {
  public:
+
   class Delegate {
    public:
     virtual void SendRTSPData(const std::string& data) = 0;
+
+    // Interfaces to manage timer events
+    virtual uint CreateTimer(int seconds) = 0;
+    virtual void ReleaseTimer(uint timer_id) = 0;
+
    protected:
     virtual ~Delegate() {}
   };
+
   virtual ~Peer() {}
   virtual void Start() = 0;
   virtual void RTSPDataReceived(const std::string& data) = 0;
@@ -43,6 +52,8 @@ class Peer {
   virtual bool Teardown() = 0;
   virtual bool Play() = 0;
   virtual bool Pause() = 0;
+
+  virtual void OnTimerEvent(uint timer_id) = 0;
 };
 
 }

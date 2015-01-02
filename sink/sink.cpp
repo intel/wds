@@ -50,3 +50,7 @@ void Sink::Teardown() {
   wfd_sink_->Teardown();
 }
 
+wfd::Peer* Sink::Peer() const {
+  return wfd_sink_.get();
+}
+
