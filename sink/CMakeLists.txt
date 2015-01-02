@@ -18,5 +18,5 @@ include_directories(${GIO_INCLUDE_DIRS})
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
-add_executable(sink-test main.cpp sink.cpp sink_media_manager.cpp)
+add_executable(sink-test main.cpp sink.cpp gst_sink_media_manager.cpp)
 target_link_libraries (sink-test mirac wysiwidi p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})

@@ -19,17 +19,17 @@
  * 02110-1301 USA
  */
 
-#ifndef SINK_MEDIA_MANAGER_H_
-#define SINK_MEDIA_MANAGER_H_
+#ifndef GST_SINK_MEDIA_MANAGER_H_
+#define GST_SINK_MEDIA_MANAGER_H_
 
 #include <memory>
 
 #include "wfd/public/media_manager.h"
 #include "mirac-gst-sink.hpp"
 
-class SinkMediaManager : public wfd::MediaManager {
+class GstSinkMediaManager : public wfd::MediaManager {
  public:
-  explicit SinkMediaManager(const std::string& hostname);
+  explicit GstSinkMediaManager(const std::string& hostname);
 
   virtual void Play() override;
   virtual void Pause() override;
@@ -50,4 +50,4 @@ class SinkMediaManager : public wfd::MediaManager {
   std::unique_ptr<MiracGstSink> gst_pipeline_;
 };
 
-#endif // SINK_MEDIA_MANAGER_H_
+#endif // GST_SINK_MEDIA_MANAGER_H_

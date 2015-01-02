@@ -19,52 +19,52 @@
  * 02110-1301 USA
  */
 
-#include "sink_media_manager.h"
+#include "gst_sink_media_manager.h"
 
-SinkMediaManager::SinkMediaManager(const std::string& hostname)
+GstSinkMediaManager::GstSinkMediaManager(const std::string& hostname)
   : gst_pipeline_(new MiracGstSink(hostname, 0)) {
 }
 
-void SinkMediaManager::Play() {
+void GstSinkMediaManager::Play() {
   gst_pipeline_->Play();
 }
 
-void SinkMediaManager::Pause() {
+void GstSinkMediaManager::Pause() {
   gst_pipeline_->Pause();
 }
 
-void SinkMediaManager::Teardown() {
+void GstSinkMediaManager::Teardown() {
   gst_pipeline_->Teardown();
 }
 
-bool SinkMediaManager::IsPaused() const {
+bool GstSinkMediaManager::IsPaused() const {
   return gst_pipeline_->IsPaused();
 }
 
-void SinkMediaManager::SetSinkRtpPorts(int port1, int port2) {
+void GstSinkMediaManager::SetSinkRtpPorts(int port1, int port2) {
 }
 
-std::pair<int,int> SinkMediaManager::SinkRtpPorts() const {
+std::pair<int,int> GstSinkMediaManager::SinkRtpPorts() const {
   return std::pair<int,int>(gst_pipeline_->sink_udp_port(), 0);
 }
 
-int SinkMediaManager::SourceRtpPort() const {
+int GstSinkMediaManager::SourceRtpPort() const {
   return 0;
 }
 
 
-void SinkMediaManager::SetPresentationUrl(const std::string& url) {
+void GstSinkMediaManager::SetPresentationUrl(const std::string& url) {
   presentation_url_ = url;
 }
 
-std::string SinkMediaManager::PresentationUrl() const {
+std::string GstSinkMediaManager::PresentationUrl() const {
   return presentation_url_;
 }
 
-void SinkMediaManager::SetSession(const std::string& session) {
+void GstSinkMediaManager::SetSession(const std::string& session) {
   session_ = session;
 }
 
-std::string SinkMediaManager::Session() const {
+std::string GstSinkMediaManager::Session() const {
   return session_;
 }
