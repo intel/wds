@@ -64,8 +64,8 @@ class M6Handler final : public MessageReceiver<Request::M6> {
 
     auto transport = new TransportHeader();
     // we assume here that there is no coupled secondary sink
-    transport->set_client_port(manager_->SinkRtpPorts().first);
-    transport->set_server_port(manager_->SourceRtpPort());
+    transport->set_client_port(ToSourceMediaManager(manager_)->SinkRtpPorts().first);
+    transport->set_server_port(ToSourceMediaManager(manager_)->SourceRtpPort());
     reply->header().set_transport(transport);
 
     return std::move(reply);

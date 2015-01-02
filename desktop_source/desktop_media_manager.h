@@ -6,7 +6,7 @@
 #include "wfd/public/media_manager.h"
 #include "mirac-gst-test-source.hpp"
 
-class DesktopMediaManager : public wfd::MediaManager {
+class DesktopMediaManager : public wfd::SourceMediaManager {
  public:
   explicit DesktopMediaManager(const std::string& hostname);
   virtual void Play() override;
@@ -16,10 +16,6 @@ class DesktopMediaManager : public wfd::MediaManager {
   virtual void SetSinkRtpPorts(int port1, int port2) override;
   virtual std::pair<int,int> SinkRtpPorts() const override;
   virtual int SourceRtpPort() const override;
-  virtual void SetPresentationUrl(const std::string& url) override;
-  virtual std::string PresentationUrl() const override;
-  virtual void SetSession(const std::string& session) override;
-  virtual std::string Session() const override;
 
  private:
   std::string hostname_;

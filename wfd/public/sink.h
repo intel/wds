@@ -26,12 +26,12 @@
 
 namespace wfd {
 
-class MediaManager;
+class SinkMediaManager;
 
 class Sink : public Peer {
  public:
   virtual ~Sink() {}
-  static Sink* Create(Peer::Delegate* delegate, MediaManager* mng);
+  static Sink* Create(Peer::Delegate* delegate, SinkMediaManager* mng);
 };
 
 }

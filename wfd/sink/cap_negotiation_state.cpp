@@ -88,7 +88,8 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new wfd::CoupledSink());
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CLIENT_RTP_PORTS]){
-          new_prop.reset(new wfd::ClientRtpPorts(manager_->SinkRtpPorts().first, manager_->SinkRtpPorts().second));
+          new_prop.reset(new wfd::ClientRtpPorts(ToSinkMediaManager(manager_)->SinkRtpPorts().first,
+                                                 ToSinkMediaManager(manager_)->SinkRtpPorts().second));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_I2C]){
           new_prop.reset(new wfd::I2C(0));
@@ -121,7 +122,7 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
 
   // presentation URL is the only thing we care about
   // support for other parameters can be added later as needed
-  manager_->SetPresentationUrl(property->presentation_url_1());
+  ToSinkMediaManager(manager_)->SetPresentationUrl(property->presentation_url_1());
   return std::unique_ptr<Reply>(new Reply(200));
 }
 

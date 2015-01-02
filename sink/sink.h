@@ -42,7 +42,7 @@ class Sink : public MiracBroker {
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;
 
-  std::unique_ptr<wfd::MediaManager> media_manager_;
+  std::unique_ptr<wfd::SinkMediaManager> media_manager_;
   std::unique_ptr<wfd::Sink> wfd_sink_;
 };
 

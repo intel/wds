@@ -27,7 +27,7 @@
 #include "wfd/public/media_manager.h"
 #include "mirac-gst-sink.hpp"
 
-class GstSinkMediaManager : public wfd::MediaManager {
+class GstSinkMediaManager : public wfd::SinkMediaManager {
  public:
   explicit GstSinkMediaManager(const std::string& hostname);
 
@@ -35,9 +35,7 @@ class GstSinkMediaManager : public wfd::MediaManager {
   virtual void Pause() override;
   virtual void Teardown() override;
   virtual bool IsPaused() const override;
-  virtual void SetSinkRtpPorts(int port1, int port2) override;
   virtual std::pair<int,int> SinkRtpPorts() const override;
-  virtual int SourceRtpPort() const override;
   virtual void SetPresentationUrl(const std::string& url) override;
   virtual std::string PresentationUrl() const override;
   virtual void SetSession(const std::string& session) override;

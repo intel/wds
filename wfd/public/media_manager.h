@@ -31,14 +31,34 @@ class MediaManager {
   virtual void Pause() = 0;
   virtual void Teardown() = 0;
   virtual bool IsPaused() const = 0;
-  virtual void SetSinkRtpPorts(int port1, int port2) = 0;
+};
+
+class SinkMediaManager : public MediaManager {
+ public:
   virtual std::pair<int,int> SinkRtpPorts() const = 0;
-  virtual int SourceRtpPort() const = 0;
   virtual void SetPresentationUrl(const std::string& url) = 0;
   virtual std::string PresentationUrl() const = 0;
   virtual void SetSession(const std::string& session) = 0;
   virtual std::string Session() const = 0;
+
 };
+
+class SourceMediaManager : public MediaManager {
+ public:
+  virtual void SetSinkRtpPorts(int port1, int port2) = 0;
+  virtual std::pair<int,int> SinkRtpPorts() const = 0;
+  virtual int SourceRtpPort() const = 0;
+};
+
+inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng)
+{
+  return static_cast<SourceMediaManager*>(mng);
+}
+
+inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng)
+{
+  return static_cast<SinkMediaManager*>(mng);
+}
 
 }  // namespace wfd
 

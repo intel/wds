@@ -6,7 +6,7 @@
 #include "mirac-broker.hpp"
 
 namespace wfd {
-class MediaManager;
+class SourceMediaManager;
 class Source;
 }
 
@@ -21,7 +21,7 @@ class MiracBrokerSource : public MiracBroker {
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;
 
-  std::unique_ptr<wfd::MediaManager> media_manager_;
+  std::unique_ptr<wfd::SourceMediaManager> media_manager_;
   std::unique_ptr<wfd::Source> wfd_source_;
 };
 
