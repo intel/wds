@@ -21,46 +21,59 @@
 
 #include "rtsp_input_handler.h"
 
+#include <cassert>
+
 namespace wfd {
 
-// FIXME : re-write in more robust way (handle granular input).
+RTSPInputHandler::~RTSPInputHandler() {
+}
+
 void RTSPInputHandler::InputReceived(const std::string& input) {
   rtsp_recieve_buffer_ += input;
-  std::string buffer;
 
-  while(GetHeader(buffer)) {
-    Message* message = nullptr;
-    driver_.Parse(buffer, message);
-    if (!message) {
-      // TODO : handle an invalid input.
-      rtsp_recieve_buffer_.clear();
-      return;
-    }
-    uint content_length = message->header().content_length();
-    if (content_length && GetPayload(buffer, content_length))
-      driver_.Parse(buffer, message);
-    MessageParsed(std::unique_ptr<Message>(message));
+  // First trying to get payload for the message obtained
+  // from the previous input.
+  if (message_ && !ParsePayload())
+    return;
+
+  while (ParseHeader()) {
+    if (!ParsePayload())
+      break;
   }
 }
 
-bool RTSPInputHandler::GetHeader(std::string& header) {
+bool RTSPInputHandler::ParseHeader() {
+  assert(!message_);
   size_t eom = rtsp_recieve_buffer_.find("\r\n\r\n");
   if (eom == std::string::npos) {
-    rtsp_recieve_buffer_.clear();
     return false;
   }
 
-  header = rtsp_recieve_buffer_.substr(0, eom + 4);
+  const std::string& header = rtsp_recieve_buffer_.substr(0, eom + 4);
   rtsp_recieve_buffer_.erase(0, eom + 4);
+  driver_.Parse(header, message_);
+  if (!message_) {
+    rtsp_recieve_buffer_.clear();
+    return false;
+  }
   return true;
 }
 
-bool RTSPInputHandler::GetPayload(std::string& payload, unsigned content_length) {
-  if (rtsp_recieve_buffer_.size() < content_length)
-      return false;
+bool RTSPInputHandler::ParsePayload() {
+  assert(message_);
+  uint content_length = message_->header().content_length();
+  if (content_length == 0) {
+    MessageParsed(std::move(message_));
+    return true;
+  }
 
-  payload = rtsp_recieve_buffer_.substr(0, content_length);
+  if (rtsp_recieve_buffer_.size() < content_length)
+    return false;
+
+  const std::string& payload = rtsp_recieve_buffer_.substr(0, content_length);
   rtsp_recieve_buffer_.erase(0, content_length);
+  driver_.Parse(payload, message_);
+  MessageParsed(std::move(message_));
   return true;
 }
 

@@ -34,7 +34,7 @@
 }
 
 %parse-param { Scanner& scanner  }
-%parse-param { Message*& message  }
+%parse-param { std::unique_ptr<Message>& message  }
 
 %code {
 /*
@@ -329,7 +329,7 @@ start: message
 
 message:
     command headers {
-      message = $1;
+      message.reset($1);
       $1->set_header(std::unique_ptr<Header>($2));
     }
   | payload {

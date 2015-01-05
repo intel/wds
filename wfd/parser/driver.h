@@ -38,7 +38,7 @@ class Driver {
   Driver() = default;
   ~Driver();
 
-  void Parse(const std::string& input, Message*& message /*out*/);
+  void Parse(const std::string& input, std::unique_ptr<Message>& message /*out*/);
 
  private:
   std::unique_ptr<Parser> parser_;

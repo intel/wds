@@ -37,11 +37,11 @@ int BaseLexer::yylex(Parser::semantic_type *lval) {
   return( yylex() );
 }
 
-Scanner::Scanner(std::istream* in, Message*& message) {
+Scanner::Scanner(std::istream* in, std::unique_ptr<Message>& message) {
   if (!message) {
     lexer_.reset(new HeaderScanner(in));
   } else if (message->is_reply()) {
-    Reply* reply = static_cast<Reply*>(message);
+    Reply* reply = static_cast<Reply*>(message.get());
     if (reply->response_code() == 303)
       lexer_.reset(new ErrorScanner(in));
     else

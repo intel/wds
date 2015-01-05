@@ -65,7 +65,7 @@ class MessageHandler {
   virtual void Handle(std::unique_ptr<Message> message) = 0;
 
   // For handlers that require timeout
-  virtual bool HandleTimeoutEvent(uint timer_id) const { return false; }
+  virtual bool HandleTimeoutEvent(uint timer_id) const;
 
   void set_observer(Observer* observer) {
     assert(observer);
