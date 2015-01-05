@@ -32,7 +32,7 @@ namespace wfd {
 Driver::~Driver() {
 }
 
-void Driver::Parse(const std::string& input, Message*& message) {
+void Driver::Parse(const std::string& input, std::unique_ptr<Message>& message) {
   std::istringstream in(input);
   if (!in.good())
     return;

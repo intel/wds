@@ -44,7 +44,7 @@ class BaseLexer {
 
 class Scanner {
 public:
-  Scanner(std::istream* in, Message*& message);
+  Scanner(std::istream* in, std::unique_ptr<Message>& message);
   virtual ~Scanner();
   virtual int yylex(Parser::semantic_type* lval);
 

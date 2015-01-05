@@ -30,17 +30,19 @@ namespace wfd {
 // An aux class to handle input buffer.
 class RTSPInputHandler {
  protected:
-  virtual ~RTSPInputHandler() {}
+  RTSPInputHandler() = default;
+  virtual ~RTSPInputHandler();
 
   void InputReceived(const std::string& input);
   virtual void MessageParsed(std::unique_ptr<Message> message) = 0;
 
  private:
-  bool GetHeader(std::string& header);
-  bool GetPayload(std::string& payload, unsigned content_length);
+  bool ParseHeader();
+  bool ParsePayload();
 
   Driver driver_;
   std::string rtsp_recieve_buffer_;
+  std::unique_ptr<Message> message_;
 };
 
 }
