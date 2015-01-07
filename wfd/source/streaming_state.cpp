@@ -58,11 +58,11 @@ class M5Sender final : public OptionalMessageSender<Request::M5> {
 
 StreamingState::StreamingState(const InitParams& init_params)
   : MessageSequenceWithOptionalSetHandler(init_params) {
-  AddSequencedHandler(new M8Handler(init_params));
+  AddSequencedHandler(make_ptr(new M8Handler(init_params)));
 
-  AddOptionalHandler(new M5Sender(init_params));
-  AddOptionalHandler(new M7Handler(init_params));
-  AddOptionalHandler(new M9Handler(init_params));
+  AddOptionalHandler(make_ptr(new M5Sender(init_params)));
+  AddOptionalHandler(make_ptr(new M7Handler(init_params)));
+  AddOptionalHandler(make_ptr(new M9Handler(init_params)));
 }
 
 StreamingState::~StreamingState() {

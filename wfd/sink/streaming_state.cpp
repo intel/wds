@@ -79,8 +79,8 @@ class PlayHandler : public MessageSequenceHandler {
  public:
   explicit PlayHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-    AddSequencedHandler(new M5Handler<TriggerMethod::PLAY>(init_params));
-    AddSequencedHandler(new M7Sender(init_params));
+    AddSequencedHandler(make_ptr(new M5Handler<TriggerMethod::PLAY>(init_params)));
+    AddSequencedHandler(make_ptr(new M7Sender(init_params)));
   }
 };
 
@@ -106,8 +106,8 @@ class M8Sender final : public SequencedMessageSender {
 
 TeardownHandler::TeardownHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(new M5Handler<wfd::TriggerMethod::TEARDOWN>(init_params));
-  AddSequencedHandler(new M8Sender(init_params));
+  AddSequencedHandler(make_ptr(new M5Handler<wfd::TriggerMethod::TEARDOWN>(init_params)));
+  AddSequencedHandler(make_ptr(new M8Sender(init_params)));
 }
 
 class M9Sender final : public SequencedMessageSender {
@@ -134,8 +134,8 @@ class PauseHandler : public MessageSequenceHandler {
  public:
   explicit PauseHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-    AddSequencedHandler(new M5Handler<TriggerMethod::PAUSE>(init_params));
-    AddSequencedHandler(new M9Sender(init_params));
+    AddSequencedHandler(make_ptr(new M5Handler<TriggerMethod::PAUSE>(init_params)));
+    AddSequencedHandler(make_ptr(new M9Sender(init_params)));
   }
 };
 
@@ -202,16 +202,16 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
 
 StreamingState::StreamingState(const InitParams& init_params)
   : MessageSequenceWithOptionalSetHandler(init_params) {
-  AddSequencedHandler(new TeardownHandler(init_params));
-  AddOptionalHandler(new PlayHandler(init_params));
-  AddOptionalHandler(new PauseHandler(init_params));
-  AddOptionalHandler(new M3Handler(init_params));
-  AddOptionalHandler(new M4Handler(init_params));
+  AddSequencedHandler(make_ptr(new TeardownHandler(init_params)));
+  AddOptionalHandler(make_ptr(new PlayHandler(init_params)));
+  AddOptionalHandler(make_ptr(new PauseHandler(init_params)));
+  AddOptionalHandler(make_ptr(new M3Handler(init_params)));
+  AddOptionalHandler(make_ptr(new M4Handler(init_params)));
 
   // optional senders that handle sending play, pause and teardown
-  AddOptionalHandler(new M7SenderOptional(init_params));
-  AddOptionalHandler(new M8SenderOptional(init_params));
-  AddOptionalHandler(new M9SenderOptional(init_params));
+  AddOptionalHandler(make_ptr(new M7SenderOptional(init_params)));
+  AddOptionalHandler(make_ptr(new M8SenderOptional(init_params)));
+  AddOptionalHandler(make_ptr(new M9SenderOptional(init_params)));
 }
 
 StreamingState::~StreamingState() {

@@ -93,8 +93,8 @@ bool M4Handler::HandleReply(Reply* reply) {
 
 CapNegotiationState::CapNegotiationState(const InitParams &init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(new M3Handler(init_params));
-  AddSequencedHandler(new M4Handler(init_params));
+  AddSequencedHandler(make_ptr(new M3Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M4Handler(init_params)));
 }
 
 CapNegotiationState::~CapNegotiationState() {

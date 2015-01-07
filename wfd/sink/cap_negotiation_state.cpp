@@ -147,12 +147,12 @@ class M5Handler final : public MessageReceiver<Request::M5> {
 
 CapNegotiationState::CapNegotiationState(const InitParams &init_params)
   : MessageSequenceWithOptionalSetHandler(init_params) {
-  AddSequencedHandler(new M3Handler(init_params));
-  AddSequencedHandler(new M4Handler(init_params));
-  AddSequencedHandler(new M5Handler(init_params));
+  AddSequencedHandler(make_ptr(new M3Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M4Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M5Handler(init_params)));
 
-  AddOptionalHandler(new M3Handler(init_params));
-  AddOptionalHandler(new M4Handler(init_params));
+  AddOptionalHandler(make_ptr(new M3Handler(init_params)));
+  AddOptionalHandler(make_ptr(new M4Handler(init_params)));
 }
 
 CapNegotiationState::~CapNegotiationState() {

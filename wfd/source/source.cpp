@@ -82,10 +82,10 @@ class SourceStateMachine : public MessageSequenceHandler {
  public:
    SourceStateMachine(const InitParams& init_params)
      : MessageSequenceHandler(init_params) {
-     AddSequencedHandler(new source::InitState(init_params));
-     AddSequencedHandler(new source::CapNegotiationState(init_params));
-     AddSequencedHandler(new source::WfdSessionState(init_params));
-     AddSequencedHandler(new source::StreamingState(init_params));
+     AddSequencedHandler(make_ptr(new source::InitState(init_params)));
+     AddSequencedHandler(make_ptr(new source::CapNegotiationState(init_params)));
+     AddSequencedHandler(make_ptr(new source::WfdSessionState(init_params)));
+     AddSequencedHandler(make_ptr(new source::StreamingState(init_params)));
    }
 
    int GetNextCSeq() { return send_cseq_++; }
@@ -104,8 +104,8 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   virtual bool Pause() override;
 
   // public MessageHandler::Observer
-  virtual void OnCompleted(MessageHandler* handler) override;
-  virtual void OnError(MessageHandler* handler) override;
+  virtual void OnCompleted(MessageHandlerPtr handler) override;
+  virtual void OnError(MessageHandlerPtr handler) override;
 
   virtual void OnTimerEvent(uint timer_id) override;
 
@@ -176,9 +176,9 @@ bool SourceImpl::Pause() {
   return true;
 }
 
-void SourceImpl::OnCompleted(MessageHandler* handler) {}
+void SourceImpl::OnCompleted(MessageHandlerPtr handler) {}
 
-void SourceImpl::OnError(MessageHandler* handler) {}
+void SourceImpl::OnError(MessageHandlerPtr handler) {}
 
 void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))

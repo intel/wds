@@ -95,11 +95,11 @@ std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
 
 WfdSessionState::WfdSessionState(const InitParams& init_params)
   : MessageSequenceWithOptionalSetHandler(init_params) {
-  AddSequencedHandler(new M5Handler(init_params));
-  AddSequencedHandler(new M6Handler(init_params));
-  AddSequencedHandler(new M7Handler(init_params));
+  AddSequencedHandler(make_ptr(new M5Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M6Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M7Handler(init_params)));
 
-  AddOptionalHandler(new M8Handler(init_params));
+  AddOptionalHandler(make_ptr(new M8Handler(init_params)));
 }
 
 WfdSessionState::~WfdSessionState() {

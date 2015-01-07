@@ -74,8 +74,8 @@ class M2Handler final : public SequencedMessageSender {
 
 InitState::InitState(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(new M1Handler(init_params));
-  AddSequencedHandler(new M2Handler(init_params));
+  AddSequencedHandler(make_ptr(new M1Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M2Handler(init_params)));
 }
 
 InitState::~InitState() {
