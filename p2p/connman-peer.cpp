@@ -86,10 +86,13 @@ void Peer::ip_changed (char *ip)
 	
 	ip_address_ = new_ip;
 
+	if (!observer_)
+		return;
+
 	if (ip_address_.empty() && ready_) {
-		// TODO notify observer: peer is no longer ok
+		observer_->on_state_changed(this);
 	} else if (!ip_address_.empty() && ready_) {
-		// TODO Notify observer: peer is now ok
+		observer_->on_state_changed(this);
 	}
 }
 
@@ -100,14 +103,17 @@ void Peer::state_changed (bool ready)
 	
 	ready_ = ready;
 
+	if (!observer_)
+		return;
+
 	if (!ready_ && !ip_address_.empty())
-		// TODO Notify observer: peer is no longer ok
+		observer_->on_state_changed(this);
 	if (ready_ && !ip_address_.empty()) {
-		// TODO Notify observer: peer is now ok
+		observer_->on_state_changed(this);
 	}
 }
 
-Peer::Peer(std::string object_path, std::shared_ptr<P2P::InformationElement> ie):
+Peer::Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement> ie):
     ie_(ie)
 {
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,

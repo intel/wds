@@ -30,14 +30,23 @@
 
 class ConnmanClient {
     public:
+		class Observer {
+			public:
+				virtual void on_peers_changed(ConnmanClient *client) {}
+
+			protected:
+				virtual ~Observer() {}
+		};
+
         ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array);
         virtual ~ConnmanClient();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
-		
-		void scan();
+		void set_observer(Observer* observer) {
+			observer_ = observer;
+		}
 
-		// TODO Observer for changes in peers_
+		void scan();
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
@@ -56,6 +65,7 @@ class ConnmanClient {
         GDBusProxy *proxy_;
         GDBusProxy *technology_proxy_;
 
+		Observer* observer_;
         std::unique_ptr<P2P::InformationElementArray>array_;
 		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };

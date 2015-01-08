@@ -87,7 +87,7 @@ void ConnmanClient::peers_changed (GVariant *params)
 
     g_variant_get (params, "(a(oa{sv})ao)", &added, &removed);
     while (g_variant_iter_loop (added, "(&oa{sv})", &path, &props)) {
-        std::cout << "changed peer " << path << std::endl;
+        std::cout << "peer has changed: " << path << std::endl;
         char *name;
         GVariant *val;
 		while (g_variant_iter_loop (props, "{&sv}", &name, &val)) {
@@ -106,14 +106,11 @@ void ConnmanClient::peers_changed (GVariant *params)
 							std::unique_ptr<P2P::InformationElementArray> array
 									(new P2P::InformationElementArray(length, bytes));
 							auto ie = std::make_shared<P2P::InformationElement>(array);
-							peers_[path] = std::make_shared<P2P::Peer>(std::string(path), ie);
 
-/*
-							if (ie.get_device_type() == P2P::SOURCE) {
-								std::cout << "Source " << ie.to_string() << " exists, subscribe to properties..." <<std::endl;
-								
-							}
-*/
+							std::cout << "added peer " << path << std::endl;
+							peers_[path] = std::make_shared<P2P::Peer>(std::string(path), ie);
+							if (observer_)
+								observer_->on_peers_changed(this);
                        }
                    }
                }
@@ -123,8 +120,11 @@ void ConnmanClient::peers_changed (GVariant *params)
 
 
     while (g_variant_iter_loop (removed, "o", &path)) {
-        std::cout << "removed peer " << path << std::endl;
-        peers_.erase (path);
+        if (peers_.erase (path) > 0) {
+			std::cout << "removed peer " << path << std::endl;
+			if (observer_)
+				observer_->on_peers_changed(this);
+		}
     }
 
     g_variant_iter_free (added);

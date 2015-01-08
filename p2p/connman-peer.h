@@ -24,15 +24,27 @@
 #ifndef CONNMAN_PEER_H_
 #define CONNMAN_PEER_H_
 
-
 namespace P2P {
 
 class Peer {
     public:
-        Peer(std::string object_path, std::shared_ptr<P2P::InformationElement>);
+		class Observer {
+			public:
+				virtual void on_state_changed(Peer *peer) {}
+
+			protected:
+				virtual ~Observer() {}
+		};
+
+        Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement>);
         virtual ~Peer();
 
-		// tODO notify observer(s) of readiness changes
+		void set_observer(Observer* observer) {
+			observer_ = observer;
+		}
+
+        const std::string& ip_address() const {return ip_address_; }
+	    bool is_ready() const { return ready_; }
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
@@ -42,6 +54,7 @@ class Peer {
 		void state_changed (bool ready);
         void proxy_cb (GAsyncResult *res);
 
+		Observer *observer_;
 		std::string ip_address_;
 		bool ready_;
         GDBusProxy *proxy_;
