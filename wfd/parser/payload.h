@@ -53,7 +53,7 @@ class Payload {
 
   void add_get_parameter_property(const PropertyType& property);
   void add_get_parameter_property(const std::string& generic_property);
-  const std::vector<std::string> get_parameter_properties() const;
+  const std::vector<std::string>& get_parameter_properties() const;
 
   std::shared_ptr<wfd::PropertyErrors> get_property_error(std::string name) const;
   std::shared_ptr<wfd::PropertyErrors> get_property_error(wfd::PropertyType type) const;

@@ -33,33 +33,49 @@
 namespace wfd {
 namespace sink {
 
-class M6Handler final : public SequencedMessageSender {
- public:
-    using SequencedMessageSender::SequencedMessageSender;
- private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
-    auto setup = new Setup(ToSinkMediaManager(manager_)->PresentationUrl());
-    auto transport = new TransportHeader();
-    // we assume here that there is no coupled secondary sink
-    transport->set_client_port(ToSinkMediaManager(manager_)->ListeningRtpPorts().first);
+M16Handler::M16Handler(const InitParams& init_params, uint& keep_alive_timer)
+  : MessageReceiver<Request::M16>(init_params),
+    keep_alive_timer_(keep_alive_timer) {}
 
-    setup->header().set_transport(transport);
-    setup->header().set_cseq(send_cseq_++);
-    setup->header().set_require_wfd_support(true);
+bool M16Handler::HandleTimeoutEvent(uint timer_id) const {
+  return timer_id == keep_alive_timer_;
+}
 
-    return std::unique_ptr<Message>(setup);
+std::unique_ptr<Reply> M16Handler::HandleMessage(Message* message) {
+  // Reset keep alive timer;
+  sender_->ReleaseTimer(keep_alive_timer_);
+  keep_alive_timer_ = sender_->CreateTimer(60);
+
+  return std::unique_ptr<Reply>(new Reply(200));
+}
+
+M6Handler::M6Handler(const InitParams& init_params, uint& keep_alive_timer)
+  : SequencedMessageSender(init_params),
+    keep_alive_timer_(keep_alive_timer) {}
+
+std::unique_ptr<Message> M6Handler::CreateMessage() {
+  auto setup = new Setup(ToSinkMediaManager(manager_)->PresentationUrl());
+  auto transport = new TransportHeader();
+  // we assume here that there is no coupled secondary sink
+  transport->set_client_port(ToSinkMediaManager(manager_)->ListeningRtpPorts().first);
+  setup->header().set_transport(transport);
+  setup->header().set_cseq(send_cseq_++);
+  setup->header().set_require_wfd_support(true);
+
+  return std::unique_ptr<Message>(setup);
+}
+
+bool M6Handler::HandleReply(Reply* reply) {
+  const std::string& session_id = reply->header().session();
+  if(reply->response_code() == 200 && !session_id.empty()) {
+    ToSinkMediaManager(manager_)->SetSession(session_id);
+    // FIXME : take timeout value from session.
+    keep_alive_timer_ = sender_->CreateTimer(60);
+    return true;
   }
 
-  virtual bool HandleReply(Reply* reply) override {
-    const std::string& session_id = reply->header().session();
-    if(reply->response_code() == 200 && !session_id.empty()) {
-      ToSinkMediaManager(manager_)->SetSession(session_id);
-      return true;
-    }
-
-    return false;
-  }
-};
+  return false;
+}
 
 class M7Handler final : public SequencedMessageSender {
  public:
@@ -79,14 +95,15 @@ class M7Handler final : public SequencedMessageSender {
   }
 };
 
-WfdSessionState::WfdSessionState(const InitParams& init_params)
+WfdSessionState::WfdSessionState(const InitParams& init_params, MessageHandlerPtr m6_handler, MessageHandlerPtr m16_handler)
   : MessageSequenceWithOptionalSetHandler(init_params) {
-  AddSequencedHandler(make_ptr(new M6Handler(init_params)));
+  AddSequencedHandler(m6_handler);
   AddSequencedHandler(make_ptr(new M7Handler(init_params)));
 
   AddOptionalHandler(make_ptr(new M3Handler(init_params)));
   AddOptionalHandler(make_ptr(new M4Handler(init_params)));
   AddOptionalHandler(make_ptr(new TeardownHandler(init_params)));
+  AddOptionalHandler(m16_handler);
 }
 
 WfdSessionState::~WfdSessionState() {
