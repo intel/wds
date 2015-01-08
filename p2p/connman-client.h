@@ -35,22 +35,27 @@ class ConnmanClient {
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
 		
-		// TODO scan()   (for source)
-		// TODO Observer for changes in peer list   (for source)
+		void scan();
+
+		// TODO Observer for changes in peers_
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void technology_proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void register_peer_service_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void scan_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
 
         void peers_changed (GVariant *params);
-        void proxy_cb(GObject *object, GAsyncResult *res);
-        void register_peer_service_cb(GObject *object, GAsyncResult *res);
+        void proxy_cb(GAsyncResult *res);
+        void technology_proxy_cb(GAsyncResult *res);
 
         void register_peer_service();
         void unregister_peer_service();
 
         GDBusProxy *proxy_;
+        GDBusProxy *technology_proxy_;
+
         std::unique_ptr<P2P::InformationElementArray>array_;
 		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };

@@ -32,7 +32,7 @@ class Peer {
         Peer(std::string object_path, std::shared_ptr<P2P::InformationElement>);
         virtual ~Peer();
 
-		// notify of readiness changes
+		// tODO notify observer(s) of readiness changes
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);

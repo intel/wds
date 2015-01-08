@@ -37,16 +37,47 @@ void ConnmanClient::proxy_signal_cb (GDBusProxy *proxy, const char *sender, cons
 
 void ConnmanClient::register_peer_service_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
-    auto client = reinterpret_cast<ConnmanClient*> (data_ptr);
-    client->register_peer_service_cb (object, res);
+    GError *error = NULL;
+    GDBusProxy *proxy = G_DBUS_PROXY (object);
+
+    g_dbus_proxy_call_finish (proxy, res, &error);
+    if (error) {
+        std::cout << "register error " << error->message << std::endl;
+        g_clear_error (&error);
+        return;
+    }
+
+    std::cout << "* registered peer service "<< std::endl;
 }
 
+/* static C callback */
+void ConnmanClient::scan_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
+{
+    GError *error = NULL;
+    GDBusProxy *proxy = G_DBUS_PROXY (object);
+
+    g_dbus_proxy_call_finish (proxy, res, &error);
+    if (error) {
+        std::cout << "scan error " << error->message << std::endl;
+        g_clear_error (&error);
+        return;
+    }
+
+    std::cout << "* scan started "<< std::endl;
+}
 
 /* static C callback */
 void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
     auto client = reinterpret_cast<ConnmanClient*> (data_ptr);
-    client->proxy_cb (object, res);
+    client->proxy_cb (res);
+}
+
+/* static C callback */
+void ConnmanClient::technology_proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
+{
+    auto client = reinterpret_cast<ConnmanClient*> (data_ptr);
+    client->technology_proxy_cb (res);
 }
 
 void ConnmanClient::peers_changed (GVariant *params)
@@ -100,21 +131,6 @@ void ConnmanClient::peers_changed (GVariant *params)
     g_variant_iter_free (removed);
 }
 
-void ConnmanClient::register_peer_service_cb (GObject *object, GAsyncResult *res)
-{
-    GError *error = NULL;
-    GDBusProxy *proxy = G_DBUS_PROXY (object);
-
-    g_dbus_proxy_call_finish (proxy, res, &error);
-    if (error) {
-        std::cout << "register error " << error->message << std::endl;
-        g_clear_error (&error);
-        return;
-    }
-
-    std::cout << "* registered peer service "<< std::endl;
-}
-
 void ConnmanClient::register_peer_service ()
 {
     GVariantBuilder builder;
@@ -157,7 +173,7 @@ void ConnmanClient::unregister_peer_service ()
                        this);
 }
 
-void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *result)
+void ConnmanClient::proxy_cb (GAsyncResult *result)
 {
     GError *error = NULL;
 
@@ -175,6 +191,17 @@ void ConnmanClient::proxy_cb (GObject *object, GAsyncResult *result)
     register_peer_service();
 }
 
+void ConnmanClient::technology_proxy_cb (GAsyncResult *result)
+{
+    GError *error = NULL;
+
+    technology_proxy_ = g_dbus_proxy_new_for_bus_finish(result, &error);
+    if (error) {
+        std::cout << "tech proxy error "<< std::endl;
+        g_clear_error (&error);
+    }
+}
+
 ConnmanClient::ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array):
     proxy_(NULL),
     array_(std::move(take_array))
@@ -188,12 +215,28 @@ ConnmanClient::ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take
                               NULL,
                               ConnmanClient::proxy_cb,
                               this);
+
+
+	/* TODO should get the p2p object path
+	 * by watching Manager.TechnologyAdded/TechnologyRemoved */
+    g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
+                              G_DBUS_PROXY_FLAGS_NONE,
+                              NULL,
+                              "net.connman",
+                              "/net/connman/technology/p2p",
+                              "net.connman.Technology",
+                              NULL,
+                              ConnmanClient::technology_proxy_cb,
+                              this);
+
 }
 
 ConnmanClient::~ConnmanClient()
 {
     if (proxy_)
         g_clear_object (&proxy_);
+    if (technology_proxy_)
+        g_clear_object (&technology_proxy_);
 }
 
 void ConnmanClient::set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array)
@@ -201,4 +244,16 @@ void ConnmanClient::set_information_element(std::unique_ptr<P2P::InformationElem
     unregister_peer_service();
     array_ = std::move (take_array);
     register_peer_service();
+}
+
+void ConnmanClient::scan()
+{
+    g_dbus_proxy_call (technology_proxy_,
+                       "Scan",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       ConnmanClient::scan_cb,
+                       this);
 }
