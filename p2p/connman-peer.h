@@ -43,12 +43,18 @@ class Peer {
 			observer_ = observer;
 		}
 
+		/* TODO add error handling for these -- maybe through observer.on_error? */
+		void connect();
+		void disconnect();
+
         const std::string& ip_address() const {return ip_address_; }
 	    bool is_ready() const { return ready_; }
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void connect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void disconnect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
 
 		void ip_changed (char *ip);
 		void state_changed (bool ready);

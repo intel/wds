@@ -58,6 +58,38 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 	}
 }
 
+/* static C callback */
+void Peer::connect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
+{
+    GError *error = NULL;
+    GDBusProxy *proxy = G_DBUS_PROXY (object);
+
+    g_dbus_proxy_call_finish (proxy, res, &error);
+    if (error) {
+        std::cout << "connect error " << error->message << std::endl;
+        g_clear_error (&error);
+        return;
+    }
+
+    std::cout << "* connected "<< std::endl;
+}
+
+/* static C callback */
+void Peer::disconnect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
+{
+    GError *error = NULL;
+    GDBusProxy *proxy = G_DBUS_PROXY (object);
+
+    g_dbus_proxy_call_finish (proxy, res, &error);
+    if (error) {
+        std::cout << "disconnect error " << error->message << std::endl;
+        g_clear_error (&error);
+        return;
+    }
+
+    std::cout << "* disconnected "<< std::endl;
+}
+
 void Peer::proxy_cb (GAsyncResult *result)
 {
     GError *error = NULL;
@@ -126,6 +158,31 @@ Peer::Peer(const std::string& object_path, std::shared_ptr<P2P::InformationEleme
                               Peer::proxy_cb,
                               this);
 }
+
+void Peer::connect()
+{
+    g_dbus_proxy_call (proxy_,
+                       "Connect",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       60 * 1000, // is 1 minute too long?
+                       NULL,
+                       Peer::connect_cb,
+                       this);
+}
+
+void Peer::disconnect()
+{
+    g_dbus_proxy_call (proxy_,
+                       "Disconnect",
+                       NULL,
+                       G_DBUS_CALL_FLAGS_NONE,
+                       -1,
+                       NULL,
+                       Peer::disconnect_cb,
+                       this);
+}
+
 
 Peer::~Peer()
 {
