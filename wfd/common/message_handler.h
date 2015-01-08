@@ -23,7 +23,7 @@
 #define MESSAGE_HANDLER_H_
 
 #include <cassert>
-#include <queue>
+#include <list>
 #include <vector>
 #include <memory>
 #include <utility>
@@ -200,11 +200,12 @@ class MessageSenderBase : public MessageHandler {
   virtual void Handle(std::unique_ptr<Message> message) override;
 
   virtual int GetResponseTimeout() const;
-  void SetTimer();
-  void ReleaseTimer();
 
-  uint timer_id_;
-  std::queue<int> cseq_queue_;
+  struct ParcelData {
+    int cseq;
+    uint timer_id;
+  };
+  std::list<ParcelData> parcel_queue_;
 };
 
 // To be used for optional senders.
