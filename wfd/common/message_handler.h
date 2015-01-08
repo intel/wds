@@ -34,6 +34,11 @@
 
 namespace wfd {
 
+// Default keep-alive timer is 60 seconds
+const int kDefaultKeepAliveTimeout = 60;
+// Default timeout for RTSP message exchange
+const int kDefaultTimeoutValue = 5;
+
 class MediaManager;
 
 class MessageHandler;
@@ -160,13 +165,13 @@ class MessageReceiverBase : public MessageHandler {
  protected:
   virtual std::unique_ptr<wfd::Reply> HandleMessage(Message* message) = 0;
   virtual bool CanHandle(Message* message) const override;
+  virtual void Handle(std::unique_ptr<Message> message) override;
 
  private:
   virtual void Start() override;
   virtual void Reset() override;
   virtual bool CanSend(Message* message) const override;
   virtual void Send(std::unique_ptr<Message> message) override;
-  virtual void Handle(std::unique_ptr<Message> message) override;
 
   bool wait_for_message_;
 };
