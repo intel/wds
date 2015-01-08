@@ -36,12 +36,19 @@ namespace wfd {
 
 class MediaManager;
 
-class MessageHandler {
+class MessageHandler;
+using MessageHandlerPtr = std::shared_ptr<MessageHandler>;
+
+inline MessageHandlerPtr make_ptr(MessageHandler* handler) {
+  return MessageHandlerPtr(handler);
+}
+
+class MessageHandler : public std::enable_shared_from_this<MessageHandler> {
  public:
   class Observer {
    public:
-    virtual void OnCompleted(MessageHandler* handler) {}
-    virtual void OnError(MessageHandler* handler) {}
+    virtual void OnCompleted(MessageHandlerPtr handler) {}
+    virtual void OnError(MessageHandlerPtr handler) {}
 
    protected:
     virtual ~Observer() {}
@@ -106,13 +113,13 @@ class MessageSequenceHandler : public MessageHandler,
   virtual bool HandleTimeoutEvent(uint timer_id) const override;
 
  protected:
-  void AddSequencedHandler(MessageHandler* handler);
+  void AddSequencedHandler(MessageHandlerPtr handler);
   // MessageHandler::Observer implementation.
-  virtual void OnCompleted(MessageHandler* handler) override;
-  virtual void OnError(MessageHandler* handler) override;
+  virtual void OnCompleted(MessageHandlerPtr handler) override;
+  virtual void OnError(MessageHandlerPtr handler) override;
 
-  std::vector<MessageHandler*> handlers_;
-  MessageHandler* current_handler_;
+  std::vector<MessageHandlerPtr> handlers_;
+  MessageHandlerPtr current_handler_;
 };
 
 class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
@@ -129,12 +136,12 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
   virtual bool HandleTimeoutEvent(uint timer_id) const override;
 
  protected:
-  void AddOptionalHandler(MessageHandler* handler);
+  void AddOptionalHandler(MessageHandlerPtr handler);
   // MessageHandler::Observer implementation.
-  virtual void OnCompleted(MessageHandler* handler) override;
-  virtual void OnError(MessageHandler* handler) override;
+  virtual void OnCompleted(MessageHandlerPtr handler) override;
+  virtual void OnError(MessageHandlerPtr handler) override;
 
-  std::vector<MessageHandler*> optional_handlers_;
+  std::vector<MessageHandlerPtr> optional_handlers_;
 };
 
 // This is aux classes to handle single message.

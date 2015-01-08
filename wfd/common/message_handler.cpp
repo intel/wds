@@ -39,8 +39,6 @@ MessageSequenceHandler::MessageSequenceHandler(const InitParams& init_params)
 }
 
 MessageSequenceHandler::~MessageSequenceHandler() {
-  for (MessageHandler* handler : handlers_)
-    delete handler;
 }
 
 void MessageSequenceHandler::Start() {
@@ -74,7 +72,7 @@ void MessageSequenceHandler::Handle(std::unique_ptr<Message> message) {
   current_handler_->Handle(std::move(message));
 }
 
-void MessageSequenceHandler::AddSequencedHandler(MessageHandler* handler) {
+void MessageSequenceHandler::AddSequencedHandler(MessageHandlerPtr handler) {
   assert(!current_handler_); // We are not started
   assert(handler);
   assert(handlers_.end() == std::find(
@@ -83,14 +81,14 @@ void MessageSequenceHandler::AddSequencedHandler(MessageHandler* handler) {
   handler->set_observer(this);
 }
 
-void MessageSequenceHandler::OnCompleted(MessageHandler* handler) {
+void MessageSequenceHandler::OnCompleted(MessageHandlerPtr handler) {
   assert(handler == current_handler_);
   current_handler_->Reset();
 
   auto it = std::find(handlers_.begin(), handlers_.end(), handler);
   assert(handlers_.end() != it);
   if (++it == handlers_.end()) {
-    observer_->OnCompleted(this);
+    observer_->OnCompleted(shared_from_this());
     return;
   }
 
@@ -98,10 +96,10 @@ void MessageSequenceHandler::OnCompleted(MessageHandler* handler) {
   current_handler_->Start();
 }
 
-void MessageSequenceHandler::OnError(MessageHandler* handler) {
+void MessageSequenceHandler::OnError(MessageHandlerPtr handler) {
   assert(handler == current_handler_);
   handler->Reset();
-  observer_->OnError(this);
+  observer_->OnError(shared_from_this());
 }
 
 bool MessageSequenceHandler::HandleTimeoutEvent(uint timer_id) const {
@@ -114,24 +112,22 @@ MessageSequenceWithOptionalSetHandler::MessageSequenceWithOptionalSetHandler(
 }
 
 MessageSequenceWithOptionalSetHandler::~MessageSequenceWithOptionalSetHandler() {
-  for (MessageHandler* handler : optional_handlers_)
-    delete handler;
 }
 
 void MessageSequenceWithOptionalSetHandler::Start() {
   MessageSequenceHandler::Start();
-  for (MessageHandler* handler : optional_handlers_)
+  for (MessageHandlerPtr handler : optional_handlers_)
     handler->Start();
 }
 
 void MessageSequenceWithOptionalSetHandler::Reset() {
   MessageSequenceHandler::Reset();
-  for (MessageHandler* handler : optional_handlers_)
+  for (MessageHandlerPtr handler : optional_handlers_)
     handler->Reset();
 }
 
 bool MessageSequenceWithOptionalSetHandler::CanSend(Message* message) const {
-  for (MessageHandler* handler : optional_handlers_)
+  for (MessageHandlerPtr handler : optional_handlers_)
     if (handler->CanSend(message))
       return true;
 
@@ -142,7 +138,7 @@ bool MessageSequenceWithOptionalSetHandler::CanSend(Message* message) const {
 }
 
 void MessageSequenceWithOptionalSetHandler::Send(std::unique_ptr<Message> message) {
-  for (MessageHandler* handler : optional_handlers_) {
+  for (MessageHandlerPtr handler : optional_handlers_) {
     if (handler->CanSend(message.get())) {
       handler->Send(std::move(message));
       return;
@@ -154,14 +150,14 @@ void MessageSequenceWithOptionalSetHandler::Send(std::unique_ptr<Message> messag
     return;
   }
 
-  observer_->OnError(this);
+  observer_->OnError(shared_from_this());
 }
 
 bool MessageSequenceWithOptionalSetHandler::CanHandle(Message* message) const {
   if (MessageSequenceHandler::CanHandle(message))
     return true;
 
-  for (MessageHandler* handler : optional_handlers_)
+  for (MessageHandlerPtr handler : optional_handlers_)
     if (handler->CanHandle(message))
       return true;
 
@@ -174,18 +170,18 @@ void MessageSequenceWithOptionalSetHandler::Handle(std::unique_ptr<Message> mess
      return;
   }
 
-  for (MessageHandler* handler : optional_handlers_) {
+  for (MessageHandlerPtr handler : optional_handlers_) {
     if (handler->CanHandle(message.get())) {
       handler->Handle(std::move(message));
       return;
     }
   }
 
-  observer_->OnError(this);
+  observer_->OnError(shared_from_this());
 }
 
 void MessageSequenceWithOptionalSetHandler::AddOptionalHandler(
-    MessageHandler* handler) {
+    MessageHandlerPtr handler) {
   assert(handler);
   assert(optional_handlers_.end() == std::find(
       optional_handlers_.begin(), optional_handlers_.end(), handler));
@@ -193,7 +189,7 @@ void MessageSequenceWithOptionalSetHandler::AddOptionalHandler(
   handler->set_observer(this);
 }
 
-void MessageSequenceWithOptionalSetHandler::OnCompleted(MessageHandler* handler) {
+void MessageSequenceWithOptionalSetHandler::OnCompleted(MessageHandlerPtr handler) {
   auto it = std::find(
       optional_handlers_.begin(), optional_handlers_.end(), handler);
   if (it != optional_handlers_.end()) {
@@ -204,13 +200,13 @@ void MessageSequenceWithOptionalSetHandler::OnCompleted(MessageHandler* handler)
   MessageSequenceHandler::OnCompleted(handler);
 }
 
-void MessageSequenceWithOptionalSetHandler::OnError(MessageHandler* handler) {
+void MessageSequenceWithOptionalSetHandler::OnError(MessageHandlerPtr handler) {
   handler->Reset();
-  observer_->OnError(this);
+  observer_->OnError(shared_from_this());
 }
 
 bool MessageSequenceWithOptionalSetHandler::HandleTimeoutEvent(uint timer_id) const {
-  for (MessageHandler* handler : optional_handlers_)
+  for (MessageHandlerPtr handler : optional_handlers_)
     if (handler->HandleTimeoutEvent(timer_id))
       return true;
   return MessageSequenceHandler::HandleTimeoutEvent(timer_id);
@@ -235,18 +231,18 @@ void MessageReceiverBase::Send(std::unique_ptr<Message> message) {}
 void MessageReceiverBase::Handle(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanHandle(message.get())) {
-    observer_->OnError(this);
+    observer_->OnError(shared_from_this());
     return;
   }
   wait_for_message_ = false;
   std::unique_ptr<Reply> reply = HandleMessage(message.get());
   if (!reply) {
-    observer_->OnError(this);
+    observer_->OnError(shared_from_this());
     return;
   }
   reply->header().set_cseq(message->cseq());
   sender_->SendRTSPData(reply->to_string());
-  observer_->OnCompleted(this);
+  observer_->OnCompleted(shared_from_this());
 }
 
 MessageSenderBase::MessageSenderBase(const InitParams& init_params)
@@ -267,7 +263,7 @@ void MessageSenderBase::Reset() {
 void MessageSenderBase::Send(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanSend(message.get())) {
-    observer_->OnError(this);
+    observer_->OnError(shared_from_this());
     return;
   }
   cseq_queue_.push(message->cseq());
@@ -284,18 +280,18 @@ bool MessageSenderBase::CanHandle(Message* message) const {
 void MessageSenderBase::Handle(std::unique_ptr<Message> message) {
   assert(message);
   if (!CanHandle(message.get())) {
-    observer_->OnError(this);
+    observer_->OnError(shared_from_this());
     return;
   }
   cseq_queue_.pop();
 
   if (!HandleReply(static_cast<Reply*>(message.get())))
-    observer_->OnError(this);
+    observer_->OnError(shared_from_this());
 
   ReleaseTimer();
 
   if (cseq_queue_.empty()) {
-    observer_->OnCompleted(this);
+    observer_->OnCompleted(shared_from_this());
   }
 }
 

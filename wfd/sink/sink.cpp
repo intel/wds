@@ -69,10 +69,10 @@ class SinkStateMachine : public MessageSequenceHandler {
  public:
    SinkStateMachine(const InitParams& init_params)
      : MessageSequenceHandler(init_params) {
-     AddSequencedHandler(new sink::InitState(init_params));
-     AddSequencedHandler(new sink::CapNegotiationState(init_params));
-     AddSequencedHandler(new sink::WfdSessionState(init_params));
-     AddSequencedHandler(new sink::StreamingState(init_params));
+     AddSequencedHandler(make_ptr(new sink::InitState(init_params)));
+     AddSequencedHandler(make_ptr(new sink::CapNegotiationState(init_params)));
+     AddSequencedHandler(make_ptr(new sink::WfdSessionState(init_params)));
+     AddSequencedHandler(make_ptr(new sink::StreamingState(init_params)));
    }
    SinkStateMachine(Peer::Delegate* sender, SinkMediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
