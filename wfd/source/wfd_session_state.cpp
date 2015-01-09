@@ -52,8 +52,9 @@ class M5Handler final : public SequencedMessageSender {
 
 class M6Handler final : public MessageReceiver<Request::M6> {
  public:
-  M6Handler(const InitParams& init_params)
-    : MessageReceiver<Request::M6>(init_params) {
+  M6Handler(const InitParams& init_params, uint& timer_id)
+    : MessageReceiver<Request::M6>(init_params),
+      keep_alive_timer_(timer_id) {
   }
 
   virtual std::unique_ptr<Reply> HandleMessage(
@@ -61,6 +62,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
     auto reply = std::unique_ptr<Reply>(new Reply(200));
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
+    reply->header().set_timeout(kDefaultKeepAliveTimeout);
 
     auto transport = new TransportHeader();
     // we assume here that there is no coupled secondary sink
@@ -70,6 +72,14 @@ class M6Handler final : public MessageReceiver<Request::M6> {
 
     return std::move(reply);
   }
+
+  virtual void Handle(std::unique_ptr<Message> message) override {
+    MessageReceiver<Request::M6>::Handle(std::move(message));
+    keep_alive_timer_ =
+        sender_->CreateTimer(kDefaultTimeoutValue);
+  }
+
+  uint& keep_alive_timer_;
 };
 
 M7Handler::M7Handler(const InitParams& init_params)
@@ -93,13 +103,24 @@ std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
   return std::unique_ptr<Reply>(new Reply(200));
 }
 
-WfdSessionState::WfdSessionState(const InitParams& init_params)
+
+M16Sender::M16Sender(const InitParams& init_params)
+  : OptionalMessageSender<Request::M16>(init_params) {
+}
+
+bool M16Sender::HandleReply(Reply* reply) {
+  return (reply->response_code() == 200);
+}
+
+WfdSessionState::WfdSessionState(const InitParams& init_params, uint& timer_id,
+    MessageHandlerPtr& m16_sender)
   : MessageSequenceWithOptionalSetHandler(init_params) {
   AddSequencedHandler(make_ptr(new M5Handler(init_params)));
-  AddSequencedHandler(make_ptr(new M6Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M6Handler(init_params, timer_id)));
   AddSequencedHandler(make_ptr(new M7Handler(init_params)));
 
   AddOptionalHandler(make_ptr(new M8Handler(init_params)));
+  AddOptionalHandler(m16_sender);
 }
 
 WfdSessionState::~WfdSessionState() {

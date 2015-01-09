@@ -27,7 +27,6 @@
 namespace wfd {
 
 int MessageHandler::send_cseq_ = 1;
-const int kDefaultTimeoutValue = 5;
 
 bool MessageHandler::HandleTimeoutEvent(uint timer_id) const {
   return false;

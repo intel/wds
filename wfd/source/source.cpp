@@ -29,6 +29,7 @@
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
 #include "wfd/common/wfd_export.h"
+#include "wfd/parser/getparameter.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/public/media_manager.h"
 
@@ -80,12 +81,13 @@ bool InitializeRequestId(Request* request) {
 
 class SourceStateMachine : public MessageSequenceHandler {
  public:
-   SourceStateMachine(const InitParams& init_params)
+   SourceStateMachine(const InitParams& init_params, uint& timer_id)
      : MessageSequenceHandler(init_params) {
+     MessageHandlerPtr m16_sender = make_ptr(new source::M16Sender(init_params));
      AddSequencedHandler(make_ptr(new source::InitState(init_params)));
      AddSequencedHandler(make_ptr(new source::CapNegotiationState(init_params)));
-     AddSequencedHandler(make_ptr(new source::WfdSessionState(init_params)));
-     AddSequencedHandler(make_ptr(new source::StreamingState(init_params)));
+     AddSequencedHandler(make_ptr(new source::WfdSessionState(init_params, timer_id, m16_sender)));
+     AddSequencedHandler(make_ptr(new source::StreamingState(init_params, m16_sender)));
    }
 
    int GetNextCSeq() { return send_cseq_++; }
@@ -112,11 +114,21 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   // RTSPInputHandler
   virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
+  // Keep-alive function
+  void SendKeepAlive();
+  void ResetAndTeardownMedia();
+
   std::unique_ptr<SourceStateMachine> state_machine_;
+  uint keep_alive_timer_;
+  Delegate* delegate_;
+  SourceMediaManager* media_manager_;
 };
 
 SourceImpl::SourceImpl(Delegate* delegate, SourceMediaManager* mng)
-  : state_machine_(new SourceStateMachine({delegate, mng, this})) {
+  : state_machine_(new SourceStateMachine({delegate, mng, this}, keep_alive_timer_)),
+    keep_alive_timer_(0),
+    delegate_(delegate),
+    media_manager_(mng) {
 }
 
 void SourceImpl::Start() {
@@ -128,8 +140,32 @@ void SourceImpl::RTSPDataReceived(const std::string& message) {
 }
 
 void SourceImpl::OnTimerEvent(uint timer_id) {
-  if (state_machine_->HandleTimeoutEvent(timer_id))
-    state_machine_->Reset();
+  if (keep_alive_timer_ == timer_id)
+    SendKeepAlive();
+  else if (state_machine_->HandleTimeoutEvent(timer_id))
+    ResetAndTeardownMedia();
+}
+
+void SourceImpl::SendKeepAlive() {
+  delegate_->ReleaseTimer(keep_alive_timer_);
+  auto get_param = std::unique_ptr<Request>(
+      new GetParameter("rtsp://localhost/wfd1.0"));
+  get_param->header().set_cseq(state_machine_->GetNextCSeq());
+  get_param->set_id(Request::M16);
+
+  if (state_machine_->CanSend(get_param.get())) {
+    state_machine_->Send(std::move(get_param));
+    keep_alive_timer_ =
+        delegate_->CreateTimer(kDefaultKeepAliveTimeout - kDefaultTimeoutValue);
+    assert(keep_alive_timer_);
+  } else {
+    ResetAndTeardownMedia();
+  }
+}
+
+void SourceImpl::ResetAndTeardownMedia() {
+  media_manager_->Teardown();
+  state_machine_->Reset();
 }
 
 namespace  {

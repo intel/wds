@@ -31,7 +31,8 @@ namespace source {
 // Includes M5, M6, M7 messages handling and optionally can handle M3, M4, M8
 class WfdSessionState : public MessageSequenceWithOptionalSetHandler {
  public:
-  WfdSessionState(const InitParams& init_params);
+  WfdSessionState(const InitParams& init_params, uint& timer_id,
+      MessageHandlerPtr& m16_sender);
   virtual ~WfdSessionState();
 };
 
@@ -51,6 +52,14 @@ class M7Handler final : public MessageReceiver<Request::M7> {
  private:
   virtual std::unique_ptr<Reply> HandleMessage(
       Message* message) override;
+};
+
+class M16Sender final : public OptionalMessageSender<Request::M16> {
+ public:
+  M16Sender(const InitParams& init_params);
+
+ private:
+  virtual bool HandleReply(Reply* reply) override;
 };
 
 }  // source
