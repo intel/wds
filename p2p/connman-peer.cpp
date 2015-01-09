@@ -37,13 +37,12 @@ void Peer::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr)
 {
 	GVariant *property;
-	char *name, *local, *remote;
+	char *name;
     auto peer = reinterpret_cast<Peer*> (data_ptr);
 
     if (g_strcmp0(signal, "PropertyChanged") != 0)
         return;
 
-    std::cout << "DBG: peer property changed " << std::endl;
     g_variant_get (params, "(sv)", &name, &property);
 
 	if (g_strcmp0(name, "State") == 0) {
@@ -51,10 +50,19 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 
 		peer->state_changed (g_strcmp0 (state, "ready") == 0);
 	} else if (g_strcmp0(name, "IPv4") == 0) {
-		std::cout << "DBG: peer ipv4 changed " << std::endl;
-		g_variant_get (property, "({ss})", &local, &remote);
+		GVariantIter *ips;
+		GVariant *spec_val;
+		char *name;
 
-		peer->ip_changed (remote);
+		std::cout << "DBG: peer ipv4 changed " << std::endl;
+		g_variant_get (property, "a{sv}", &ips);
+        while (g_variant_iter_loop (ips, "{sv}", &name, &spec_val)) {
+            if (g_strcmp0 (name, "Remote") == 0) {
+				peer->ip_changed (g_variant_get_string (spec_val, NULL));
+				break;
+			}
+		}
+		g_variant_iter_free (ips);
 	}
 }
 
@@ -109,7 +117,7 @@ void Peer::proxy_cb (GAsyncResult *result)
     /* TODO check the ip address in case it's up to date already */
 }
 
-void Peer::ip_changed (char *ip)
+void Peer::ip_changed (const char *ip)
 {
 	std::string new_ip(ip);
 
