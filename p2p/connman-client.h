@@ -33,6 +33,7 @@ class ConnmanClient {
 		class Observer {
 			public:
 				virtual void on_peers_changed(ConnmanClient *client) {}
+				virtual void on_initialized(ConnmanClient *client) {}
 
 			protected:
 				virtual ~Observer() {}
@@ -46,6 +47,7 @@ class ConnmanClient {
 			observer_ = observer;
 		}
 
+		/* TODO error / finished handling */
 		void scan();
 
     private:

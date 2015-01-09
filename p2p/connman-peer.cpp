@@ -115,6 +115,9 @@ void Peer::proxy_cb (GAsyncResult *result)
                       G_CALLBACK (Peer::proxy_signal_cb), this);
 
     /* TODO check the ip address in case it's up to date already */
+
+	if (observer_)
+		observer_->on_initialized(this);
 }
 
 void Peer::ip_changed (const char *ip)
@@ -154,6 +157,7 @@ void Peer::state_changed (bool ready)
 }
 
 Peer::Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement> ie):
+    observer_(NULL),
     ie_(ie)
 {
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,

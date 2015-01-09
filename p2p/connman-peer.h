@@ -31,6 +31,7 @@ class Peer {
 		class Observer {
 			public:
 				virtual void on_state_changed(Peer *peer) {}
+				virtual void on_initialized(Peer *peer) {}
 
 			protected:
 				virtual ~Observer() {}

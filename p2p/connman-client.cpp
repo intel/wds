@@ -189,6 +189,9 @@ void ConnmanClient::proxy_cb (GAsyncResult *result)
     /* TODO run GetPeers just in case the list is up to date already */
 
     register_peer_service();
+
+	if(technology_proxy_ && observer_)
+		observer_->on_initialized(this);
 }
 
 void ConnmanClient::technology_proxy_cb (GAsyncResult *result)
@@ -200,10 +203,14 @@ void ConnmanClient::technology_proxy_cb (GAsyncResult *result)
         std::cout << "tech proxy error "<< std::endl;
         g_clear_error (&error);
     }
+
+	if(proxy_ && observer_)
+		observer_->on_initialized(this);
 }
 
 ConnmanClient::ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array):
     proxy_(NULL),
+    observer_(NULL),
     array_(std::move(take_array))
 {
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
