@@ -46,8 +46,6 @@ void ConnmanClient::register_peer_service_cb (GObject *object, GAsyncResult *res
         g_clear_error (&error);
         return;
     }
-
-    std::cout << "* registered peer service "<< std::endl;
 }
 
 /* static C callback */
@@ -87,7 +85,6 @@ void ConnmanClient::peers_changed (GVariant *params)
 
     g_variant_get (params, "(a(oa{sv})ao)", &added, &removed);
     while (g_variant_iter_loop (added, "(&oa{sv})", &path, &props)) {
-        std::cout << "peer has changed: " << path << std::endl;
         char *name;
         GVariant *val;
 		while (g_variant_iter_loop (props, "{&sv}", &name, &val)) {
@@ -107,10 +104,10 @@ void ConnmanClient::peers_changed (GVariant *params)
 									(new P2P::InformationElementArray(length, bytes));
 							auto ie = std::make_shared<P2P::InformationElement>(array);
 
-							std::cout << "added peer " << path << std::endl;
 							peers_[path] = std::make_shared<P2P::Peer>(std::string(path), ie);
-							if (observer_)
-								observer_->on_peers_changed(this);
+							if (observer_){
+								observer_->on_peer_added(this, peers_[path]);
+							}
                        }
                    }
                }
@@ -120,10 +117,9 @@ void ConnmanClient::peers_changed (GVariant *params)
 
 
     while (g_variant_iter_loop (removed, "o", &path)) {
+		/* TODO call on_peer_removed() */
         if (peers_.erase (path) > 0) {
 			std::cout << "removed peer " << path << std::endl;
-			if (observer_)
-				observer_->on_peers_changed(this);
 		}
     }
 
@@ -209,8 +205,11 @@ void ConnmanClient::technology_proxy_cb (GAsyncResult *result)
 }
 
 ConnmanClient::ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array):
+	ConnmanClient(take_array, NULL) {}
+
+ConnmanClient::ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer):
     proxy_(NULL),
-    observer_(NULL),
+    observer_(observer),
     array_(std::move(take_array))
 {
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,

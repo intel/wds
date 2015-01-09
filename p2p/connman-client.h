@@ -32,7 +32,8 @@ class ConnmanClient {
     public:
 		class Observer {
 			public:
-				virtual void on_peers_changed(ConnmanClient *client) {}
+				virtual void on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) {}
+				// virtual void on_peer_removed(ConnmanClient *client) {}
 				virtual void on_initialized(ConnmanClient *client) {}
 
 			protected:
@@ -40,6 +41,7 @@ class ConnmanClient {
 		};
 
         ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array);
+        ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
         virtual ~ConnmanClient();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);

@@ -54,7 +54,6 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 		GVariant *spec_val;
 		char *name;
 
-		std::cout << "DBG: peer ipv4 changed " << std::endl;
 		g_variant_get (property, "a{sv}", &ips);
         while (g_variant_iter_loop (ips, "{sv}", &name, &spec_val)) {
             if (g_strcmp0 (name, "Remote") == 0) {
@@ -102,8 +101,6 @@ void Peer::proxy_cb (GAsyncResult *result)
 {
     GError *error = NULL;
 
-    std::cout << "Registering proxy for peer..." << std::endl;
-
     proxy_ = g_dbus_proxy_new_for_bus_finish(result, &error);
     if (error) {
         std::cout << "Peer proxy error "<< std::endl;
@@ -132,9 +129,7 @@ void Peer::ip_changed (const char *ip)
 	if (!observer_)
 		return;
 
-	if (ip_address_.empty() && ready_) {
-		observer_->on_state_changed(this);
-	} else if (!ip_address_.empty() && ready_) {
+	if ((ip_address_.empty() && ready_) || (!ip_address_.empty() && ready_)) {
 		observer_->on_state_changed(this);
 	}
 }
@@ -149,9 +144,7 @@ void Peer::state_changed (bool ready)
 	if (!observer_)
 		return;
 
-	if (!ready_ && !ip_address_.empty())
-		observer_->on_state_changed(this);
-	if (ready_ && !ip_address_.empty()) {
+	if ((!ready_ && !ip_address_.empty()) || (ready_ && !ip_address_.empty())) {
 		observer_->on_state_changed(this);
 	}
 }

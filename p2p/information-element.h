@@ -148,7 +148,8 @@ class InformationElement {
     virtual ~InformationElement();
 
     void add_subelement(P2P::Subelement* subelement);
-    DeviceType get_device_type();
+    const DeviceType get_device_type() const;
+    const int get_rtsp_port() const;
 
     std::unique_ptr<InformationElementArray> serialize () const;
     std::string to_string() const;

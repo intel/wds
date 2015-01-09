@@ -49,6 +49,7 @@ class Peer {
 		void disconnect();
 
         const std::string& ip_address() const {return ip_address_; }
+        const int port() const { return ie_->get_rtsp_port(); }
 	    bool is_ready() const { return ready_; }
 
     private:
