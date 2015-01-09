@@ -200,7 +200,7 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
   }
 };
 
-StreamingState::StreamingState(const InitParams& init_params)
+StreamingState::StreamingState(const InitParams& init_params, MessageHandlerPtr m16_handler)
   : MessageSequenceWithOptionalSetHandler(init_params) {
   AddSequencedHandler(make_ptr(new TeardownHandler(init_params)));
   AddOptionalHandler(make_ptr(new PlayHandler(init_params)));
@@ -212,6 +212,7 @@ StreamingState::StreamingState(const InitParams& init_params)
   AddOptionalHandler(make_ptr(new M7SenderOptional(init_params)));
   AddOptionalHandler(make_ptr(new M8SenderOptional(init_params)));
   AddOptionalHandler(make_ptr(new M9SenderOptional(init_params)));
+  AddOptionalHandler(m16_handler);
 }
 
 StreamingState::~StreamingState() {

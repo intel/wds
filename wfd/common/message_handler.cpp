@@ -246,18 +246,19 @@ void MessageReceiverBase::Handle(std::unique_ptr<Message> message) {
 }
 
 MessageSenderBase::MessageSenderBase(const InitParams& init_params)
-  : MessageHandler(init_params),
-    timer_id_(0) {
+  : MessageHandler(init_params) {
 }
 
 MessageSenderBase::~MessageSenderBase() {
-  ReleaseTimer();
+  for (const ParcelData& data : parcel_queue_)
+    sender_->ReleaseTimer(data.timer_id);
 }
 
 void MessageSenderBase::Reset() {
-  while (!cseq_queue_.empty())
-    cseq_queue_.pop();
-  ReleaseTimer();
+  while (!parcel_queue_.empty()) {
+    sender_->ReleaseTimer(parcel_queue_.front().timer_id);
+    parcel_queue_.pop_front();
+  }
 }
 
 void MessageSenderBase::Send(std::unique_ptr<Message> message) {
@@ -266,15 +267,15 @@ void MessageSenderBase::Send(std::unique_ptr<Message> message) {
     observer_->OnError(shared_from_this());
     return;
   }
-  cseq_queue_.push(message->cseq());
+  parcel_queue_.push_front(
+      {message->cseq(), sender_->CreateTimer(GetResponseTimeout())});
   sender_->SendRTSPData(message->to_string());
-  SetTimer();
 }
 
 bool MessageSenderBase::CanHandle(Message* message) const {
   assert(message);
-  return message->is_reply() && !cseq_queue_.empty() &&
-         (message->cseq() == cseq_queue_.front());
+  return message->is_reply() && !parcel_queue_.empty() &&
+         (message->cseq() == parcel_queue_.front().cseq);
 }
 
 void MessageSenderBase::Handle(std::unique_ptr<Message> message) {
@@ -283,31 +284,25 @@ void MessageSenderBase::Handle(std::unique_ptr<Message> message) {
     observer_->OnError(shared_from_this());
     return;
   }
-  cseq_queue_.pop();
+  sender_->ReleaseTimer(parcel_queue_.front().timer_id);
+  parcel_queue_.pop_front();
 
-  if (!HandleReply(static_cast<Reply*>(message.get())))
+  if (!HandleReply(static_cast<Reply*>(message.get()))) {
     observer_->OnError(shared_from_this());
+    return;
+  }
 
-  ReleaseTimer();
-
-  if (cseq_queue_.empty()) {
+  if (parcel_queue_.empty()) {
     observer_->OnCompleted(shared_from_this());
   }
 }
 
 bool MessageSenderBase::HandleTimeoutEvent(uint timer_id) const {
-  return timer_id_ == timer_id;
-}
+  for (const ParcelData& data : parcel_queue_)
+    if (data.timer_id == timer_id)
+      return true;
 
-void MessageSenderBase::SetTimer() {
-  uint timer_id = sender_->CreateTimer(GetResponseTimeout());
-  if (timer_id > 0)
-    timer_id_ = timer_id;
-}
-
-void MessageSenderBase::ReleaseTimer() {
-  sender_->ReleaseTimer(timer_id_);
-  timer_id_ = 0;
+  return false;
 }
 
 int MessageSenderBase::GetResponseTimeout() const {

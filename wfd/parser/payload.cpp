@@ -112,7 +112,7 @@ void Payload::add_get_parameter_property(const std::string& generic_property) {
   request_properties_.push_back(generic_property);
 }
 
-const std::vector<std::string> Payload::get_parameter_properties() const {
+const std::vector<std::string>& Payload::get_parameter_properties() const {
   return request_properties_;
 }
 

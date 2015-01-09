@@ -31,7 +31,7 @@ namespace sink {
 // Includes M8 message handling and optionally can handle M3, M4, M7 and M9
 class StreamingState : public MessageSequenceWithOptionalSetHandler {
  public:
-  StreamingState(const InitParams& init_params);
+  StreamingState(const InitParams& init_params, MessageHandlerPtr m16_handler);
   virtual ~StreamingState();
 };
 

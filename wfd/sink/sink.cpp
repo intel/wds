@@ -46,7 +46,10 @@ bool InitializeRequestId(Request* request) {
     id = Request::M1;
     break;
   case Request::MethodGetParameter:
-    id = Request::M3;
+    if (request->payload().get_parameter_properties().empty())
+      id = Request::M16;
+    else
+      id = Request::M3;
     break;
   case Request::MethodSetParameter:
     if (request->payload().has_property(WFD_PRESENTATION_URL))
@@ -68,16 +71,23 @@ bool InitializeRequestId(Request* request) {
 class SinkStateMachine : public MessageSequenceHandler {
  public:
    SinkStateMachine(const InitParams& init_params)
-     : MessageSequenceHandler(init_params) {
+     : MessageSequenceHandler(init_params),
+       keep_alive_timer_(0) {
+     auto m6_handler = make_ptr(new sink::M6Handler(init_params, keep_alive_timer_));
+     auto m16_handler = make_ptr(new sink::M16Handler(init_params, keep_alive_timer_));
      AddSequencedHandler(make_ptr(new sink::InitState(init_params)));
      AddSequencedHandler(make_ptr(new sink::CapNegotiationState(init_params)));
-     AddSequencedHandler(make_ptr(new sink::WfdSessionState(init_params)));
-     AddSequencedHandler(make_ptr(new sink::StreamingState(init_params)));
+     AddSequencedHandler(make_ptr(new sink::WfdSessionState(init_params, m6_handler, m16_handler)));
+     AddSequencedHandler(make_ptr(new sink::StreamingState(init_params, m16_handler)));
    }
+
    SinkStateMachine(Peer::Delegate* sender, SinkMediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
 
    int GetNextCSeq() { return send_cseq_++; }
+
+ private:
+   uint keep_alive_timer_;
 };
 
 class SinkImpl final : public Sink, public RTSPInputHandler {
