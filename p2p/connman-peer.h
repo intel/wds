@@ -51,6 +51,7 @@ class Peer {
         const std::string& remote_host() const {return remote_host_; }
         const int remote_port() const { return ie_->get_rtsp_port(); }
         const std::string& local_host() const {return local_host_; }
+        const P2P::DeviceType device_type() const { return ie_->get_device_type(); }
 	    bool is_available() const { return ready_ && !remote_host_.empty() && !local_host_.empty(); }
 
     private:
