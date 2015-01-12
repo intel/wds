@@ -50,7 +50,7 @@ class Peer {
 
         const std::string& ip_address() const {return ip_address_; }
         const int port() const { return ie_->get_rtsp_port(); }
-	    bool is_ready() const { return ready_; }
+	    bool is_available() const { return ready_ && !ip_address_.empty(); }
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);

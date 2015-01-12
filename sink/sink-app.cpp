@@ -35,9 +35,9 @@ void SinkApp::on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> pe
 void SinkApp::on_state_changed(P2P::Peer *peer)
 {
 	/* TODO only observe sources ... */
-	if (peer->is_ready()) {
+	if (peer->is_available()) {
 		std::cout << "* Connecting to peer at " << peer->ip_address() << ":" << ntohs(peer->port()) << std::endl;
-		
+
         sink_.reset(new Sink (peer->ip_address(), ntohs(peer->port())));
 	}
 }
