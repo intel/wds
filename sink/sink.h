@@ -31,7 +31,7 @@
 
 class Sink : public MiracBroker {
  public:
-  explicit Sink(const std::string& host, int rtsp_port);
+  explicit Sink(const std::string& remote_host, int remote_rtsp_port, const std::string& local_host);
   ~Sink();
 
   void Play();
@@ -47,6 +47,7 @@ class Sink : public MiracBroker {
 
   std::unique_ptr<wfd::SinkMediaManager> media_manager_;
   std::unique_ptr<wfd::Sink> wfd_sink_;
+  std::string local_host_;
 };
 
 #endif // SINK_H

@@ -84,7 +84,7 @@ static gboolean _user_input_handler (
 int main (int argc, char *argv[])
 {
 	gst_init(&argc, &argv);
-	SinkApp app;
+    std::unique_ptr<SinkApp> app;
 
     GMainLoop *main_loop =  g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, main_loop);

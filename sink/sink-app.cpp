@@ -38,7 +38,7 @@ void SinkApp::on_availability_changed(P2P::Peer *peer)
 	if (peer->is_available()) {
 		std::cout << "* Connecting to peer at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
 
-        sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port())));
+        sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port()), peer->local_host()));
 	}
 }
 
