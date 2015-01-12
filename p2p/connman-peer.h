@@ -19,6 +19,7 @@
  * 02110-1301 USA
  */
 
+#include <gio/gio.h>
 #include "information-element.h"
 
 #ifndef CONNMAN_PEER_H_
@@ -37,7 +38,7 @@ class Peer {
 				virtual ~Observer() {}
 		};
 
-        Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement>);
+        Peer(const char *object_path, GVariantIter *property_iterator);
         virtual ~Peer();
 
 		void set_observer(Observer* observer) {
@@ -48,10 +49,11 @@ class Peer {
 		void connect();
 		void disconnect();
 
+        const P2P::DeviceType device_type() const { return ie_->get_device_type(); }
+        const std::string& name() const { return name_; }
         const std::string& remote_host() const {return remote_host_; }
         const int remote_port() const { return ie_->get_rtsp_port(); }
         const std::string& local_host() const {return local_host_; }
-        const P2P::DeviceType device_type() const { return ie_->get_device_type(); }
 	    bool is_available() const { return ready_ && !remote_host_.empty() && !local_host_.empty(); }
 
     private:
@@ -62,10 +64,13 @@ class Peer {
 
 		void remote_ip_changed (const char *ip);
 		void local_ip_changed (const char *ip);
-		void state_changed (bool ready);
+		void state_changed (const char *state);
+		void name_changed (const char *name);
         void proxy_cb (GAsyncResult *res);
+		void handle_property_change (const char *name, GVariant *property);
 
 		Observer *observer_;
+		std::string name_;
 		std::string remote_host_;
 		std::string local_host_;
 		bool ready_;

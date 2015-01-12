@@ -28,7 +28,7 @@
 
 void SinkApp::on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer)
 {
-	std::cout << "* New peer" << std::endl;
+	std::cout << "* New peer: " << peer->name() << std::endl;
 	peer->set_observer (this);
 }
 

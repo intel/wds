@@ -81,46 +81,27 @@ void ConnmanClient::technology_proxy_cb (GObject *object, GAsyncResult *res, gpo
 void ConnmanClient::peers_changed (GVariant *params)
 {
     GVariantIter *added, *removed, *props;
-    char *path;
+    const char *path;
 
     g_variant_get (params, "(a(oa{sv})ao)", &added, &removed);
     while (g_variant_iter_loop (added, "(&oa{sv})", &path, &props)) {
-        char *name;
-        GVariant *val;
-		while (g_variant_iter_loop (props, "{&sv}", &name, &val)) {
-            if (g_strcmp0 (name, "Services") == 0) {
-                GVariantIter *service_array, *services;
-                GVariant *spec_val;
 
-                g_variant_get (val, "a(a{sv})", &service_array);
-                while (g_variant_iter_loop (service_array, "(a{sv})", &services)) {
-    	            while (g_variant_iter_loop (services, "{sv}", &name, &spec_val)) {
-                        if (g_strcmp0 (name, "WiFiDisplayIEs") == 0) {
-                            uint8_t *bytes;
-							gsize length;
-
-                            bytes = (uint8_t*)g_variant_get_fixed_array (spec_val, &length, 1);
-							std::unique_ptr<P2P::InformationElementArray> array
-									(new P2P::InformationElementArray(length, bytes));
-							auto ie = std::make_shared<P2P::InformationElement>(array);
-
-							peers_[path] = std::make_shared<P2P::Peer>(std::string(path), ie);
-							if (observer_){
-								observer_->on_peer_added(this, peers_[path]);
-							}
-                       }
-                   }
-               }
-           }
+        try {
+            peers_[path] = std::make_shared<P2P::Peer>(path, props);
+            if (observer_)
+                observer_->on_peer_added(this, peers_[path]);
+        } catch (std::invalid_argument &x) {
+            /* Not a miracast peer */
         }
+
     }
 
 
     while (g_variant_iter_loop (removed, "o", &path)) {
-		/* TODO call on_peer_removed() */
+        /* TODO call on_peer_removed() */
         if (peers_.erase (path) > 0) {
-			std::cout << "removed peer " << path << std::endl;
-		}
+            std::cout << "removed peer " << path << std::endl;
+        }
     }
 
     g_variant_iter_free (added);

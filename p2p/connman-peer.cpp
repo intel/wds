@@ -20,6 +20,7 @@
  */
 
 #include <iostream>
+#include <stdexcept>
 #include <gio/gio.h>
 
 #include "connman-peer.h"
@@ -45,26 +46,50 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 
     g_variant_get (params, "(sv)", &name, &property);
 
-	if (g_strcmp0(name, "State") == 0) {
-	    const char *state = g_variant_get_string (property, NULL); 
+    peer->handle_property_change (name, property);
+}
 
-		peer->state_changed (g_strcmp0 (state, "ready") == 0);
-	} else if (g_strcmp0(name, "IPv4") == 0) {
-		GVariantIter *ips;
-		GVariant *spec_val;
-		char *name;
+void Peer::handle_property_change (const char *name, GVariant *property)
+{
+    if (g_strcmp0(name, "State") == 0) {
+        state_changed (g_variant_get_string (property, NULL));
+    } else if (g_strcmp0(name, "Name") == 0) {
+        name_changed (g_variant_get_string (property, NULL));
+    } else if (g_strcmp0(name, "Services") == 0) {
+        GVariantIter *service_array, *services;
+        GVariant *spec_val;
 
-		g_variant_get (property, "a{sv}", &ips);
+        g_variant_get (property, "a(a{sv})", &service_array);
+        while (g_variant_iter_loop (service_array, "(a{sv})", &services)) {
+            const char *service_name;
+            while (g_variant_iter_loop (services, "{sv}", &service_name, &spec_val)) {
+                if (g_strcmp0 (service_name, "WiFiDisplayIEs") == 0) {
+                    uint8_t *bytes;
+                    gsize length;
+
+                    bytes = (uint8_t*)g_variant_get_fixed_array (spec_val, &length, 1);
+                    std::unique_ptr<P2P::InformationElementArray> array
+                            (new P2P::InformationElementArray(length, bytes));
+                    ie_.reset(new P2P::InformationElement (array));
+                }
+            }
+        }
+        g_variant_iter_free (service_array);
+    } else if (g_strcmp0(name, "IPv4") == 0) {
+        GVariantIter *ips;
+        GVariant *spec_val;
+        char *name;
+
+        g_variant_get (property, "a{sv}", &ips);
         while (g_variant_iter_loop (ips, "{sv}", &name, &spec_val)) {
             if (g_strcmp0 (name, "Remote") == 0) {
-				peer->remote_ip_changed (g_variant_get_string (spec_val, NULL));
-			} else if (g_strcmp0 (name, "Local") == 0) {
-				peer->local_ip_changed (g_variant_get_string (spec_val, NULL));
-			}
-			
-		}
-		g_variant_iter_free (ips);
-	}
+                remote_ip_changed (g_variant_get_string (spec_val, NULL));
+            } else if (g_strcmp0 (name, "Local") == 0) {
+                local_ip_changed (g_variant_get_string (spec_val, NULL));
+            }
+        }
+        g_variant_iter_free (ips);
+    }
 }
 
 /* static C callback */
@@ -121,13 +146,11 @@ void Peer::proxy_cb (GAsyncResult *result)
 
 void Peer::remote_ip_changed (const char *ip)
 {
-	std::string new_ip(ip);
-
-	if (new_ip.compare (remote_host_) == 0)
+	if (g_strcmp0 (ip, remote_host_.c_str()) == 0)
 		return;
 
 	auto was_available = is_available();
-	remote_host_ = new_ip;
+	remote_host_ = std::string(ip);
 
 	if (!observer_)
 		return;
@@ -138,13 +161,11 @@ void Peer::remote_ip_changed (const char *ip)
 
 void Peer::local_ip_changed (const char *ip)
 {
-	std::string new_ip(ip);
-
-	if (new_ip.compare (local_host_) == 0)
+	if (g_strcmp0 (ip, local_host_.c_str()) == 0)
 		return;
 
 	auto was_available = is_available();
-	local_host_ = new_ip;
+	local_host_ = std::string(ip);
 
 	if (!observer_)
 		return;
@@ -153,8 +174,10 @@ void Peer::local_ip_changed (const char *ip)
 		observer_->on_availability_changed(this);
 }
 
-void Peer::state_changed (bool ready)
+void Peer::state_changed (const char *state)
 {
+	bool ready = (g_strcmp0 (state, "ready") == 0);
+
 	if (ready_ == ready)
 		return;
 	
@@ -168,15 +191,33 @@ void Peer::state_changed (bool ready)
 		observer_->on_availability_changed(this);
 }
 
-Peer::Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement> ie):
-    observer_(NULL),
-    ie_(ie)
+void Peer::name_changed (const char *name)
 {
+	if (g_strcmp0 (name, name_.c_str()) == 0)
+		return;
+
+	name_ = std::string (name);
+}
+
+
+Peer::Peer(const char *object_path, GVariantIter *props):
+    observer_(NULL)
+{
+    GVariant *val;
+    const char *prop_name;
+
+    while (g_variant_iter_loop (props, "{&sv}", &prop_name, &val)) {
+        handle_property_change (prop_name, val);
+    }
+
+    if (!ie_)
+        throw std::invalid_argument("WiFiDisplayIEs is a required property");
+
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
                               G_DBUS_PROXY_FLAGS_NONE,
                               NULL,
                               "net.connman",
-                              object_path.c_str(),
+                              object_path,
                               "net.connman.Peer",
                               NULL,
                               Peer::proxy_cb,
