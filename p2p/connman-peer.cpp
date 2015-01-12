@@ -57,9 +57,11 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 		g_variant_get (property, "a{sv}", &ips);
         while (g_variant_iter_loop (ips, "{sv}", &name, &spec_val)) {
             if (g_strcmp0 (name, "Remote") == 0) {
-				peer->ip_changed (g_variant_get_string (spec_val, NULL));
-				break;
+				peer->remote_ip_changed (g_variant_get_string (spec_val, NULL));
+			} else if (g_strcmp0 (name, "Local") == 0) {
+				peer->local_ip_changed (g_variant_get_string (spec_val, NULL));
 			}
+			
 		}
 		g_variant_iter_free (ips);
 	}
@@ -117,21 +119,38 @@ void Peer::proxy_cb (GAsyncResult *result)
 		observer_->on_initialized(this);
 }
 
-void Peer::ip_changed (const char *ip)
+void Peer::remote_ip_changed (const char *ip)
 {
 	std::string new_ip(ip);
 
-	if (new_ip.compare (ip_address_) == 0)
+	if (new_ip.compare (remote_host_) == 0)
 		return;
-	
-	ip_address_ = new_ip;
+
+	auto was_available = is_available();
+	remote_host_ = new_ip;
 
 	if (!observer_)
 		return;
 
-	if ((ip_address_.empty() && ready_) || (!ip_address_.empty() && ready_)) {
-		observer_->on_state_changed(this);
-	}
+	if (was_available != is_available())
+		observer_->on_availability_changed(this);
+}
+
+void Peer::local_ip_changed (const char *ip)
+{
+	std::string new_ip(ip);
+
+	if (new_ip.compare (local_host_) == 0)
+		return;
+
+	auto was_available = is_available();
+	local_host_ = new_ip;
+
+	if (!observer_)
+		return;
+
+	if (was_available != is_available())
+		observer_->on_availability_changed(this);
 }
 
 void Peer::state_changed (bool ready)
@@ -139,14 +158,14 @@ void Peer::state_changed (bool ready)
 	if (ready_ == ready)
 		return;
 	
+	auto was_available = is_available();
 	ready_ = ready;
 
 	if (!observer_)
 		return;
 
-	if ((!ready_ && !ip_address_.empty()) || (ready_ && !ip_address_.empty())) {
-		observer_->on_state_changed(this);
-	}
+	if (was_available != is_available())
+		observer_->on_availability_changed(this);
 }
 
 Peer::Peer(const std::string& object_path, std::shared_ptr<P2P::InformationElement> ie):

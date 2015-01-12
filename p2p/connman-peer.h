@@ -30,7 +30,7 @@ class Peer {
     public:
 		class Observer {
 			public:
-				virtual void on_state_changed(Peer *peer) {}
+				virtual void on_availability_changed(Peer *peer) {}
 				virtual void on_initialized(Peer *peer) {}
 
 			protected:
@@ -48,9 +48,10 @@ class Peer {
 		void connect();
 		void disconnect();
 
-        const std::string& ip_address() const {return ip_address_; }
-        const int port() const { return ie_->get_rtsp_port(); }
-	    bool is_available() const { return ready_ && !ip_address_.empty(); }
+        const std::string& remote_host() const {return remote_host_; }
+        const int remote_port() const { return ie_->get_rtsp_port(); }
+        const std::string& local_host() const {return local_host_; }
+	    bool is_available() const { return ready_ && !remote_host_.empty() && !local_host_.empty(); }
 
     private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
@@ -58,12 +59,14 @@ class Peer {
         static void connect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void disconnect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
 
-		void ip_changed (const char *ip);
+		void remote_ip_changed (const char *ip);
+		void local_ip_changed (const char *ip);
 		void state_changed (bool ready);
         void proxy_cb (GAsyncResult *res);
 
 		Observer *observer_;
-		std::string ip_address_;
+		std::string remote_host_;
+		std::string local_host_;
 		bool ready_;
         GDBusProxy *proxy_;
 		std::shared_ptr<P2P::InformationElement> ie_;

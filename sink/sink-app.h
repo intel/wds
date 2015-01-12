@@ -37,7 +37,7 @@ class SinkApp: public ConnmanClient::Observer, public P2P::Peer::Observer {
 		void on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) override;
 		void on_initialized(ConnmanClient *client)  override {};
 		
-		void on_state_changed(P2P::Peer *peer) override;
+		void on_availability_changed(P2P::Peer *peer) override;
 		void on_initialized(P2P::Peer *peer) override {};
 
 	private:
