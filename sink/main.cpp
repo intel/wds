@@ -83,8 +83,34 @@ static gboolean _user_input_handler (
 
 int main (int argc, char *argv[])
 {
-	gst_init(&argc, &argv);
+    char* hostname = NULL;
+    int port = 7236;
     std::unique_ptr<SinkApp> app;
+
+    GOptionEntry main_entries[] = {
+        { "hostname", 0, 0, G_OPTION_ARG_STRING, &hostname, "Specify remote hostname (for debugging purposes)", "host"},
+        { "rtsp_port", 0, 0, G_OPTION_ARG_INT, &port, "Specify remote RTSP port number (for debugging purposes), 7236 by default", "rtsp_port"},
+        { NULL }
+    };
+
+    GOptionContext* context = g_option_context_new ("- WFD sink demo application\n");
+    g_option_context_add_main_entries (context, main_entries, NULL);
+    g_option_context_add_group (context, gst_init_get_option_group ());
+
+    GError* error = NULL;
+    if (!g_option_context_parse (context, &argc, &argv, &error)) {
+        g_print ("option parsing failed: %s\n", error->message);
+        g_option_context_free(context);
+        exit (1);
+    }
+    g_option_context_free(context);
+
+    if (hostname) {
+        app.reset(new SinkApp(std::string(hostname), port));
+        g_free (hostname);
+    } else {
+        app.reset(new SinkApp());
+    }
 
     GMainLoop *main_loop =  g_main_loop_new(NULL, TRUE);
     g_unix_signal_add(SIGINT, _sig_handler, main_loop);

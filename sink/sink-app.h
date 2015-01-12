@@ -30,6 +30,7 @@
 class SinkApp: public ConnmanClient::Observer, public P2P::Peer::Observer {
 	public:
 		SinkApp();
+		SinkApp(const std::string& hostname, int port);
 		~SinkApp();
 
 		Sink& sink() { return *sink_; }

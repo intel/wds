@@ -43,7 +43,6 @@ void SinkApp::on_availability_changed(P2P::Peer *peer)
 }
 
 SinkApp::SinkApp(){
-
     // Create a information element for a simple WFD Sink
     P2P::InformationElement ie;
     auto sub_element = P2P::new_subelement(P2P::DEVICE_INFORMATION);
@@ -64,6 +63,13 @@ SinkApp::SinkApp(){
     // register the P2P service with connman
     auto array = ie.serialize ();
     connman_.reset(new ConnmanClient (array, this));
+}
+
+SinkApp::SinkApp(const std::string& hostname, int port)
+{
+    std::cout << "* Connecting to peer at " << hostname << ":" << port << std::endl;
+
+    sink_.reset(new Sink (hostname, port, ""));
 }
 
 SinkApp::~SinkApp() {
