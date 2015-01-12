@@ -34,12 +34,11 @@ void SinkApp::on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> pe
 
 void SinkApp::on_availability_changed(P2P::Peer *peer)
 {
-	/* TODO only observe sources ... */
-	if (peer->is_available()) {
-		std::cout << "* Connecting to peer at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
+    if (!sink_ && peer->is_available() && peer->device_type() == P2P::SOURCE) {
+        std::cout << "* Connecting to source at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
 
         sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port()), peer->local_host()));
-	}
+    }
 }
 
 SinkApp::SinkApp(){
