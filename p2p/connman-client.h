@@ -33,7 +33,7 @@ class ConnmanClient {
 		class Observer {
 			public:
 				virtual void on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) {}
-				// virtual void on_peer_removed(ConnmanClient *client) {}
+				virtual void on_peer_removed(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) {}
 				virtual void on_initialized(ConnmanClient *client) {}
 
 			protected:

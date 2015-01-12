@@ -96,12 +96,15 @@ void ConnmanClient::peers_changed (GVariant *params)
 
     }
 
-
     while (g_variant_iter_loop (removed, "o", &path)) {
-        /* TODO call on_peer_removed() */
-        if (peers_.erase (path) > 0) {
-            std::cout << "removed peer " << path << std::endl;
-        }
+        auto it = peers_.find(path);
+        if (it == peers_.end())
+			return;
+
+        if (observer_)
+            observer_->on_peer_removed(this, it->second);
+
+        peers_.erase(it);
     }
 
     g_variant_iter_free (added);
