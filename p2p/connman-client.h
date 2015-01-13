@@ -54,17 +54,19 @@ class Client {
 		/* TODO error / finished handling */
 		void scan();
 
-    private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void technology_proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void register_peer_service_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void scan_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void get_peers_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
 
         void peers_changed (GVariant *params);
         void proxy_cb(GAsyncResult *res);
         void technology_proxy_cb(GAsyncResult *res);
+        void handle_new_peers(GVariantIter *added);
 
+        void initialize_peers();
         void register_peer_service();
         void unregister_peer_service();
 

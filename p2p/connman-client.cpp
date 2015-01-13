@@ -50,6 +50,28 @@ void Client::register_peer_service_cb (GObject *object, GAsyncResult *res, gpoin
     }
 }
 
+void Client::get_peers_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
+{
+    GError *error = NULL;
+    GDBusProxy *proxy = G_DBUS_PROXY(object);
+    GVariantIter *peer_iter;
+    GVariant *params;
+
+    params = g_dbus_proxy_call_finish(proxy, res, &error);
+    if (error) {
+        std::cout << "GetPeers error " << error->message << std::endl;
+        g_clear_error(&error);
+        return;
+    }
+
+    g_variant_get(params, "(a(oa{sv}))", &peer_iter);
+    auto client = reinterpret_cast<Client*>(data_ptr);
+    client->handle_new_peers(peer_iter);
+
+    g_variant_unref(params);
+    g_variant_iter_free(peer_iter);
+}
+
 /* static C callback */
 void Client::scan_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
@@ -80,14 +102,12 @@ void Client::technology_proxy_cb (GObject *object, GAsyncResult *res, gpointer d
     client->technology_proxy_cb (res);
 }
 
-void Client::peers_changed (GVariant *params)
+void Client::handle_new_peers (GVariantIter *added)
 {
-    GVariantIter *added, *removed, *props;
+    GVariantIter *props;
     const char *path;
 
-    g_variant_get (params, "(a(oa{sv})ao)", &added, &removed);
-    while (g_variant_iter_loop (added, "(&oa{sv})", &path, &props)) {
-
+    while (g_variant_iter_loop(added, "(oa{sv})", &path, &props)) {
         try {
             peers_[path] = std::make_shared<P2P::Peer>(path, props);
             if (observer_)
@@ -95,8 +115,17 @@ void Client::peers_changed (GVariant *params)
         } catch (std::invalid_argument &x) {
             /* Not a miracast peer */
         }
-
     }
+}
+
+void Client::peers_changed (GVariant *params)
+{
+    GVariantIter *added, *removed;
+    const char *path;
+
+    g_variant_get(params, "(a(oa{sv})ao)", &added, &removed);
+
+    handle_new_peers(added);
 
     while (g_variant_iter_loop (removed, "o", &path)) {
         auto it = peers_.find(path);
@@ -155,6 +184,19 @@ void Client::unregister_peer_service ()
                        this);
 }
 
+void Client::initialize_peers ()
+{
+    g_dbus_proxy_call(proxy_,
+                      "GetPeers",
+                      NULL,
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      NULL,
+                      Client::get_peers_cb,
+                      this);
+}
+
+
 void Client::proxy_cb (GAsyncResult *result)
 {
     GError *error = NULL;
@@ -166,10 +208,10 @@ void Client::proxy_cb (GAsyncResult *result)
         return;
     }
 
-    g_signal_connect (proxy_, "g-signal",
-                      G_CALLBACK (Client::proxy_signal_cb), this);
-    /* TODO run GetPeers just in case the list is up to date already */
+    g_signal_connect(proxy_, "g-signal",
+                     G_CALLBACK (Client::proxy_signal_cb), this);
 
+    initialize_peers();
     register_peer_service();
 
 	if(technology_proxy_ && observer_)
