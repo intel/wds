@@ -67,13 +67,14 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new wfd::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_VIDEO_FORMATS]){
+          // TODO : get supported codecs from manager.
           auto codec_list = wfd::H264Codecs();
           // again, declare that we support absolutely everything, let gstreamer deal with it
           auto codec_cbp = new wfd::H264Codec(1, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
           auto codec_chp = new wfd::H264Codec(2, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
           codec_list.push_back(*codec_cbp);
           codec_list.push_back(*codec_chp);
-          new_prop.reset(new wfd::VideoFormats(64 , 0, codec_list)); // 64 should mean 1920x1080p24
+          new_prop.reset(new wfd::VideoFormats(manager_->SupportedNativeVideoFormat() , 0, codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_3D_FORMATS]){
           new_prop.reset(new wfd::Formats3d());

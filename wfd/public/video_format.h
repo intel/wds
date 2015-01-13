@@ -24,55 +24,93 @@
 
 namespace wfd {
 
-enum Resolution {
-  // CEA resolutions
-  k640x480,
-  k720x480,
-  k720x576,
-  k1280x720,
-  k1920x1080,
+typedef unsigned RateAndResolution;
 
-  // VESA Resolutions
-  k800x600,
-  k1024x768,
-  k1152x864,
-  k1280x768,
-  k1280x800,
-  k1360x768,
-  k1366x768,
-  k1280x1024,
-  k1400x1050,
-  k1440x900,
-  k1600x900,
-  k1600x1200,
-  k1680x1024,
-  k1680x1050,
-  k1920x1200,
+// NOTE : Do not change the elements order in the following enums!
 
-  // HH resolutions
-  k800x480,
-  k854x480,
-  k864x480,
-  k640x360,
-  k960x540,
-  k848x480
+enum ResolutionType {
+  CEA,
+  VESA,
+  HH
 };
 
-enum FrameRate {
-  p24,
-  p25,
-  p30,
-  p60,
-  i50,
-  i60
+enum CEARatesAndResolutions {
+  CEA640x480p60,
+  CEA720x480p60,
+  CEA720x480i60,
+  CEA720x576p50,
+  CEA720x576i50,
+  CEA1280x720p30,
+  CEA1280x720p60,
+  CEA1920x1080p30,
+  CEA1920x1080p60,
+  CEA1920x1080i60,
+  CEA1280x720p25,
+  CEA1280x720p50,
+  CEA1920x1080p25,
+  CEA1920x1080p50,
+  CEA1920x1080i50,
+  CEA1280x720p24,
+  CEA1920x1080p24
 };
 
+enum VESARatesAndResolutions {
+  VESA800x600p30,
+  VESA800x600p60,
+  VESA1024x768p30,
+  VESA1024x768p60,
+  VESA1152x864p30,
+  VESA1152x864p60,
+  VESA1280x768p30,
+  VESA1280x768p60,
+  VESA1280x800p30,
+  VESA1280x800p60,
+  VESA1360x768p30,
+  VESA1360x768p60,
+  VESA1366x768p30,
+  VESA1366x768p60,
+  VESA1280x1024p30,
+  VESA1280x1024p60,
+  VESA1400x1050p30,
+  VESA1400x1050p60,
+  VESA1440x900p30,
+  VESA1440x900p60,
+  VESA1600x900p30,
+  VESA1600x900p60,
+  VESA1600x1200p30,
+  VESA1600x1200p60,
+  VESA1680x1024p30,
+  VESA1680x1024p60,
+  VESA1680x1050p30,
+  VESA1680x1050p60,
+  VESA1920x1200p30
+};
+
+enum HHRatesAndResolutions {
+  HH800x480p30,
+  HH800x480p60,
+  HH854x480p30,
+  HH854x480p60,
+  HH864x480p30,
+  HH864x480p60,
+  HH640x360p30,
+  HH640x360p60,
+  HH960x540p30,
+  HH960x540p60,
+  HH848x480p30,
+  HH848x480p60
+};
 
 struct NativeVideoFormat {
-  NativeVideoFormat(Resolution resolution, FrameRate frame_rate)
-  : frame_rate(frame_rate), resolution(resolution) {}
-  FrameRate frame_rate;
-  Resolution resolution;
+  NativeVideoFormat(CEARatesAndResolutions rr)
+  : type(CEA), rate_resolution(rr) {}
+  NativeVideoFormat(VESARatesAndResolutions rr)
+  : type(VESA), rate_resolution(rr) {}
+  NativeVideoFormat(HHRatesAndResolutions rr)
+  : type(HH), rate_resolution(rr) {}
+
+  const ResolutionType type;
+  const RateAndResolution rate_resolution;
 };
 
 struct H264VideoFormat {
@@ -89,31 +127,19 @@ struct H264VideoFormat {
     k4_2
   };
 
-  // Resolution type
-  enum {
-    CEA,
-    VESA,
-    HH
-  } type;
+  H264VideoFormat(H264Profile profile, H264Level level, CEARatesAndResolutions rr)
+  : profile(profile), level(level), type(CEA), rate_resolution(rr) {}
 
-  H264VideoFormat(H264Profile profile, H264Level level,
-      Resolution resolution, FrameRate frame_rate)
-  : profile(profile),
-    level(level),
-    resolution(resolution),
-    frame_rate(frame_rate) {
-      if (resolution < k800x600)
-        type = CEA;
-      else if (resolution < k800x480)
-        type = VESA;
-      else
-        type = HH;
-  }
+  H264VideoFormat(H264Profile profile, H264Level level, VESARatesAndResolutions rr)
+  : profile(profile), level(level), type(VESA), rate_resolution(rr) {}
 
-  H264Profile profile;
-  H264Level level;
-  Resolution resolution;
-  FrameRate frame_rate;
+  H264VideoFormat(H264Profile profile, H264Level level, HHRatesAndResolutions rr)
+  : profile(profile), level(level), type(HH), rate_resolution(rr) {}
+
+  const H264Profile profile;
+  const H264Level level;
+  const ResolutionType type;
+  const RateAndResolution rate_resolution;
 };
 
 }  // namespace wfd
