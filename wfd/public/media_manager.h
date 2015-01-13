@@ -22,6 +22,9 @@
 #ifndef MEDIA_MANAGER_H_
 #define MEDIA_MANAGER_H_
 
+#include <vector>
+#include "video_format.h"
+
 namespace wfd {
 
 /**
@@ -57,6 +60,8 @@ class MediaManager {
    * @return true if media stream is paused, false otherwise.
    */
   virtual bool IsPaused() const = 0;
+  virtual std::vector<H264VideoFormat> SupportedH264VideoFormats() const = 0;
+  virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
 };
 
 class SinkMediaManager : public MediaManager {

@@ -39,3 +39,17 @@ std::pair<int, int> DesktopMediaManager::SinkRtpPorts() const {
 int DesktopMediaManager::SourceRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
+
+std::vector<wfd::H264VideoFormat>
+DesktopMediaManager::SupportedH264VideoFormats() const {
+  return {wfd::H264VideoFormat(
+      wfd::H264VideoFormat::CBP,
+      wfd::H264VideoFormat::k3_1,
+      wfd::k640x480,
+      wfd::p60
+      )};
+}
+
+wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
+  return wfd::NativeVideoFormat(wfd::k640x480, wfd::p60);
+}

@@ -17,6 +17,9 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
   virtual std::pair<int,int> SinkRtpPorts() const override;
   virtual int SourceRtpPort() const override;
 
+  virtual std::vector<wfd::H264VideoFormat> SupportedH264VideoFormats() const override;
+  virtual wfd::NativeVideoFormat SupportedNativeVideoFormat() const override;
+
  private:
   std::string hostname_;
   std::unique_ptr<MiracGstTestSource> gst_pipeline_;
