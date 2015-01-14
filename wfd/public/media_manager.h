@@ -22,8 +22,10 @@
 #ifndef MEDIA_MANAGER_H_
 #define MEDIA_MANAGER_H_
 
+#include <string>
 #include <vector>
 #include "video_format.h"
+#include "wfd_export.h"
 
 namespace wfd {
 
@@ -33,7 +35,7 @@ namespace wfd {
  * Source or sink applications should implement that interface. MediaManager
  * instance is used by state machine to control media stream.
  */
-class MediaManager {
+class WFD_EXPORT MediaManager {
  public:
   virtual ~MediaManager() {}
 
@@ -60,8 +62,30 @@ class MediaManager {
    * @return true if media stream is paused, false otherwise.
    */
   virtual bool IsPaused() const = 0;
+
+  /**
+   * Returns list of supported H264 video formats
+   * @return vector of supported H264 video formats
+   */
   virtual std::vector<H264VideoFormat> SupportedH264VideoFormats() const = 0;
+
+  /**
+   * Returns native video format of a device
+   * @return native video format
+   */
   virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
+
+  /**
+   * Finds optimal format for streaming.
+   * Default quality selection algorithm will pick codec with higher bandwidth
+   *
+   * @param native format of a remote device
+   * @param list of H264 formats that are supported by remote device
+   * @return optimal H264 video format
+   */
+  virtual H264VideoFormat FindOptimalFormat(
+      const NativeVideoFormat& remote_device_native_format,
+      const std::vector<H264VideoFormat>& remotely_supported_formats) const;
 };
 
 class SinkMediaManager : public MediaManager {

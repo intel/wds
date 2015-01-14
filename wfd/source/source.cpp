@@ -28,7 +28,7 @@
 #include "wfd_session_state.h"
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
-#include "wfd/common/wfd_export.h"
+#include "wfd/public/wfd_export.h"
 #include "wfd/parser/getparameter.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/public/media_manager.h"

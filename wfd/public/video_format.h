@@ -136,10 +136,10 @@ struct H264VideoFormat {
   H264VideoFormat(H264Profile profile, H264Level level, HHRatesAndResolutions rr)
   : profile(profile), level(level), type(HH), rate_resolution(rr) {}
 
-  const H264Profile profile;
-  const H264Level level;
-  const ResolutionType type;
-  const RateAndResolution rate_resolution;
+  H264Profile profile;
+  H264Level level;
+  ResolutionType type;
+  RateAndResolution rate_resolution;
 };
 
 }  // namespace wfd

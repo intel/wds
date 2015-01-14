@@ -45,8 +45,7 @@ DesktopMediaManager::SupportedH264VideoFormats() const {
   return {wfd::H264VideoFormat(
       wfd::H264VideoFormat::CBP,
       wfd::H264VideoFormat::k3_1,
-      wfd::CEA640x480p60
-      )};
+      wfd::CEA640x480p60)};
 }
 
 wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
