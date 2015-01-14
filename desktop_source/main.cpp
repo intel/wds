@@ -33,7 +33,7 @@
 
 struct SourceAppData {
     std::unique_ptr<MiracBrokerSource> source;
-    std::unique_ptr<ConnmanClient> connman;
+    std::unique_ptr<P2P::Client> p2p_client;
 
     int port;
 };
@@ -136,7 +136,7 @@ int main (int argc, char *argv[])
 
     // register the P2P service with connman
     auto array = ie.serialize ();
-    data.connman.reset(new ConnmanClient (array));
+    data.p2p_client.reset(new P2P::Client (array));
     data.source.reset(new MiracBrokerSource(data.port));
     g_main_loop_run (main_loop);
 

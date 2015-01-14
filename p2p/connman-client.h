@@ -28,21 +28,23 @@
 #include "information-element.h"
 #include "connman-peer.h"
 
-class ConnmanClient {
+namespace P2P {
+
+class Client {
     public:
 		class Observer {
 			public:
-				virtual void on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) {}
-				virtual void on_peer_removed(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) {}
-				virtual void on_initialized(ConnmanClient *client) {}
+				virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+				virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+				virtual void on_initialized(Client *client) {}
 
 			protected:
 				virtual ~Observer() {}
 		};
 
-        ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array);
-        ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
-        virtual ~ConnmanClient();
+        Client(std::unique_ptr<P2P::InformationElementArray> &take_array);
+        Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
+        virtual ~Client();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
 		void set_observer(Observer* observer) {
@@ -74,4 +76,5 @@ class ConnmanClient {
 		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };
 
+}
 #endif // CONNMAN_CLIENT_H_

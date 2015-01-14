@@ -53,7 +53,7 @@ int main (int argc, const char **argv)
 
     // register the P2P service with connman
     auto array = ie.serialize ();
-    ConnmanClient client (array);
+    P2P::Client p2p_client (array);
 
     g_main_loop_run (main_loop);
     g_main_loop_unref (main_loop);

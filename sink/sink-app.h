@@ -27,7 +27,7 @@
 #include "sink.h"
 #include "connman-client.h"
 
-class SinkApp: public ConnmanClient::Observer, public P2P::Peer::Observer {
+class SinkApp: public P2P::Client::Observer, public P2P::Peer::Observer {
 	public:
 		SinkApp();
 		SinkApp(const std::string& hostname, int port);
@@ -35,14 +35,14 @@ class SinkApp: public ConnmanClient::Observer, public P2P::Peer::Observer {
 
 		Sink& sink() { return *sink_; }
 
-		void on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer) override;
-		void on_initialized(ConnmanClient *client)  override {};
+		void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
+		void on_initialized(P2P::Client *client) override {};
 		
 		void on_availability_changed(P2P::Peer *peer) override;
 		void on_initialized(P2P::Peer *peer) override {};
 
 	private:
-		std::unique_ptr<ConnmanClient> connman_;
+		std::unique_ptr<P2P::Client> p2p_client_;
 		std::unique_ptr<Sink> sink_;
 };
 

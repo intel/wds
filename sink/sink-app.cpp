@@ -26,7 +26,7 @@
 #include "sink.h"
 #include "connman-client.h"
 
-void SinkApp::on_peer_added(ConnmanClient *client, std::shared_ptr<P2P::Peer> peer)
+void SinkApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
 {
 	std::cout << "* New peer: " << peer->name() << std::endl;
 	peer->set_observer (this);
@@ -61,7 +61,7 @@ SinkApp::SinkApp(){
 
     // register the P2P service with connman
     auto array = ie.serialize ();
-    connman_.reset(new ConnmanClient (array, this));
+    p2p_client_.reset(new P2P::Client(array, this));
 }
 
 SinkApp::SinkApp(const std::string& hostname, int port)
