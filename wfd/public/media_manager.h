@@ -69,20 +69,18 @@ class SinkMediaManager : public MediaManager {
   virtual std::pair<int,int> ListeningRtpPorts() const = 0;
 
   /**
-   * Sets presentation URLs for media stream.
+   * Sets presentation URL for media stream.
    * Presentation URL can be referred in order to control media stream resource
-   * within wfd session. In coupled sink operation mode, url1 represents audio
-   * resource.
+   * within wfd session.
    *
-   * @param presentation url0 that represents video / audio stream
-   * @param presentation url1 that represents audio stream resource
+   * @param presentation url that represents video / audio stream
    */
   virtual void SetPresentationUrl(const std::string& url) = 0;
 
   /**
-   * Returns presentation URLs for managed media resource.
-   * @see SetPresentationUrls
-   * @return pair of URL strings, url0 and url1
+   * Returns presentation URL for managed media resource.
+   * @see SetPresentationUrl
+   * @return presentation url
    */
   virtual std::string PresentationUrl() const = 0;
 

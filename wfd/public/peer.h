@@ -36,19 +36,26 @@ class Peer {
   /**
    * Delegate interface.
    *
-   * Implementation of Delegate interface is responsible for sending serialized
-   * RTSP messages over the TCP/IP connection.
+   * Implementation of Delegate interface is responsible for networking
+   * and timers management.
    */
   class Delegate {
    public:
     /**
-     * Sends RTSP data over the network
+     * The implementation should send the RTSP data over the network
+     * @param data data to be send
      */
     virtual void SendRTSPData(const std::string& data) = 0;
-
-    // Interfaces to manage timer events
-    // todo(shalamov): add documentation
+    /**
+     * The implementation should start a timer to be used by the state machine.
+     * @param seconds the time interval in seconds
+     * @return unique timer id within the session
+     */
     virtual uint CreateTimer(int seconds) = 0;
+    /**
+     * The implementation should release timer by the given id.
+     * @param timer_id id of the timer to be released.
+     */
     virtual void ReleaseTimer(uint timer_id) = 0;
 
    protected:
@@ -92,7 +99,14 @@ class Peer {
    */
   virtual bool Pause() = 0;
 
-  // todo(shalamov): add documentation
+  /**
+   * This method should be called by the client to notify the state
+   * machine about the timer events.
+   * @param timer_id id of the timer
+   * @return true if request can be sent, false otherwise.
+   *
+   * @see Delegate::CreateTimer()
+   */
   virtual void OnTimerEvent(uint timer_id) = 0;
 };
 
