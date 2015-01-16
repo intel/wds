@@ -73,3 +73,8 @@ GstSinkMediaManager::SupportedH264VideoFormats() const {
 wfd::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
   return wfd::NativeVideoFormat(wfd::CEA1920x1080p24);
 }
+
+bool GstSinkMediaManager::SetOptimalFormat(
+    const wfd::H264VideoFormat& optimal_format) {
+  return true;
+}

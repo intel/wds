@@ -51,3 +51,8 @@ DesktopMediaManager::SupportedH264VideoFormats() const {
 wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
   return wfd::NativeVideoFormat(wfd::CEA640x480p60);
 }
+
+bool DesktopMediaManager::SetOptimalFormat(
+    const wfd::H264VideoFormat& optimal_format) {
+  return true;
+}

@@ -86,6 +86,14 @@ class WFD_EXPORT MediaManager {
   virtual H264VideoFormat FindOptimalFormat(
       const NativeVideoFormat& remote_device_native_format,
       const std::vector<H264VideoFormat>& remotely_supported_formats) const;
+
+  /**
+   * Sets optimal H264 format that would be used to send / receive video stream
+   *
+   * @param optimal H264 format
+   * @return true if format can be used by media manager
+   */
+  virtual bool SetOptimalFormat(const H264VideoFormat& optimal_format) = 0;
 };
 
 class SinkMediaManager : public MediaManager {

@@ -19,6 +19,7 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
 
   virtual std::vector<wfd::H264VideoFormat> SupportedH264VideoFormats() const override;
   virtual wfd::NativeVideoFormat SupportedNativeVideoFormat() const override;
+  virtual bool SetOptimalFormat(const wfd::H264VideoFormat& optimal_format) override;
 
  private:
   std::string hostname_;
