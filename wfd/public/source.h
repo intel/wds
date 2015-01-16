@@ -28,9 +28,19 @@ namespace wfd {
 
 class SourceMediaManager;
 
+/**
+ * Source state machine implementation
+ */
 class Source : public Peer {
  public:
   virtual ~Source() {}
+
+  /**
+   * Factory method that creates Source state machine.
+   * @param delegate that is used for networking
+   * @param media manger that is used for media stream management
+   * @return newly created Source instance
+   */
   static Source* Create(Peer::Delegate* delegate, SourceMediaManager* mng);
 };
 

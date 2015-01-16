@@ -28,9 +28,19 @@ namespace wfd {
 
 class SinkMediaManager;
 
+/**
+ * Sink state machine implementation
+ */
 class Sink : public Peer {
  public:
   virtual ~Sink() {}
+
+  /**
+   * Factory method that creates Sink state machine.
+   * @param delegate that is used for networking
+   * @param media manger that is used for media stream management
+   * @return newly created Sink instance
+   */
   static Sink* Create(Peer::Delegate* delegate, SinkMediaManager* mng);
 };
 
