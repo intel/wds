@@ -25,7 +25,7 @@
 #include "init_state.h"
 #include "wfd/common/message_handler.h"
 #include "wfd/common/rtsp_input_handler.h"
-#include "wfd/common/wfd_export.h"
+#include "wfd/public/wfd_export.h"
 #include "wfd/parser/pause.h"
 #include "wfd/parser/play.h"
 #include "wfd/parser/teardown.h"

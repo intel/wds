@@ -45,7 +45,32 @@ H264Codec::H264Codec(unsigned char profile, unsigned char level,
     max_hres_(max_hres),
     max_vres_(max_vres) {}
 
+H264Codec::H264Codec(H264VideoFormat format)
+  : profile_(1 << format.profile),
+    level_(1 << format.level),
+    cea_support_((format.type == CEA) ? 1 << format.rate_resolution : 0),
+    vesa_support_((format.type == VESA) ? 1 << format.rate_resolution : 0),
+    hh_support_((format.type == HH) ? 1 << format.rate_resolution : 0),
+    latency_(0),
+    min_slice_size_(0),
+    slice_enc_params_(0),
+    frame_rate_control_support_(0),
+    max_hres_(0),
+    max_vres_(0) {
+
+}
+
 VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
+}
+
+VideoFormats::VideoFormats(NativeVideoFormat format,
+    bool preferred_display_mode,
+    const H264Codecs& h264_codecs)
+  : Property(WFD_VIDEO_FORMATS),
+    native_(format.rate_resolution),
+    preferred_display_mode_(preferred_display_mode ? 1 : 0),
+    h264_codecs_(h264_codecs) {
+  native_ = (native_ << 2) | format.type;
 }
 
 VideoFormats::VideoFormats(unsigned char native,

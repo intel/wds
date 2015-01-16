@@ -41,6 +41,9 @@ class GstSinkMediaManager : public wfd::SinkMediaManager {
   virtual void SetSession(const std::string& session) override;
   virtual std::string Session() const override;
 
+  virtual std::vector<wfd::H264VideoFormat> SupportedH264VideoFormats() const override;
+  virtual wfd::NativeVideoFormat SupportedNativeVideoFormat() const override;
+
  private:
   std::string hostname_;
   std::string presentation_url_;

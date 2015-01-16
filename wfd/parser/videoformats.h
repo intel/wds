@@ -24,6 +24,7 @@
 #define VIDEOFORMATS_H_
 
 #include "property.h"
+#include "wfd/public/video_format.h"
 
 #include <vector>
 
@@ -38,8 +39,11 @@ struct H264Codec {
       unsigned char frame_rate_control_support, int max_hres,
       int max_vres);
 
+  H264Codec(H264VideoFormat format);
+
   std::string to_string() const;
 
+ private:
   unsigned char profile_;
   unsigned char level_;
   unsigned int cea_support_;
@@ -56,9 +60,11 @@ struct H264Codec {
 typedef std::vector<wfd::H264Codec> H264Codecs;
 
 class VideoFormats: public Property {
-
-public:
+ public:
   VideoFormats();
+  VideoFormats(NativeVideoFormat format,
+               bool preferred_display_mode,
+               const H264Codecs& h264_codecs);
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);

@@ -60,3 +60,16 @@ void GstSinkMediaManager::SetSession(const std::string& session) {
 std::string GstSinkMediaManager::Session() const {
   return session_;
 }
+
+std::vector<wfd::H264VideoFormat>
+GstSinkMediaManager::SupportedH264VideoFormats() const {
+  return {wfd::H264VideoFormat(
+      wfd::H264VideoFormat::CBP,
+      wfd::H264VideoFormat::k3_1,
+      wfd::CEA640x480p60
+      )};
+}
+
+wfd::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
+  return wfd::NativeVideoFormat(wfd::CEA1920x1080p24);
+}

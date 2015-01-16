@@ -3,7 +3,7 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fvisibility=hidden -fPIC")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -Wall")
 
-include_directories ("${PROJECT_SOURCE_DIR}/include" )
+include_directories ("${PROJECT_SOURCE_DIR}" )
 
 find_package(BISON REQUIRED)
 BISON_TARGET(Parser parser.ypp ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp COMPILE_FLAGS "-d -v -t -r all --debug")
