@@ -35,7 +35,7 @@ namespace wfd {
  * Source or sink applications should implement that interface. MediaManager
  * instance is used by state machine to control media stream.
  */
-class WFD_EXPORT MediaManager {
+class MediaManager {
  public:
   virtual ~MediaManager() {}
 
@@ -74,18 +74,6 @@ class WFD_EXPORT MediaManager {
    * @return native video format
    */
   virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
-
-  /**
-   * Finds optimal format for streaming.
-   * Default quality selection algorithm will pick codec with higher bandwidth
-   *
-   * @param native format of a remote device
-   * @param list of H264 formats that are supported by remote device
-   * @return optimal H264 video format
-   */
-  virtual H264VideoFormat FindOptimalFormat(
-      const NativeVideoFormat& remote_device_native_format,
-      const std::vector<H264VideoFormat>& remotely_supported_formats) const;
 
   /**
    * Sets optimal H264 format that would be used to send / receive video stream
@@ -135,7 +123,7 @@ class SinkMediaManager : public MediaManager {
 
 };
 
-class SourceMediaManager : public MediaManager {
+class WFD_EXPORT SourceMediaManager : public MediaManager {
  public:
   /**
    * Sets RTP ports for media stream.
@@ -158,6 +146,18 @@ class SourceMediaManager : public MediaManager {
    */
   virtual std::pair<int,int> SinkRtpPorts() const = 0;
   virtual int SourceRtpPort() const = 0;
+
+  /**
+   * Finds optimal format for streaming.
+   * Default quality selection algorithm will pick codec with higher bandwidth
+   *
+   * @param native format of a remote device
+   * @param list of H264 formats that are supported by remote device
+   * @return optimal H264 video format
+   */
+  virtual H264VideoFormat FindOptimalFormat(
+      const NativeVideoFormat& remote_device_native_format,
+      const std::vector<H264VideoFormat>& remotely_supported_formats) const;
 };
 
 inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng) {

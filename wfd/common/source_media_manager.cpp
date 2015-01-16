@@ -110,19 +110,19 @@ static QualityInfo hh_info_table[] = {
 
 QualityInfo get_cea_info(const H264VideoFormat& format) {
   if (format.rate_resolution > CEA_TABLE_LENGTH)
-    assert(!"Should not happen!");;
+    assert(false);
   return cea_info_table[format.rate_resolution];
 }
 
 QualityInfo get_vesa_info(const H264VideoFormat& format) {
   if (format.rate_resolution > VESA_TABLE_LENGTH)
-    assert(!"Should not happen!");;
+    assert(false);
   return vesa_info_table[format.rate_resolution];
 }
 
 QualityInfo get_hh_info(const H264VideoFormat& format) {
   if (format.rate_resolution > HH_TABLE_LENGTH)
-    assert(!"Should not happen!");;
+    assert(false);
   return hh_info_table[format.rate_resolution];
 }
 
@@ -139,7 +139,7 @@ QualityInfo get_quality_info(const H264VideoFormat& format) {
     info = get_hh_info(format);
     break;
   default:
-    assert(!"Should not happen!");
+    assert(false);
     break;
   }
   return info;
@@ -163,7 +163,7 @@ bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) 
   return b < a;
 }
 
-H264VideoFormat MediaManager::FindOptimalFormat(const NativeVideoFormat& native,
+H264VideoFormat SourceMediaManager::FindOptimalFormat(const NativeVideoFormat& native,
       const std::vector<H264VideoFormat>& formats) const {
   std::vector<H264VideoFormat> locally_supported_formats =
       SupportedH264VideoFormats();
@@ -193,8 +193,9 @@ H264VideoFormat MediaManager::FindOptimalFormat(const NativeVideoFormat& native,
     ++it;
   }
 
+  // Should not happen, 640x480p60 should be always supported!
   if (it == end)
-    assert(!"Should not happen, 640x480p60 should be always supported!");
+    assert(false);
 
   // if remote device supports higher codec profile / level
   // downgrade them to what we support locally.
