@@ -204,6 +204,13 @@ NativeVideoFormat VideoFormats::GetNativeFormat() const {
   return NativeVideoFormat(CEA640x480p60);
 }
 
+std::vector<H264VideoFormat> VideoFormats::GetSupportedH264Formats() const {
+  std::vector<H264VideoFormat> result;
+  for (const auto& codec : h264_codecs_)
+    result.push_back(codec.ToVideoFormat());
+  return result;
+}
+
 std::string VideoFormats::to_string() const {
   std::string ret;
 

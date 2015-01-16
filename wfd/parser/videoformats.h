@@ -73,8 +73,7 @@ class VideoFormats: public Property {
   virtual ~VideoFormats();
 
   NativeVideoFormat GetNativeFormat() const;
-
-  const H264Codecs& h264_codecs() const { return h264_codecs_; }
+  std::vector<H264VideoFormat> GetSupportedH264Formats() const;
 
   virtual std::string to_string() const override;
 
