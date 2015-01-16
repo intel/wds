@@ -19,13 +19,13 @@
  * 02110-1301 USA
  */
 
-
 #include "videoformats.h"
+
+#include <cassert>
 
 #include "macros.h"
 
 namespace wfd {
-
 
 H264Codec::H264Codec(unsigned char profile, unsigned char level,
     unsigned int cea_support, unsigned int vesa_support,
@@ -58,32 +58,6 @@ H264Codec::H264Codec(H264VideoFormat format)
     max_hres_(0),
     max_vres_(0) {
 
-}
-
-VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
-}
-
-VideoFormats::VideoFormats(NativeVideoFormat format,
-    bool preferred_display_mode,
-    const std::vector<H264VideoFormat>& h264_formats)
-  : Property(WFD_VIDEO_FORMATS),
-    native_(format.rate_resolution),
-    preferred_display_mode_(preferred_display_mode ? 1 : 0) {
-  native_ = (native_ << 2) | format.type;
-  for(auto h264_format : h264_formats)
-    h264_codecs_.push_back(H264Codec(h264_format));
-}
-
-VideoFormats::VideoFormats(unsigned char native,
-    unsigned char preferred_display_mode,
-    const H264Codecs& h264_codecs)
-  : Property(WFD_VIDEO_FORMATS),
-    native_(native),
-    preferred_display_mode_(preferred_display_mode),
-    h264_codecs_(h264_codecs) {
-}
-
-VideoFormats::~VideoFormats() {
 }
 
 std::string H264Codec::to_string() const {
@@ -124,6 +98,110 @@ std::string H264Codec::to_string() const {
   }
 
   return ret;
+}
+
+namespace {
+
+template <typename EnumType, typename ArgType>
+EnumType MaskToEnum(ArgType from, EnumType biggest_value) {
+  assert(from != 0);
+  ArgType copy = from;
+  unsigned result = 0;
+  while ((copy & 1) == 0 && copy != 0) {
+    copy = copy >> 1;
+    ++result;
+  }
+  if (result > static_cast<unsigned>(biggest_value)) {
+    assert(false);
+    return biggest_value;
+  }
+  return static_cast<EnumType>(result);
+}
+
+inline H264VideoFormat::H264Profile ToH264Profile(unsigned char profile) {
+  return MaskToEnum<H264VideoFormat::H264Profile>(profile, H264VideoFormat::CBP);
+}
+
+inline H264VideoFormat::H264Level ToH264Level(unsigned char level) {
+  return MaskToEnum<H264VideoFormat::H264Level>(level, H264VideoFormat::k4_2);
+}
+
+
+}  // namespace
+
+H264VideoFormat H264Codec::ToVideoFormat() const {
+  auto profile = ToH264Profile(profile_);
+  auto level = ToH264Level(level_);
+  if (cea_support_ != 0)
+    return H264VideoFormat(
+        profile, level, MaskToEnum<CEARatesAndResolutions>(
+            cea_support_, CEA1920x1080p24));
+  if (vesa_support_ != 0)
+    return H264VideoFormat(
+        profile, level, MaskToEnum<VESARatesAndResolutions>(
+             vesa_support_, VESA1920x1200p30));
+  if (hh_support_ != 0)
+    return H264VideoFormat(
+        profile, level, MaskToEnum<HHRatesAndResolutions>(
+             hh_support_, HH848x480p60));
+
+  assert(false);
+  return H264VideoFormat(profile, level, CEA640x480p60);
+}
+
+VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
+}
+
+VideoFormats::VideoFormats(NativeVideoFormat format,
+    bool preferred_display_mode,
+    const std::vector<H264VideoFormat>& h264_formats)
+  : Property(WFD_VIDEO_FORMATS),
+    native_(format.rate_resolution),
+    preferred_display_mode_(preferred_display_mode ? 1 : 0) {
+  native_ = (native_ << 2) | format.type;
+  for(auto h264_format : h264_formats)
+    h264_codecs_.push_back(H264Codec(h264_format));
+}
+
+VideoFormats::VideoFormats(unsigned char native,
+    unsigned char preferred_display_mode,
+    const H264Codecs& h264_codecs)
+  : Property(WFD_VIDEO_FORMATS),
+    native_(native),
+    preferred_display_mode_(preferred_display_mode),
+    h264_codecs_(h264_codecs) {
+}
+
+VideoFormats::~VideoFormats() {
+}
+
+namespace {
+
+template <typename EnumType>
+NativeVideoFormat GetFormatFromIndex(unsigned index, EnumType biggest_value) {
+  if (index <= static_cast<unsigned>(biggest_value))
+    return NativeVideoFormat(static_cast<EnumType>(index));
+  assert(false);
+  return NativeVideoFormat(biggest_value);
+}
+
+}
+
+NativeVideoFormat VideoFormats::GetNativeFormat() const {
+  unsigned index  = native_ >> 2;
+  unsigned selection_bits = native_ & 3;
+  switch (selection_bits) {
+  case 0: // 0b000 CEA
+    return GetFormatFromIndex<CEARatesAndResolutions>(index, CEA1920x1080p24);
+  case 1: // 0b001 VESA
+    return GetFormatFromIndex<VESARatesAndResolutions>(index, VESA1920x1200p30);
+  case 2: // 0b010 HH
+    return GetFormatFromIndex<HHRatesAndResolutions>(index, HH848x480p60);
+  default:
+    assert(false);
+    break;
+  }
+  return NativeVideoFormat(CEA640x480p60);
 }
 
 std::string VideoFormats::to_string() const {

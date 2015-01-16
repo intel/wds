@@ -41,6 +41,8 @@ struct H264Codec {
 
   H264Codec(H264VideoFormat format);
 
+  H264VideoFormat ToVideoFormat() const;
+
   std::string to_string() const;
 
  private:
@@ -70,8 +72,8 @@ class VideoFormats: public Property {
                const H264Codecs& h264_codecs);
   virtual ~VideoFormats();
 
-  unsigned char native_resolution() const { return native_; }
-  unsigned char preferred_display_mode() const { return preferred_display_mode_;}
+  NativeVideoFormat GetNativeFormat() const;
+
   const H264Codecs& h264_codecs() const { return h264_codecs_; }
 
   virtual std::string to_string() const override;
