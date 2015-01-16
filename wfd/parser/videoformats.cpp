@@ -65,12 +65,13 @@ VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
 
 VideoFormats::VideoFormats(NativeVideoFormat format,
     bool preferred_display_mode,
-    const H264Codecs& h264_codecs)
+    const std::vector<H264VideoFormat>& h264_formats)
   : Property(WFD_VIDEO_FORMATS),
     native_(format.rate_resolution),
-    preferred_display_mode_(preferred_display_mode ? 1 : 0),
-    h264_codecs_(h264_codecs) {
+    preferred_display_mode_(preferred_display_mode ? 1 : 0) {
   native_ = (native_ << 2) | format.type;
+  for(auto h264_format : h264_formats)
+    h264_codecs_.push_back(H264Codec(h264_format));
 }
 
 VideoFormats::VideoFormats(unsigned char native,

@@ -64,7 +64,7 @@ class VideoFormats: public Property {
   VideoFormats();
   VideoFormats(NativeVideoFormat format,
                bool preferred_display_mode,
-               const H264Codecs& h264_codecs);
+               const std::vector<H264VideoFormat>& h264_formats);
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);
