@@ -76,6 +76,7 @@ bool M3Handler::HandleReply(Reply* reply) {
 
   auto video_formats = static_cast<VideoFormats*>(
       reply->payload().get_property(WFD_VIDEO_FORMATS).get());
+  assert(video_formats);
   H264VideoFormat optimal_format = source_manager->FindOptimalFormat(
       video_formats->GetNativeFormat(),
       video_formats->GetSupportedH264Formats());
@@ -92,6 +93,13 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
       std::shared_ptr<Property>(new PresentationUrl(
           "rtsp://127.0.0.1/wfd1.0/streamid=0",
           "")));
+
+  set_param->payload().add_property(
+      std::shared_ptr<VideoFormats>(new VideoFormats(
+          manager_->SupportedNativeVideoFormat(),
+          false,
+          {manager_->GetOptimalFormat()})));
+
   return std::unique_ptr<Message>(set_param);
 }
 

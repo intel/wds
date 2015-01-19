@@ -3,7 +3,9 @@
 #include <cassert>
 
 DesktopMediaManager::DesktopMediaManager(const std::string& hostname)
-  : hostname_(hostname) {
+  : hostname_(hostname),
+    format_(wfd::H264VideoFormat::CBP,  wfd::H264VideoFormat::k3_1,
+            wfd::CEA640x480p60) {
 }
 
 void DesktopMediaManager::Play() {
@@ -42,10 +44,7 @@ int DesktopMediaManager::SourceRtpPort() const {
 
 std::vector<wfd::H264VideoFormat>
 DesktopMediaManager::SupportedH264VideoFormats() const {
-  return {wfd::H264VideoFormat(
-      wfd::H264VideoFormat::CBP,
-      wfd::H264VideoFormat::k3_1,
-      wfd::CEA640x480p60)};
+  return {format_};
 }
 
 wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
@@ -54,5 +53,10 @@ wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
 
 bool DesktopMediaManager::SetOptimalFormat(
     const wfd::H264VideoFormat& optimal_format) {
+  format_ = optimal_format;
   return true;
+}
+
+wfd::H264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
+  return format_;
 }

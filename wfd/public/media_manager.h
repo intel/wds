@@ -82,6 +82,13 @@ class MediaManager {
    * @return true if format can be used by media manager
    */
   virtual bool SetOptimalFormat(const H264VideoFormat& optimal_format) = 0;
+
+  /**
+   * Gets optimal H264 format @see SetOptimalFormat
+   *
+   * @return optimal H264 format
+   */
+  virtual H264VideoFormat GetOptimalFormat() const = 0;
 };
 
 class SinkMediaManager : public MediaManager {
