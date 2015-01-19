@@ -65,7 +65,7 @@ class MessageHandler : public std::enable_shared_from_this<MessageHandler> {
     Observer* observer;
   };
 
-  virtual ~MessageHandler() {}
+  virtual ~MessageHandler();
 
   virtual void Start() = 0;
   virtual void Reset() = 0;

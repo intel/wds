@@ -32,6 +32,8 @@ bool MessageHandler::HandleTimeoutEvent(uint timer_id) const {
   return false;
 }
 
+MessageHandler::~MessageHandler() {}
+
 MessageSequenceHandler::MessageSequenceHandler(const InitParams& init_params)
   : MessageHandler(init_params),
     current_handler_(nullptr) {
@@ -56,18 +58,20 @@ void MessageSequenceHandler::Reset() {
 }
 
 bool MessageSequenceHandler::CanSend(Message* message) const {
-  return current_handler_->CanSend(message);
+  return current_handler_ && current_handler_->CanSend(message);
 }
 
 void MessageSequenceHandler::Send(std::unique_ptr<Message> message) {
+  assert(current_handler_);
   current_handler_->Send(std::move(message));
 }
 
 bool MessageSequenceHandler::CanHandle(Message* message) const {
-  return current_handler_->CanHandle(message);
+  return current_handler_ && current_handler_->CanHandle(message);
 }
 
 void MessageSequenceHandler::Handle(std::unique_ptr<Message> message) {
+  assert(current_handler_);
   current_handler_->Handle(std::move(message));
 }
 
