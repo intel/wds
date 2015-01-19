@@ -35,6 +35,7 @@
 #include "wfd/parser/getparameter.h"
 #include "wfd/parser/payload.h"
 #include "wfd/parser/presentationurl.h"
+#include "wfd/parser/propertyerrors.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/parser/standbyresumecapability.h"
@@ -67,14 +68,9 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new wfd::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_VIDEO_FORMATS]){
-          // TODO : get supported codecs from manager.
-          auto codec_list = wfd::H264Codecs();
-          // again, declare that we support absolutely everything, let gstreamer deal with it
-          auto codec_cbp = new wfd::H264Codec(1, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
-          auto codec_chp = new wfd::H264Codec(2, 16, 0x1ffff, 0x1fffffff, 0xfff, 0, 0, 0, 0x11, 0, 0);
-          codec_list.push_back(*codec_cbp);
-          codec_list.push_back(*codec_chp);
-          new_prop.reset(new wfd::VideoFormats(manager_->SupportedNativeVideoFormat() , 0, codec_list));
+          new_prop.reset(new wfd::VideoFormats(manager_->SupportedNativeVideoFormat(),
+              false,
+              manager_->SupportedH264VideoFormats()));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_3D_FORMATS]){
           new_prop.reset(new wfd::Formats3d());
@@ -118,12 +114,26 @@ M4Handler::M4Handler(const InitParams& init_params)
 }
 
 std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
-  auto property =
+  auto presentation_url =
       static_cast<wfd::PresentationUrl*>(message->payload().get_property(wfd::WFD_PRESENTATION_URL).get());
+  assert(presentation_url);
+  SinkMediaManager* sink_media_manager= ToSinkMediaManager(manager_);
+  sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
 
-  // presentation URL is the only thing we care about
-  // support for other parameters can be added later as needed
-  ToSinkMediaManager(manager_)->SetPresentationUrl(property->presentation_url_1());
+  auto video_formats =
+      static_cast<wfd::VideoFormats*>(message->payload().get_property(wfd::WFD_VIDEO_FORMATS).get());
+  assert(video_formats);
+  if (!sink_media_manager->SetOptimalFormat(video_formats->GetSupportedH264Formats()[0])) {
+    auto reply = std::unique_ptr<Reply>(new Reply(303));
+    auto payload = std::unique_ptr<Payload>(new Payload());
+    std::vector<unsigned short> error_codes = {415};
+    auto property_errors =
+        std::make_shared<PropertyErrors>(wfd::WFD_VIDEO_FORMATS, error_codes);
+    payload->add_property_error(property_errors);
+    reply->set_payload(std::move(payload));
+    return std::move(reply);
+  }
+
   return std::unique_ptr<Reply>(new Reply(200));
 }
 

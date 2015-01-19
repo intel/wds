@@ -22,7 +22,9 @@
 #include "gst_sink_media_manager.h"
 
 GstSinkMediaManager::GstSinkMediaManager(const std::string& hostname)
-  : gst_pipeline_(new MiracGstSink(hostname, 0)) {
+  : gst_pipeline_(new MiracGstSink(hostname, 0)),
+    format_(wfd::H264VideoFormat::CBP,  wfd::H264VideoFormat::k3_1,
+        wfd::CEA640x480p60) {
 }
 
 void GstSinkMediaManager::Play() {
@@ -63,13 +65,20 @@ std::string GstSinkMediaManager::Session() const {
 
 std::vector<wfd::H264VideoFormat>
 GstSinkMediaManager::SupportedH264VideoFormats() const {
-  return {wfd::H264VideoFormat(
-      wfd::H264VideoFormat::CBP,
-      wfd::H264VideoFormat::k3_1,
-      wfd::CEA640x480p60
-      )};
+  return {format_};
 }
 
 wfd::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
   return wfd::NativeVideoFormat(wfd::CEA1920x1080p24);
+}
+
+bool GstSinkMediaManager::SetOptimalFormat(
+    const wfd::H264VideoFormat& optimal_format) {
+  format_ = optimal_format;
+  return true;
+}
+
+
+wfd::H264VideoFormat GstSinkMediaManager::GetOptimalFormat() const {
+  return format_;
 }

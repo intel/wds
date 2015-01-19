@@ -28,6 +28,7 @@
 #include "wfd/parser/presentationurl.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setparameter.h"
+#include "wfd/parser/videoformats.h"
 
 namespace wfd {
 namespace source {
@@ -67,11 +68,19 @@ bool M3Handler::HandleReply(Reply* reply) {
   if (reply->response_code() != 200)
     return false;
 
+  SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   auto prop = reply->payload().get_property(WFD_CLIENT_RTP_PORTS);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
   assert(ports);
-  ToSourceMediaManager(manager_)->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
-  return true;
+  source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
+
+  auto video_formats = static_cast<VideoFormats*>(
+      reply->payload().get_property(WFD_VIDEO_FORMATS).get());
+  assert(video_formats);
+  H264VideoFormat optimal_format = source_manager->FindOptimalFormat(
+      video_formats->GetNativeFormat(),
+      video_formats->GetSupportedH264Formats());
+  return source_manager->SetOptimalFormat(optimal_format);
 }
 
 std::unique_ptr<Message> M4Handler::CreateMessage() {
@@ -84,6 +93,13 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
       std::shared_ptr<Property>(new PresentationUrl(
           "rtsp://127.0.0.1/wfd1.0/streamid=0",
           "")));
+
+  set_param->payload().add_property(
+      std::shared_ptr<VideoFormats>(new VideoFormats(
+          manager_->SupportedNativeVideoFormat(),
+          false,
+          {manager_->GetOptimalFormat()})));
+
   return std::unique_ptr<Message>(set_param);
 }
 
