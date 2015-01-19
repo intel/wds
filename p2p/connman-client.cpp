@@ -145,6 +145,12 @@ void Client::peers_changed (GVariant *params)
 void Client::register_peer_service ()
 {
     GVariantBuilder builder;
+
+    /* HACK: Connman should figure out the "master" boolean on its own but it does not.
+     * We need to do it here with InformationElement for now... */
+    P2P::InformationElement ie(array_);
+    bool is_master = (ie.get_device_type() != P2P::SOURCE);
+
     g_variant_builder_init (&builder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_add (&builder, "{sv}",
                            "WiFiDisplayIEs",
@@ -155,7 +161,7 @@ void Client::register_peer_service ()
 
     g_dbus_proxy_call (proxy_,
                        "RegisterPeerService",
-                       g_variant_new ("(a{sv}b)", &builder, TRUE),
+                       g_variant_new ("(a{sv}b)", &builder, is_master),
                        G_DBUS_CALL_FLAGS_NONE,
                        -1,
                        NULL,

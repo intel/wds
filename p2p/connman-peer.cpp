@@ -150,7 +150,11 @@ void Peer::remote_ip_changed (const char *ip)
 		return;
 
 	auto was_available = is_available();
-	remote_host_ = std::string(ip);
+
+	if (g_strcmp0 (ip, "0.0.0.0") == 0)
+		remote_host_.clear();
+	else
+		remote_host_ = std::string(ip);
 
 	if (!observer_)
 		return;
@@ -165,7 +169,11 @@ void Peer::local_ip_changed (const char *ip)
 		return;
 
 	auto was_available = is_available();
-	local_host_ = std::string(ip);
+
+	if (g_strcmp0 (ip, "0.0.0.0") == 0)
+		local_host_.clear();
+	else
+		local_host_ = std::string(ip);
 
 	if (!observer_)
 		return;
