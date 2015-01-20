@@ -102,6 +102,8 @@ enum HHRatesAndResolutions {
 };
 
 struct NativeVideoFormat {
+  NativeVideoFormat()
+  : type(CEA), rate_resolution(CEA640x480p60) {}
   NativeVideoFormat(CEARatesAndResolutions rr)
   : type(CEA), rate_resolution(rr) {}
   NativeVideoFormat(VESARatesAndResolutions rr)
@@ -109,8 +111,8 @@ struct NativeVideoFormat {
   NativeVideoFormat(HHRatesAndResolutions rr)
   : type(HH), rate_resolution(rr) {}
 
-  const ResolutionType type;
-  const RateAndResolution rate_resolution;
+  ResolutionType type;
+  RateAndResolution rate_resolution;
 };
 
 struct H264VideoFormat {
@@ -126,6 +128,9 @@ struct H264VideoFormat {
     k4_1,
     k4_2
   };
+
+  H264VideoFormat()
+  : profile(CBP), level(k3_1), type(CEA), rate_resolution(CEA640x480p60) {}
 
   H264VideoFormat(H264Profile profile, H264Level level, CEARatesAndResolutions rr)
   : profile(profile), level(level), type(CEA), rate_resolution(rr) {}
