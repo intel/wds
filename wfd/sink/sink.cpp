@@ -90,7 +90,7 @@ class SinkStateMachine : public MessageSequenceHandler {
    uint keep_alive_timer_;
 };
 
-class SinkImpl final : public Sink, public RTSPInputHandler {
+class SinkImpl final : public Sink, public RTSPInputHandler, public MessageHandler::Observer {
  public:
   SinkImpl(Delegate* delegate, SinkMediaManager* mng);
 
@@ -105,6 +105,9 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   // RTSPInputHandler
   virtual void MessageParsed(std::unique_ptr<Message> message) override;
 
+  // public MessageHandler::Observer
+  virtual void OnCompleted(MessageHandlerPtr handler) override;
+  virtual void OnError(MessageHandlerPtr handler) override;
   virtual void OnTimerEvent(uint timer_id) override;
 
   bool HandleCommand(std::unique_ptr<Message> command);
@@ -112,12 +115,14 @@ class SinkImpl final : public Sink, public RTSPInputHandler {
   template <class WfdMessage, Request::ID id>
   std::unique_ptr<Message> CreateCommand();
 
-  std::unique_ptr<SinkStateMachine> state_machine_;
+  void ResetAndTeardownMedia();
+
+  std::shared_ptr<SinkStateMachine> state_machine_;
   SinkMediaManager* manager_;
 };
 
 SinkImpl::SinkImpl(Delegate* delegate, SinkMediaManager* mng)
-  : state_machine_(new SinkStateMachine(delegate, mng)),
+  : state_machine_(new SinkStateMachine({delegate, mng, this})),
     manager_(mng) {
 }
 
@@ -164,16 +169,33 @@ bool SinkImpl::Pause() {
 void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
     return; // FIXME : Report error.
+  if (!state_machine_->CanHandle(message.get()))
+    return; // FIXME : Report error.
   state_machine_->Handle(std::move(message));
 }
 
-WFD_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
-  return new SinkImpl(delegate, mng);
+void SinkImpl::ResetAndTeardownMedia() {
+  manager_->Teardown();
+  state_machine_->Reset();
+}
+
+void SinkImpl::OnCompleted(MessageHandlerPtr handler) {
+  assert(handler == state_machine_);
+  ResetAndTeardownMedia();
+}
+
+void SinkImpl::OnError(MessageHandlerPtr handler) {
+   assert(handler == state_machine_);
+   ResetAndTeardownMedia();
 }
 
 void SinkImpl::OnTimerEvent(uint timer_id) {
   if (state_machine_->HandleTimeoutEvent(timer_id))
     state_machine_->Reset();
+}
+
+WFD_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
+  return new SinkImpl(delegate, mng);
 }
 
 }  // namespace wfd

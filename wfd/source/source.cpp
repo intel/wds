@@ -118,7 +118,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   void SendKeepAlive();
   void ResetAndTeardownMedia();
 
-  std::unique_ptr<SourceStateMachine> state_machine_;
+  std::shared_ptr<SourceStateMachine> state_machine_;
   uint keep_alive_timer_;
   Delegate* delegate_;
   SourceMediaManager* media_manager_;
@@ -212,12 +212,20 @@ bool SourceImpl::Pause() {
   return true;
 }
 
-void SourceImpl::OnCompleted(MessageHandlerPtr handler) {}
+void SourceImpl::OnCompleted(MessageHandlerPtr handler) {
+  assert(handler == state_machine_);
+  ResetAndTeardownMedia();
+}
 
-void SourceImpl::OnError(MessageHandlerPtr handler) {}
+void SourceImpl::OnError(MessageHandlerPtr handler) {
+   assert(handler == state_machine_);
+   ResetAndTeardownMedia();
+}
 
 void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
+    return; // FIXME : Report error.
+  if (!state_machine_->CanHandle(message.get()))
     return; // FIXME : Report error.
   state_machine_->Handle(std::move(message));
 }

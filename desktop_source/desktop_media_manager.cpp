@@ -19,8 +19,8 @@ void DesktopMediaManager::Pause() {
 }
 
 void DesktopMediaManager::Teardown() {
-  assert(gst_pipeline_);
-  gst_pipeline_->SetState(GST_STATE_READY);
+  if (gst_pipeline_)
+    gst_pipeline_->SetState(GST_STATE_READY);
 }
 
 bool DesktopMediaManager::IsPaused() const {
