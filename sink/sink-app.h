@@ -19,39 +19,31 @@
  * 02110-1301 USA
  */
 
+#ifndef SINK_APP_H
+#define SINK_APP_H
+
+#include <memory>
+
 #include "sink.h"
-#include "gst_sink_media_manager.h"
+#include "connman-client.h"
 
-Sink::Sink(const std::string& remote_host, int remote_rtsp_port, const std::string& local_host)
-  : MiracBroker(remote_host, std::to_string(remote_rtsp_port)),
-    local_host_(local_host) {
-}
+class SinkApp: public P2P::Client::Observer, public P2P::Peer::Observer {
+	public:
+		SinkApp();
+		SinkApp(const std::string& hostname, int port);
+		~SinkApp();
 
-Sink::~Sink() {}
+		Sink& sink() { return *sink_; }
 
-void Sink::got_message(const std::string& message) {
-  wfd_sink_->RTSPDataReceived(message);
-}
+		void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
+		void on_initialized(P2P::Client *client) override {};
+		
+		void on_availability_changed(P2P::Peer *peer) override;
+		void on_initialized(P2P::Peer *peer) override {};
 
-void Sink::on_connected() {
-  media_manager_.reset(new GstSinkMediaManager(local_host_));
-  wfd_sink_.reset(wfd::Sink::Create(this, media_manager_.get()));
-  wfd_sink_->Start();
-}
+	private:
+		std::unique_ptr<P2P::Client> p2p_client_;
+		std::unique_ptr<Sink> sink_;
+};
 
-void Sink::Play() {
-  wfd_sink_->Play();
-}
-
-void Sink::Pause() {
-  wfd_sink_->Pause();
-}
-
-void Sink::Teardown() {
-  wfd_sink_->Teardown();
-}
-
-wfd::Peer* Sink::Peer() const {
-  return wfd_sink_.get();
-}
-
+#endif // SINK_APP_H

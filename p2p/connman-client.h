@@ -26,25 +26,57 @@
 #include <gio/gio.h>
 
 #include "information-element.h"
+#include "connman-peer.h"
 
-class ConnmanClient {
+namespace P2P {
+
+class Client {
     public:
-        ConnmanClient(std::unique_ptr<P2P::InformationElementArray> &take_array);
-        virtual ~ConnmanClient();
+		class Observer {
+			public:
+				virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+				virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+				virtual void on_initialized(Client *client) {}
+
+			protected:
+				virtual ~Observer() {}
+		};
+
+        Client(std::unique_ptr<P2P::InformationElementArray> &take_array);
+        Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
+        virtual ~Client();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
+		void set_observer(Observer* observer) {
+			observer_ = observer;
+		}
 
-    private:
+		/* TODO error / finished handling */
+		void scan();
+
+        static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void technology_proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void register_peer_service_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void scan_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void get_peers_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
 
-        void proxy_cb(GObject *object, GAsyncResult *res);
-        void register_peer_service_cb(GObject *object, GAsyncResult *res);
+        void peers_changed (GVariant *params);
+        void proxy_cb(GAsyncResult *res);
+        void technology_proxy_cb(GAsyncResult *res);
+        void handle_new_peers(GVariantIter *added);
+
+        void initialize_peers();
         void register_peer_service();
         void unregister_peer_service();
 
         GDBusProxy *proxy_;
+        GDBusProxy *technology_proxy_;
+
+		Observer* observer_;
         std::unique_ptr<P2P::InformationElementArray>array_;
+		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };
 
+}
 #endif // CONNMAN_CLIENT_H_

@@ -19,44 +19,58 @@
  * 02110-1301 USA
  */
 
-#include <assert.h> 
 #include <iostream>
-#include <string.h>
 #include <netinet/in.h> // htons()
 
+#include "sink-app.h"
+#include "sink.h"
 #include "connman-client.h"
-#include "information-element.h"
 
-int main (int argc, const char **argv)
+void SinkApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
 {
-    GMainLoop *main_loop = g_main_loop_new(NULL, TRUE);
+	std::cout << "* New peer: " << peer->name() << std::endl;
+	peer->set_observer (this);
+}
 
-    // check that packing works
-    assert (sizeof(P2P::DeviceInformationSubelement) ==
-            P2P::SubelementSize[P2P::DEVICE_INFORMATION]);
-    assert (sizeof(P2P::AssociatedBSSIDSubelement) ==
-            P2P::SubelementSize[P2P::ASSOCIATED_BSSID]);
-    assert (sizeof(P2P::CoupledSinkInformationSubelement) ==
-            P2P::SubelementSize[P2P::COUPLED_SINK_INFORMATION]);
+void SinkApp::on_availability_changed(P2P::Peer *peer)
+{
+    if (!sink_ && peer->is_available() && peer->device_type() == P2P::SOURCE) {
+        std::cout << "* Connecting to source at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
 
+        sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port()), peer->local_host()));
+    }
+}
+
+SinkApp::SinkApp(){
     // Create a information element for a simple WFD Sink
     P2P::InformationElement ie;
     auto sub_element = P2P::new_subelement(P2P::DEVICE_INFORMATION);
     auto dev_info = (P2P::DeviceInformationSubelement*)sub_element;
-    dev_info->session_management_control_port =  htons(8080);
+
+    // TODO port number is a lie -- we should start the sink first, then 
+    // use the port from there (and sink should probably default to 7236)
+
+	// TODO InformationElement could have constructors for this stuff...
+    dev_info->session_management_control_port = htons(7236);
     dev_info->maximum_throughput = htons(50);
     dev_info->field1.device_type = P2P::PRIMARY_SINK;
     dev_info->field1.session_availability = true;
     ie.add_subelement (sub_element);
 
-    std::cout << "Registering " << ie.to_string() <<  std::endl;
+    std::cout << "* Registering Wifi Display with IE " << ie.to_string() <<  std::endl;
 
     // register the P2P service with connman
     auto array = ie.serialize ();
-    P2P::Client p2p_client (array);
+    p2p_client_.reset(new P2P::Client(array, this));
+}
 
-    g_main_loop_run (main_loop);
-    g_main_loop_unref (main_loop);
+SinkApp::SinkApp(const std::string& hostname, int port)
+{
+    std::cout << "* Connecting to peer at " << hostname << ":" << port << std::endl;
 
-    return 0;
+    sink_.reset(new Sink (hostname, port, ""));
+}
+
+SinkApp::~SinkApp() {
+	
 }
