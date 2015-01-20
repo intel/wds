@@ -30,7 +30,7 @@ namespace P2P {
 /* static C callback */
 void Peer::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
-    auto client = reinterpret_cast<Peer*> (data_ptr);
+    auto client = static_cast<Peer*> (data_ptr);
     client->proxy_cb (res);
 }
 
@@ -39,7 +39,7 @@ void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *s
 {
 	GVariant *property;
 	char *name;
-    auto peer = reinterpret_cast<Peer*> (data_ptr);
+    auto peer = static_cast<Peer*> (data_ptr);
 
     if (g_strcmp0(signal, "PropertyChanged") != 0)
         return;

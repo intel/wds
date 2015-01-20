@@ -33,7 +33,7 @@ void Client::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char 
     if (g_strcmp0(signal, "PeersChanged") != 0)
         return;
 
-    auto client = reinterpret_cast<Client*> (data_ptr);
+    auto client = static_cast<Client*> (data_ptr);
     client->peers_changed (params);
 }
 
@@ -65,7 +65,7 @@ void Client::get_peers_cb (GObject *object, GAsyncResult *res, gpointer data_ptr
     }
 
     g_variant_get(params, "(a(oa{sv}))", &peer_iter);
-    auto client = reinterpret_cast<Client*>(data_ptr);
+    auto client = static_cast<Client*>(data_ptr);
     client->handle_new_peers(peer_iter);
 
     g_variant_unref(params);
@@ -91,14 +91,14 @@ void Client::scan_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 /* static C callback */
 void Client::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
-    auto client = reinterpret_cast<Client*> (data_ptr);
+    auto client = static_cast<Client*> (data_ptr);
     client->proxy_cb (res);
 }
 
 /* static C callback */
 void Client::technology_proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 {
-    auto client = reinterpret_cast<Client*> (data_ptr);
+    auto client = static_cast<Client*> (data_ptr);
     client->technology_proxy_cb (res);
 }
 
