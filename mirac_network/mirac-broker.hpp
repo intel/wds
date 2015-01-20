@@ -41,7 +41,7 @@ class MiracBroker : public wfd::Peer::Delegate
 {
     public:
         MiracBroker (const std::string& listen_port);
-        MiracBroker(const std::string& peer_address, const std::string& peer_port);
+        MiracBroker(const std::string& peer_address, const std::string& peer_port, uint timeout = 2000);
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
         std::string get_peer_address() const;
@@ -56,17 +56,20 @@ class MiracBroker : public wfd::Peer::Delegate
 
         virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};
+        virtual void on_connect_timeout() {};
 
     private:
         static gboolean send_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean receive_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean listen_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean connect_cb (gint fd, GIOCondition condition, gpointer data_ptr);
+        static gboolean try_connect(gpointer data_ptr);
 
         gboolean send_cb (gint fd, GIOCondition condition);
         gboolean receive_cb (gint fd, GIOCondition condition);
         gboolean listen_cb (gint fd, GIOCondition condition);
         gboolean connect_cb (gint fd, GIOCondition condition);
+        void try_connect();
 
         void handle_body(const std::string msg);
         void handle_header(const std::string msg);
@@ -74,6 +77,14 @@ class MiracBroker : public wfd::Peer::Delegate
         std::unique_ptr<MiracNetwork> network_;
         std::unique_ptr<MiracNetwork> connection_;
         std::vector<uint> timers_;
+
+        std::string peer_address_;
+        std::string peer_port_;
+
+        GTimer *connect_timer_;
+        uint connect_wait_id_;
+        uint connect_timeout_;
+        static const uint connect_wait_ = 200;
 };
 
 
