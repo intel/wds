@@ -34,35 +34,35 @@ struct TimerCallbackData {
 /* static C callback wrapper */
 gboolean MiracBroker::send_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = reinterpret_cast<MiracBroker*> (data_ptr);
+    auto broker = static_cast<MiracBroker*> (data_ptr);
     return broker->send_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = reinterpret_cast<MiracBroker*> (data_ptr);
+    auto broker = static_cast<MiracBroker*> (data_ptr);
     return broker->receive_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = reinterpret_cast<MiracBroker*> (data_ptr);
+    auto broker = static_cast<MiracBroker*> (data_ptr);
     return broker->listen_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = reinterpret_cast<MiracBroker*> (data_ptr);
+    auto broker = static_cast<MiracBroker*> (data_ptr);
     return broker->connect_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::try_connect (gpointer data_ptr)
 {
-    auto broker = reinterpret_cast<MiracBroker*> (data_ptr);
+    auto broker = static_cast<MiracBroker*> (data_ptr);
     broker->try_connect();
     return false;
 }
