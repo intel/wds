@@ -38,7 +38,7 @@ ConnectorType::ConnectorType(unsigned short connector_type)
 ConnectorType::~ConnectorType() {
 }
 
-std::string ConnectorType::to_string() const {
+std::string ConnectorType::ToString() const {
   std::string ret = PropertyName::wfd_connector_type + std::string(SEMICOLON)
     + std::string(SPACE);
 

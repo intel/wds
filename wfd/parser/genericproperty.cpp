@@ -38,7 +38,7 @@ GenericProperty::GenericProperty(const std::string& key, const std::string& valu
 GenericProperty::~GenericProperty() {
 }
 
-std::string GenericProperty::to_string() const{
+std::string GenericProperty::ToString() const{
   return key_ + ": " + value_;
 }
 

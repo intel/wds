@@ -49,7 +49,7 @@ ContentProtection::HDCPSpec ContentProtection::hdcp_spec() const {
   return hdcp_spec_;
 }
 
-std::string ContentProtection::to_string() const {
+std::string ContentProtection::ToString() const {
   std::string ret =
       PropertyName::wfd_content_protection
     + std::string(SEMICOLON) + std::string(SPACE);

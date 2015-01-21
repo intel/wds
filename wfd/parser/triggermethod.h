@@ -38,10 +38,10 @@ class TriggerMethod : public Property {
 
  public:
   explicit TriggerMethod(TriggerMethod::Method method);
-  virtual ~TriggerMethod();
+  ~TriggerMethod() override;
 
   TriggerMethod::Method method() const { return method_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   TriggerMethod::Method method_;

@@ -33,8 +33,6 @@ class SourceMediaManager;
  */
 class Source : public Peer {
  public:
-  virtual ~Source() {}
-
   /**
    * Factory method that creates Source state machine.
    * @param delegate that is used for networking

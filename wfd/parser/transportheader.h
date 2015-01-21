@@ -44,7 +44,7 @@ class TransportHeader {
     bool server_supports_rtcp() const;
     void set_server_supports_rtcp(bool server_supports_rtcp);
 
-    virtual std::string to_string() const;
+    std::string ToString() const;
 
  private:
     unsigned int client_port_;

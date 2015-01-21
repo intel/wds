@@ -60,7 +60,7 @@ class Payload {
   void add_property_error(const std::shared_ptr<wfd::PropertyErrors>& errors);
   const PropertyErrorMap& property_errors() const;
 
-  virtual std::string to_string() const;
+  std::string ToString() const;
 
  private:
   PropertyMap properties_;

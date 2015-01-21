@@ -105,23 +105,23 @@ class MessageSequenceHandler : public MessageHandler,
                                public MessageHandler::Observer {
  public:
   explicit MessageSequenceHandler(const InitParams& init_params);
-  virtual ~MessageSequenceHandler();
-  virtual void Start() override;
-  virtual void Reset() override;
+  ~MessageSequenceHandler() override;
+  void Start() override;
+  void Reset() override;
 
-  virtual bool CanSend(Message* message) const override;
-  virtual void Send(std::unique_ptr<Message> message) override;
+  bool CanSend(Message* message) const override;
+  void Send(std::unique_ptr<Message> message) override;
 
-  virtual bool CanHandle(Message* message) const override;
-  virtual void Handle(std::unique_ptr<Message> message) override;
+  bool CanHandle(Message* message) const override;
+  void Handle(std::unique_ptr<Message> message) override;
 
-  virtual bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(uint timer_id) const override;
 
  protected:
   void AddSequencedHandler(MessageHandlerPtr handler);
   // MessageHandler::Observer implementation.
-  virtual void OnCompleted(MessageHandlerPtr handler) override;
-  virtual void OnError(MessageHandlerPtr handler) override;
+  void OnCompleted(MessageHandlerPtr handler) override;
+  void OnError(MessageHandlerPtr handler) override;
 
   std::vector<MessageHandlerPtr> handlers_;
   MessageHandlerPtr current_handler_;
@@ -130,21 +130,21 @@ class MessageSequenceHandler : public MessageHandler,
 class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
  public:
   explicit MessageSequenceWithOptionalSetHandler(const InitParams& init_params);
-  virtual ~MessageSequenceWithOptionalSetHandler();
-  virtual void Start() override;
-  virtual void Reset() override;
-  virtual bool CanSend(Message* message) const override;
-  virtual void Send(std::unique_ptr<Message> message) override;
-  virtual bool CanHandle(Message* message) const override;
-  virtual void Handle(std::unique_ptr<Message> message) override;
+  ~MessageSequenceWithOptionalSetHandler() override;
+  void Start() override;
+  void Reset() override;
+  bool CanSend(Message* message) const override;
+  void Send(std::unique_ptr<Message> message) override;
+  bool CanHandle(Message* message) const override;
+  void Handle(std::unique_ptr<Message> message) override;
 
-  virtual bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(uint timer_id) const override;
 
  protected:
   void AddOptionalHandler(MessageHandlerPtr handler);
   // MessageHandler::Observer implementation.
-  virtual void OnCompleted(MessageHandlerPtr handler) override;
-  virtual void OnError(MessageHandlerPtr handler) override;
+  void OnCompleted(MessageHandlerPtr handler) override;
+  void OnError(MessageHandlerPtr handler) override;
 
   std::vector<MessageHandlerPtr> optional_handlers_;
 };
@@ -160,18 +160,18 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
 class MessageReceiverBase : public MessageHandler {
  public:
   explicit MessageReceiverBase(const InitParams& init_params);
-  virtual ~MessageReceiverBase();
+  ~MessageReceiverBase() override;
 
  protected:
   virtual std::unique_ptr<wfd::Reply> HandleMessage(Message* message) = 0;
-  virtual bool CanHandle(Message* message) const override;
-  virtual void Handle(std::unique_ptr<Message> message) override;
+  bool CanHandle(Message* message) const override;
+  void Handle(std::unique_ptr<Message> message) override;
 
  private:
-  virtual void Start() override;
-  virtual void Reset() override;
-  virtual bool CanSend(Message* message) const override;
-  virtual void Send(std::unique_ptr<Message> message) override;
+  void Start() override;
+  void Reset() override;
+  bool CanSend(Message* message) const override;
+  void Send(std::unique_ptr<Message> message) override;
 
   bool wait_for_message_;
 };
@@ -182,7 +182,7 @@ class MessageReceiver : public MessageReceiverBase {
   using MessageReceiverBase::MessageReceiverBase;
 
  protected:
-  virtual bool CanHandle(Message* message) const override {
+  bool CanHandle(Message* message) const override {
     return MessageReceiverBase::CanHandle(message) && message->is_request() &&
            id == ToRequest(message)->id();
   }
@@ -191,18 +191,18 @@ class MessageReceiver : public MessageReceiverBase {
 class MessageSenderBase : public MessageHandler {
  public:
   explicit MessageSenderBase(const InitParams& init_params);
-  virtual ~MessageSenderBase();
+  ~MessageSenderBase() override;
 
  protected:
   virtual bool HandleReply(Reply* reply) = 0;
-  virtual void Send(std::unique_ptr<Message> message) override;
-  virtual void Reset() override;
-  virtual bool HandleTimeoutEvent(uint timer_id) const override;
+  void Send(std::unique_ptr<Message> message) override;
+  void Reset() override;
+  bool HandleTimeoutEvent(uint timer_id) const override;
 
 
  private:
-  virtual bool CanHandle(Message* message) const override;
-  virtual void Handle(std::unique_ptr<Message> message) override;
+  bool CanHandle(Message* message) const override;
+  void Handle(std::unique_ptr<Message> message) override;
 
   virtual int GetResponseTimeout() const;
 
@@ -219,31 +219,29 @@ class OptionalMessageSender : public MessageSenderBase {
  public:
   using MessageSenderBase::MessageSenderBase;
 
-  virtual ~OptionalMessageSender() {}
-
  protected:
-  virtual bool CanSend(Message* message) const override {
+  bool CanSend(Message* message) const override {
     assert(message);
     return message->is_request() && ToRequest(message)->id() == id;
   }
 
  private:
-  virtual void Start() override {}
+  void Start() override {}
 };
 
 // To be used for sequensed senders.
 class SequencedMessageSender : public MessageSenderBase {
  public:
   explicit SequencedMessageSender(const InitParams& init_params);
-  virtual ~SequencedMessageSender();
+  ~SequencedMessageSender() override;
 
  protected:
   virtual std::unique_ptr<Message> CreateMessage() = 0;
 
  private:
-  virtual void Start() override;
-  virtual void Reset() override;
-  virtual bool CanSend(Message* message) const override;
+  void Start() override;
+  void Reset() override;
+  bool CanSend(Message* message) const override;
 
   Message* to_be_send_;
 };

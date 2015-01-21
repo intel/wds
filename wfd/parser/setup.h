@@ -30,8 +30,8 @@ namespace wfd {
 class Setup : public Request {
  public:
     explicit Setup(const std::string& request_uri);
-    virtual ~Setup();
-    virtual std::string to_string() const override;
+    ~Setup() override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

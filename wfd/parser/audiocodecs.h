@@ -63,7 +63,7 @@ struct AudioCodec {
   unsigned short latency() const;
   void set_latency(unsigned short latency);
 
-  std::string to_string() const;
+  std::string ToString() const;
 
  private:
   AudioFormat::Type audio_format_;
@@ -75,10 +75,10 @@ class AudioCodecs: public Property {
  public:
   AudioCodecs();
   AudioCodecs(const std::vector<AudioCodec>& audio_codecs);
-  virtual ~AudioCodecs();
+  ~AudioCodecs() override;
 
   const std::vector<AudioCodec>& audio_codecs() const { return audio_codecs_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   std::vector<AudioCodec> audio_codecs_;

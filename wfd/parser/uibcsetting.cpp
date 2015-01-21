@@ -38,7 +38,7 @@ UIBCSetting::UIBCSetting(bool is_enabled)
 UIBCSetting::~UIBCSetting() {
 }
 
-std::string UIBCSetting::to_string() const {
+std::string UIBCSetting::ToString() const {
   std::string ret =
       PropertyName::wfd_uibc_setting + std::string(SEMICOLON)
      + std::string(SPACE) + (is_enabled() ? enable : disable);

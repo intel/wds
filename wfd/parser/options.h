@@ -30,8 +30,8 @@ namespace wfd {
 class Options: public Request {
   public:
     explicit Options(const std::string& request_uri);
-    virtual ~Options();
-    virtual std::string to_string() const override;
+    ~Options() override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

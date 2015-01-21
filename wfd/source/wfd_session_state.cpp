@@ -36,7 +36,7 @@ class M5Handler final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
 
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
+  std::unique_ptr<Message> CreateMessage() override {
     SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
     set_param->header().set_cseq(send_cseq_++);
     set_param->payload().add_property(
@@ -44,7 +44,7 @@ class M5Handler final : public SequencedMessageSender {
     return std::unique_ptr<Message>(set_param);
   }
 
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     return (reply->response_code() == 200);
   }
 
@@ -57,7 +57,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
       keep_alive_timer_(timer_id) {
   }
 
-  virtual std::unique_ptr<Reply> HandleMessage(
+  std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     auto reply = std::unique_ptr<Reply>(new Reply(200));
     // todo: generate unique session id
@@ -73,7 +73,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
     return std::move(reply);
   }
 
-  virtual void Handle(std::unique_ptr<Message> message) override {
+  void Handle(std::unique_ptr<Message> message) override {
     MessageReceiver<Request::M6>::Handle(std::move(message));
     keep_alive_timer_ =
         sender_->CreateTimer(kDefaultTimeoutValue);

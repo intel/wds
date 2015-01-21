@@ -48,7 +48,7 @@ PreferredDisplayMode::PreferredDisplayMode(
     h264_codec_(h264_codec) {
 }
 
-std::string PreferredDisplayMode::to_string() const {
+std::string PreferredDisplayMode::ToString() const {
   MAKE_HEX_STRING_6(p_clock, p_clock_);
   MAKE_HEX_STRING_4(h, h_);
   MAKE_HEX_STRING_4(hb, hb_);
@@ -76,7 +76,7 @@ std::string PreferredDisplayMode::to_string() const {
   + std::string(SPACE) + vbs3d
   + std::string(SPACE) + modes_2d_s3d
   + std::string(SPACE) + p_depth
-  + std::string(SPACE) + h264_codec_.to_string();
+  + std::string(SPACE) + h264_codec_.ToString();
   return ret;
 }
 

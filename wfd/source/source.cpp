@@ -99,20 +99,20 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
 
  private:
   // Source implementation.
-  virtual void Start() override;
-  virtual void RTSPDataReceived(const std::string& message) override;
-  virtual bool Teardown() override;
-  virtual bool Play() override;
-  virtual bool Pause() override;
+  void Start() override;
+  void RTSPDataReceived(const std::string& message) override;
+  bool Teardown() override;
+  bool Play() override;
+  bool Pause() override;
 
   // public MessageHandler::Observer
-  virtual void OnCompleted(MessageHandlerPtr handler) override;
-  virtual void OnError(MessageHandlerPtr handler) override;
+  void OnCompleted(MessageHandlerPtr handler) override;
+  void OnError(MessageHandlerPtr handler) override;
 
-  virtual void OnTimerEvent(uint timer_id) override;
+  void OnTimerEvent(uint timer_id) override;
 
   // RTSPInputHandler
-  virtual void MessageParsed(std::unique_ptr<Message> message) override;
+  void MessageParsed(std::unique_ptr<Message> message) override;
 
   // Keep-alive function
   void SendKeepAlive();

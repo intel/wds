@@ -65,7 +65,7 @@ void AudioCodec::set_latency(unsigned short latency) {
   latency_ = latency;
 }
 
-std::string AudioCodec::to_string() const {
+std::string AudioCodec::ToString() const {
   MAKE_HEX_STRING_8(audio_modes_str,
       static_cast<unsigned int>(audio_modes().to_ulong()));
   MAKE_HEX_STRING_2(latency_str, latency());
@@ -86,7 +86,7 @@ AudioCodecs::AudioCodecs(const std::vector<AudioCodec>& audio_codecs)
 AudioCodecs::~AudioCodecs() {
 }
 
-std::string AudioCodecs::to_string() const {
+std::string AudioCodecs::ToString() const {
   std::string ret = PropertyName::wfd_audio_codecs + std::string(SEMICOLON)
     + std::string(SPACE);
 
@@ -94,7 +94,7 @@ std::string AudioCodecs::to_string() const {
     auto i = audio_codecs_.begin();
     auto end = audio_codecs_.end();
     while (i != end) {
-      ret += (*i).to_string();
+      ret += (*i).ToString();
       if (i != --audio_codecs_.end()) {
         ret += ", ";
       }

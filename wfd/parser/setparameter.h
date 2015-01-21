@@ -30,8 +30,7 @@ namespace wfd {
 class SetParameter : public Request {
  public:
     explicit SetParameter(const std::string& request_uri);
-    virtual ~SetParameter();
-    virtual std::string to_string() const override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

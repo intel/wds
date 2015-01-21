@@ -37,7 +37,7 @@ TriggerMethod::TriggerMethod(TriggerMethod::Method method)
 TriggerMethod::~TriggerMethod() {
 }
 
-std::string TriggerMethod::to_string() const {
+std::string TriggerMethod::ToString() const {
   std::string ret =
       PropertyName::wfd_trigger_method + std::string(SEMICOLON)
     + std::string(SPACE) + name[method()];

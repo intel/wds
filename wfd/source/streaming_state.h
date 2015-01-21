@@ -32,7 +32,7 @@ namespace source {
 class StreamingState : public MessageSequenceWithOptionalSetHandler {
  public:
   StreamingState(const InitParams& init_params, MessageHandlerPtr m16_sender);
-  virtual ~StreamingState();
+  ~StreamingState() override;
 };
 
 }  // source

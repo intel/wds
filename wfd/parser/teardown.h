@@ -30,8 +30,8 @@ namespace wfd {
 class Teardown : public Request {
  public:
     explicit Teardown(const std::string& request_uri);
-    virtual ~Teardown();
-    virtual std::string to_string() const override;
+    ~Teardown() override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

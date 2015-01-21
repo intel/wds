@@ -142,7 +142,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
   M5Handler(const InitParams& init_params)
     : MessageReceiver<Request::M5>(init_params) {
   }
-  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
+  std::unique_ptr<Reply> HandleMessage(Message* message) override {
     auto property =
         static_cast<wfd::TriggerMethod*>(message->payload().get_property(wfd::WFD_TRIGGER_METHOD).get());
 
@@ -164,9 +164,6 @@ CapNegotiationState::CapNegotiationState(const InitParams &init_params)
 
   AddOptionalHandler(make_ptr(new M3Handler(init_params)));
   AddOptionalHandler(make_ptr(new M4Handler(init_params)));
-}
-
-CapNegotiationState::~CapNegotiationState() {
 }
 
 }  // sink

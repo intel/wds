@@ -30,8 +30,8 @@ namespace wfd {
 class GetParameter : public Request {
  public:
     explicit GetParameter(const std::string& request_uri);
-    virtual ~GetParameter();
-    virtual std::string to_string() const override;
+    ~GetParameter() override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

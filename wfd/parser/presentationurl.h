@@ -31,11 +31,11 @@ class PresentationUrl: public Property {
  public:
   PresentationUrl(const std::string& presentation_url_1,
       const std::string presentation_url_2);
-  virtual ~PresentationUrl();
+  ~PresentationUrl() override;
 
   const std::string& presentation_url_1() const { return presentation_url_1_; }
   const std::string& presentation_url_2() const { return presentation_url_2_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   std::string presentation_url_1_;

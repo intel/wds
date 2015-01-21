@@ -68,7 +68,7 @@ class Header {
     void add_generic_header(const std::string& key ,const std::string& value);
     const GenericHeaderMap& generic_headers () const;
 
-    virtual std::string to_string() const;
+    std::string ToString() const;
 
  private:
     int cseq_;

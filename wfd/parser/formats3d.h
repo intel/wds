@@ -48,7 +48,7 @@ struct H264Codec3d {
       max_hres_(max_hres),
       max_vres_(max_vres) {}
 
-  std::string to_string() const;
+  std::string ToString() const;
 
   unsigned char profile_;
   unsigned char level_;
@@ -69,13 +69,13 @@ class Formats3d: public Property {
   Formats3d(unsigned char native,
             unsigned char preferred_display_mode,
             const H264Codecs3d& h264_codecs_3d);
-  virtual ~Formats3d();
+  ~Formats3d() override;
 
   unsigned char native_resolution() const { return native_; }
   unsigned char preferred_display_mode() const { return preferred_display_mode_;}
   const H264Codecs3d& codecs() const { return h264_codecs_3d_; }
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned char native_;

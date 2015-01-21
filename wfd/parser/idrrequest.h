@@ -30,9 +30,9 @@ namespace wfd {
 class IDRRequest: public Property {
 public:
   IDRRequest();
-  virtual ~IDRRequest();
+  ~IDRRequest() override;
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 };
 
 }  // namespace wfd

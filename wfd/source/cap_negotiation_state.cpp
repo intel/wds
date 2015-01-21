@@ -38,8 +38,8 @@ class M3Handler final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
 
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override;
-  virtual bool HandleReply(Reply* reply) override;
+  std::unique_ptr<Message> CreateMessage() override;
+  bool HandleReply(Reply* reply) override;
 };
 
 class M4Handler final : public SequencedMessageSender {
@@ -47,8 +47,8 @@ class M4Handler final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
 
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override;
-  virtual bool HandleReply(Reply* reply) override;
+  std::unique_ptr<Message> CreateMessage() override;
+  bool HandleReply(Reply* reply) override;
 };
 
 std::unique_ptr<Message> M3Handler::CreateMessage() {

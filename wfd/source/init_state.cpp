@@ -31,14 +31,14 @@ class M1Handler final : public SequencedMessageSender {
  public:
   using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
+  std::unique_ptr<Message> CreateMessage() override {
     Options* options = new Options("*");
     options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
     return std::unique_ptr<Message>(options);
   }
 
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     return (reply->response_code() == 200);
   }
 
@@ -49,7 +49,7 @@ class M2Handler final : public MessageReceiver<Request::M2> {
   M2Handler(const InitParams& init_params)
     : MessageReceiver<Request::M2>(init_params) {
   }
-  virtual std::unique_ptr<Reply> HandleMessage(
+  std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     auto reply = std::unique_ptr<Reply>(new Reply(200));
     std::vector<wfd::Method> supported_methods;

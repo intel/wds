@@ -30,8 +30,7 @@ namespace wfd {
 class Play : public Request {
  public:
     explicit Play(const std::string& request_uri);
-    virtual ~Play();
-    virtual std::string to_string() const override;
+    std::string ToString() const override;
 };
 
 } // namespace wfd

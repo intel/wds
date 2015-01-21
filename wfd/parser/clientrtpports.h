@@ -30,11 +30,11 @@ namespace wfd {
 class ClientRtpPorts: public Property {
  public:
   ClientRtpPorts(unsigned short rtp_port_0, unsigned short rtp_port_1);
-  virtual ~ClientRtpPorts();
+  ~ClientRtpPorts() override;
 
   unsigned short rtp_port_0() const { return rtp_port_0_; }
   unsigned short rtp_port_1() const { return rtp_port_1_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned short rtp_port_0_;

@@ -31,11 +31,11 @@ Options::Options(const std::string& request_uri)
 Options::~Options() {
 }
 
-std::string Options::to_string() const {
+std::string Options::ToString() const {
   std::string ret = MethodName::OPTIONS
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);
-  return ret + Message::to_string();
+  return ret + Message::ToString();
 }
 
 } // namespace wfd

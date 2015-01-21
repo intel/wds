@@ -35,7 +35,7 @@ StandbyResumeCapability::StandbyResumeCapability(bool is_supported)
 StandbyResumeCapability::~StandbyResumeCapability() {
 }
 
-std::string StandbyResumeCapability::to_string() const {
+std::string StandbyResumeCapability::ToString() const {
   std::string ret =
       PropertyName::wfd_standby_resume_capability + std::string(SEMICOLON)
      + std::string(SPACE) + (is_none() ? wfd::NONE : supported);

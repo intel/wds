@@ -31,11 +31,11 @@ class DisplayEdid: public Property {
  public:
   DisplayEdid();
   DisplayEdid(unsigned short edid_block_count, std::string edid_payload);
-  virtual ~DisplayEdid();
+  ~DisplayEdid() override;
 
   unsigned short block_count() const { return edid_block_count_; }
   const std::string& payload() const { return edid_payload_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned short edid_block_count_;

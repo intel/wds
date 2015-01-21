@@ -32,7 +32,7 @@ namespace source {
 class InitState : public MessageSequenceHandler {
  public:
   InitState(const InitParams& init_params);
-  virtual ~InitState();
+  ~InitState() override;
 };
 
 }  // source

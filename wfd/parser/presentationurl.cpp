@@ -34,7 +34,7 @@ PresentationUrl::PresentationUrl(const std::string& presentation_url_1,
 PresentationUrl::~PresentationUrl() {
 }
 
-std::string PresentationUrl::to_string() const {
+std::string PresentationUrl::ToString() const {
   std::string ret =
       PropertyName::wfd_presentation_url + std::string(SEMICOLON)
     + std::string(SPACE)

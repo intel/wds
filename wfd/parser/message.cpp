@@ -50,14 +50,14 @@ Payload& Message::payload() {
   return *payload_;
 }
 
-std::string Message::to_string() const {
+std::string Message::ToString() const {
   std::string ret;
   if (payload_)
-    ret = payload_->to_string();
+    ret = payload_->ToString();
 
   if (header_) {
     header_->set_content_length (ret.length());
-    ret = header_->to_string() + ret;
+    ret = header_->ToString() + ret;
   }
 
   return ret;

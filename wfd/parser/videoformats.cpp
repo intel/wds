@@ -60,7 +60,7 @@ H264Codec::H264Codec(H264VideoFormat format)
 
 }
 
-std::string H264Codec::to_string() const {
+std::string H264Codec::ToString() const {
   std::string ret;
   MAKE_HEX_STRING_2(profile, profile_);
   MAKE_HEX_STRING_2(level, level_);
@@ -211,7 +211,7 @@ std::vector<H264VideoFormat> VideoFormats::GetSupportedH264Formats() const {
   return result;
 }
 
-std::string VideoFormats::to_string() const {
+std::string VideoFormats::ToString() const {
   std::string ret;
 
   ret = PropertyName::wfd_video_formats
@@ -229,7 +229,7 @@ std::string VideoFormats::to_string() const {
   auto it = h264_codecs_.begin();
   auto end = h264_codecs_.end();
   while(it != end) {
-    ret += (*it).to_string();
+    ret += (*it).ToString();
     ++it;
     if (it != end)
       ret += ", ";

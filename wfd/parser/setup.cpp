@@ -31,11 +31,11 @@ Setup::Setup(const std::string& request_uri)
 Setup::~Setup() {
 }
 
-std::string Setup::to_string() const {
+std::string Setup::ToString() const {
   std::string ret = MethodName::SETUP
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);
-  return ret + Message::to_string();
+  return ret + Message::ToString();
 }
 
 } /* namespace wfd */

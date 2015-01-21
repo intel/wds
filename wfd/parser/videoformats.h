@@ -43,7 +43,7 @@ struct H264Codec {
 
   H264VideoFormat ToVideoFormat() const;
 
-  std::string to_string() const;
+  std::string ToString() const;
 
  private:
   unsigned char profile_;
@@ -70,12 +70,12 @@ class VideoFormats: public Property {
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);
-  virtual ~VideoFormats();
+  ~VideoFormats() override;
 
   NativeVideoFormat GetNativeFormat() const;
   std::vector<H264VideoFormat> GetSupportedH264Formats() const;
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned char native_;

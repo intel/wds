@@ -41,7 +41,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
     : MessageReceiver<Request::M5>(init_params) {
   }
 
-  virtual bool CanHandle(Message* message) const override {
+  bool CanHandle(Message* message) const override {
     if (!MessageReceiver<Request::M5>::CanHandle(message))
       return false;
 
@@ -50,7 +50,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
     return  method == property->method();
   }
 
-  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
+  std::unique_ptr<Reply> HandleMessage(Message* message) override {
     return std::unique_ptr<Reply>(new Reply());
   }
 };
@@ -59,14 +59,14 @@ class M7Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
+  std::unique_ptr<Message> CreateMessage() override {
     Play* play = new Play(ToSinkMediaManager(manager_)->PresentationUrl());
     play->header().set_session(ToSinkMediaManager(manager_)->Session());
     play->header().set_cseq (send_cseq_++);
     return std::unique_ptr<Message>(play);
   }
 
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     if (reply->response_code() == 200) {
       manager_->Play();
       return true;
@@ -88,14 +88,14 @@ class M8Sender final : public SequencedMessageSender {
  public:
   using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
+  std::unique_ptr<Message> CreateMessage() override {
     Teardown* teardown = new Teardown(ToSinkMediaManager(manager_)->PresentationUrl());
     teardown->header().set_session(ToSinkMediaManager(manager_)->Session());
     teardown->header().set_cseq (send_cseq_++);
     return std::unique_ptr<Message>(teardown);
   }
 
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     if (!ToSinkMediaManager(manager_)->Session().empty() && (reply->response_code() == 200)) {
       manager_->Teardown();
       return true;
@@ -114,14 +114,14 @@ class M9Sender final : public SequencedMessageSender {
  public:
     using SequencedMessageSender::SequencedMessageSender;
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override {
+  std::unique_ptr<Message> CreateMessage() override {
     Pause* pause = new Pause(ToSinkMediaManager(manager_)->PresentationUrl());
     pause->header().set_session(ToSinkMediaManager(manager_)->Session());
     pause->header().set_cseq (send_cseq_++);
     return std::unique_ptr<Message>(pause);
   }
 
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     if (reply->response_code() == 200) {
       manager_->Pause();
       return true;
@@ -145,7 +145,7 @@ class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
     : OptionalMessageSender<Request::M7>(init_params) {
   }
  private:
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     if (reply->response_code() == 200) {
       manager_->Play();
       return true;
@@ -153,7 +153,7 @@ class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
     return false;
   }
 
-  virtual bool CanSend(Message* message) const override {
+  bool CanSend(Message* message) const override {
     if (OptionalMessageSender<Request::M7>::CanSend(message)
         && manager_->IsPaused())
       return true;
@@ -167,7 +167,7 @@ class M8SenderOptional final : public OptionalMessageSender<Request::M8> {
     : OptionalMessageSender<Request::M8>(init_params) {
   }
  private:
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     // todo: if successfull, switch to init state
     if (reply->response_code() == 200) {
       manager_->Teardown();
@@ -184,7 +184,7 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
     : OptionalMessageSender<Request::M9>(init_params) {
   }
  private:
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     if (reply->response_code() == 200) {
       manager_->Pause();
       return true;
@@ -192,7 +192,7 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
     return false;
   }
 
-  virtual bool CanSend(Message* message) const override {
+  bool CanSend(Message* message) const override {
     if (OptionalMessageSender<Request::M9>::CanSend(message)
         && !manager_->IsPaused())
       return true;
@@ -213,9 +213,6 @@ StreamingState::StreamingState(const InitParams& init_params, MessageHandlerPtr 
   AddOptionalHandler(make_ptr(new M8SenderOptional(init_params)));
   AddOptionalHandler(make_ptr(new M9SenderOptional(init_params)));
   AddOptionalHandler(m16_handler);
-}
-
-StreamingState::~StreamingState() {
 }
 
 }  // sink

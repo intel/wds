@@ -32,7 +32,7 @@ namespace source {
 class CapNegotiationState : public MessageSequenceHandler {
  public:
   CapNegotiationState(const InitParams& init_params);
-  virtual ~CapNegotiationState();
+  ~CapNegotiationState() override;
 };
 
 }  // source

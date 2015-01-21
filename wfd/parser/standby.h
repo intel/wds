@@ -30,8 +30,8 @@ namespace wfd {
 class Standby: public Property {
 public:
   Standby();
-  virtual ~Standby();
-  virtual std::string to_string() const override;
+  ~Standby() override;
+  std::string ToString() const override;
 };
 
 }  // namespace wfd

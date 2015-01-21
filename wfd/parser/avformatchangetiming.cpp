@@ -37,7 +37,7 @@ AVFormatChangeTiming::AVFormatChangeTiming(unsigned long long int pts,
 AVFormatChangeTiming::~AVFormatChangeTiming() {
 }
 
-std::string AVFormatChangeTiming::to_string() const {
+std::string AVFormatChangeTiming::ToString() const {
   MAKE_HEX_STRING_10(pts, pts_);
   MAKE_HEX_STRING_10(dts, dts_);
   std::string ret =

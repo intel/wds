@@ -30,9 +30,9 @@ namespace wfd {
 class StandbyResumeCapability: public Property {
 public:
   explicit StandbyResumeCapability(bool is_supported);
-  virtual ~StandbyResumeCapability();
+  ~StandbyResumeCapability() override;
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 };
 
 }  // namespace wfd

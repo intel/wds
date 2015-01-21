@@ -32,19 +32,18 @@ namespace sink {
 class CapNegotiationState : public MessageSequenceWithOptionalSetHandler {
  public:
   CapNegotiationState(const InitParams& init_params);
-  virtual ~CapNegotiationState();
 };
 
 class M4Handler final : public MessageReceiver<Request::M4> {
  public:
   M4Handler(const InitParams& init_params);
-  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  std::unique_ptr<Reply> HandleMessage(Message* message) override;
 };
 
 class M3Handler final : public MessageReceiver<Request::M3> {
  public:
   M3Handler(const InitParams& init_params);
-  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  std::unique_ptr<Reply> HandleMessage(Message* message) override;
 };
 
 }  // namespace sink

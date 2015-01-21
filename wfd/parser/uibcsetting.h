@@ -30,10 +30,10 @@ namespace wfd {
 class UIBCSetting : public Property {
  public:
   explicit UIBCSetting(bool is_enabled);
-  virtual ~UIBCSetting();
+  ~UIBCSetting() override;
 
   bool is_enabled() const { return is_enabled_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   bool is_enabled_;

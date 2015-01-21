@@ -73,7 +73,7 @@ void TransportHeader::set_server_supports_rtcp(bool server_supports_rtcp) {
   server_supports_rtcp_ = server_supports_rtcp;
 }
 
-std::string TransportHeader::to_string() const {
+std::string TransportHeader::ToString() const {
   std::string ret;
 
   if (client_port_ > 0) {

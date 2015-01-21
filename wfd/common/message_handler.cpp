@@ -244,7 +244,7 @@ void MessageReceiverBase::Handle(std::unique_ptr<Message> message) {
     return;
   }
   reply->header().set_cseq(message->cseq());
-  sender_->SendRTSPData(reply->to_string());
+  sender_->SendRTSPData(reply->ToString());
   observer_->OnCompleted(shared_from_this());
 }
 
@@ -272,7 +272,7 @@ void MessageSenderBase::Send(std::unique_ptr<Message> message) {
   }
   parcel_queue_.push_front(
       {message->cseq(), sender_->CreateTimer(GetResponseTimeout())});
-  sender_->SendRTSPData(message->to_string());
+  sender_->SendRTSPData(message->ToString());
 }
 
 bool MessageSenderBase::CanHandle(Message* message) const {

@@ -32,7 +32,6 @@ namespace sink {
 class StreamingState : public MessageSequenceWithOptionalSetHandler {
  public:
   StreamingState(const InitParams& init_params, MessageHandlerPtr m16_handler);
-  virtual ~StreamingState();
 };
 
 class TeardownHandler : public MessageSequenceHandler {

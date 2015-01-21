@@ -42,7 +42,7 @@ Formats3d::~Formats3d() {
   // TODO Auto-generated destructor stub
 }
 
-std::string H264Codec3d::to_string() const {
+std::string H264Codec3d::ToString() const {
   std::string ret;
   MAKE_HEX_STRING_2(profile, profile_);
   MAKE_HEX_STRING_2(level, level_);
@@ -78,7 +78,7 @@ std::string H264Codec3d::to_string() const {
   return ret;
 }
 
-std::string Formats3d::to_string() const {
+std::string Formats3d::ToString() const {
   std::string ret;
 
   ret = PropertyName::wfd_3d_formats
@@ -96,7 +96,7 @@ std::string Formats3d::to_string() const {
   auto it = h264_codecs_3d_.begin();
   auto end = h264_codecs_3d_.end();
   while(it != end) {
-    ret += (*it).to_string();
+    ret += (*it).ToString();
     ++it;
     if (it != end)
       ret += ", ";

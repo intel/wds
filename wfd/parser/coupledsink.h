@@ -31,11 +31,11 @@ class CoupledSink: public Property {
  public:
   CoupledSink();
   CoupledSink(unsigned char status, unsigned long long int sink_address);
-  virtual ~CoupledSink();
+  ~CoupledSink() override;
 
   unsigned char status() const { return status_; }
   unsigned long long int sink_address() const { return sink_address_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned short status_;

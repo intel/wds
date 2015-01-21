@@ -65,9 +65,9 @@ class UIBCCapability: public Property {
       const std::vector<InputType>& generic_capabilities,
       const std::vector<DetailedCapability> hidc_capabilities,
       int tcp_port);
-  virtual ~UIBCCapability();
+  ~UIBCCapability() override;
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
 
