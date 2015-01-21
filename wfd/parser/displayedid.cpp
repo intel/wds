@@ -39,7 +39,7 @@ DisplayEdid::DisplayEdid(unsigned short edid_block_count,
 DisplayEdid::~DisplayEdid() {
 }
 
-std::string DisplayEdid::to_string() const {
+std::string DisplayEdid::ToString() const {
 
   std::string ret =
       PropertyName::wfd_display_edid + std::string(SEMICOLON)

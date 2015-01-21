@@ -33,7 +33,7 @@ class WfdSessionState : public MessageSequenceWithOptionalSetHandler {
  public:
   WfdSessionState(const InitParams& init_params, uint& timer_id,
       MessageHandlerPtr& m16_sender);
-  virtual ~WfdSessionState();
+  ~WfdSessionState() override;
 };
 
 class M8Handler final : public MessageReceiver<Request::M8> {
@@ -41,7 +41,7 @@ class M8Handler final : public MessageReceiver<Request::M8> {
   M8Handler(const InitParams& init_params);
 
  private:
-  virtual std::unique_ptr<Reply> HandleMessage(
+  std::unique_ptr<Reply> HandleMessage(
       Message* message) override;
 };
 
@@ -50,7 +50,7 @@ class M7Handler final : public MessageReceiver<Request::M7> {
   M7Handler(const InitParams& init_params);
 
  private:
-  virtual std::unique_ptr<Reply> HandleMessage(
+  std::unique_ptr<Reply> HandleMessage(
       Message* message) override;
 };
 
@@ -59,7 +59,7 @@ class M16Sender final : public OptionalMessageSender<Request::M16> {
   M16Sender(const InitParams& init_params);
 
  private:
-  virtual bool HandleReply(Reply* reply) override;
+  bool HandleReply(Reply* reply) override;
 };
 
 }  // source

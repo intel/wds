@@ -34,7 +34,7 @@ class Property {
  public:
   explicit Property(PropertyType type);
   virtual ~Property();
-  virtual std::string to_string() const;
+  virtual std::string ToString() const;
 
   PropertyType type() { return type_; }
   bool is_none() const { return is_none_; }

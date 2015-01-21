@@ -38,7 +38,7 @@ Property::~Property() {
 	// TODO Auto-generated destructor stub
 }
 
-std::string Property::to_string() const {
+std::string Property::ToString() const {
   return std::string();
 }
 

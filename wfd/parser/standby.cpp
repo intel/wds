@@ -30,7 +30,7 @@ Standby::Standby() : Property(WFD_STANDBY) {
 Standby::~Standby() {
 }
 
-std::string Standby::to_string() const {
+std::string Standby::ToString() const {
   return std::string("wfd_standby");
 }
 

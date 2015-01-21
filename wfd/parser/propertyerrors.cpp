@@ -42,7 +42,7 @@ PropertyErrors::PropertyErrors(const std::string& generic_property_name, std::ve
 PropertyErrors::~PropertyErrors() {
 }
 
-std::string PropertyErrors::to_string() const {
+std::string PropertyErrors::ToString() const {
   std::string ret;
 
   if (type_ == WFD_GENERIC)

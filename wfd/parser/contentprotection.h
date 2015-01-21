@@ -37,11 +37,11 @@ class ContentProtection: public Property {
  public:
   ContentProtection();
   ContentProtection(HDCPSpec hdcp_spec, unsigned int port);
-  virtual ~ContentProtection();
+  ~ContentProtection() override;
 
   HDCPSpec hdcp_spec() const;
   unsigned int port() const { return port_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   HDCPSpec hdcp_spec_;

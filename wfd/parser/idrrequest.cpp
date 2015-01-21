@@ -30,7 +30,7 @@ IDRRequest::IDRRequest() : Property(WFD_IDR_REQUEST) {
 IDRRequest::~IDRRequest() {
 }
 
-std::string IDRRequest::to_string() const {
+std::string IDRRequest::ToString() const {
   return std::string("wfd_idr_request");
 }
 

@@ -37,7 +37,7 @@ Route::Route(const Route::Destination& destination)
 Route::~Route() {
 }
 
-std::string Route::to_string() const {
+std::string Route::ToString() const {
   std::string ret = PropertyName::wfd_route+ std::string(SEMICOLON)
     + std::string(SPACE) + (destination() == PRIMARY ? primary : secondary);
   return ret;

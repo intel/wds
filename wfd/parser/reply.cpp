@@ -37,11 +37,11 @@ Reply::Reply(int response_code)
 Reply::~Reply() {
 }
 
-std::string Reply::to_string() const {
+std::string Reply::ToString() const {
   std::string ret;
   ret += kRTSPHeader + std::to_string(response_code_)
        + std::string(SPACE) + kOK + std::string(CRLF);
-  return ret + Message::to_string();
+  return ret + Message::ToString();
 }
 
 }  // namespace wfd

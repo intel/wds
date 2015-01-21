@@ -32,8 +32,8 @@ class M6Handler final : public SequencedMessageSender {
   M6Handler(const InitParams& init_params, uint& keep_alive_timer);
 
  private:
-  virtual std::unique_ptr<Message> CreateMessage() override;
-  virtual bool HandleReply(Reply* reply) override;
+  std::unique_ptr<Message> CreateMessage() override;
+  bool HandleReply(Reply* reply) override;
 
   uint& keep_alive_timer_;
 };
@@ -43,8 +43,8 @@ class M16Handler final : public MessageReceiver<Request::M16> {
   M16Handler(const InitParams& init_params, uint& keep_alive_timer);
 
  private:
-  virtual bool HandleTimeoutEvent(uint timer_id) const override;
-  virtual std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  bool HandleTimeoutEvent(uint timer_id) const override;
+  std::unique_ptr<Reply> HandleMessage(Message* message) override;
 
   uint& keep_alive_timer_;
 };
@@ -54,7 +54,6 @@ class M16Handler final : public MessageReceiver<Request::M16> {
 class WfdSessionState : public MessageSequenceWithOptionalSetHandler {
  public:
   WfdSessionState(const InitParams& init_params, MessageHandlerPtr m6_handler, MessageHandlerPtr m16_handler);
-  virtual ~WfdSessionState();
 };
 
 }  // sink

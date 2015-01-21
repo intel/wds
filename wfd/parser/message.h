@@ -52,7 +52,7 @@ class Message {
 
   Payload& payload();
 
-  virtual std::string to_string() const;
+  virtual std::string ToString() const;
 
  protected:
   std::unique_ptr<Header> header_;
@@ -80,7 +80,7 @@ class Request : public Message {
   };
 
   Request(RTSPMethod method, const std::string& request_uri = std::string());
-  virtual ~Request();
+  ~Request() override;
 
   const std::string& request_uri() const { return request_uri_; }
   void set_request_uri(const std::string& request_uri) {

@@ -39,7 +39,7 @@ ClientRtpPorts::ClientRtpPorts(unsigned short rtp_port_0,
 ClientRtpPorts::~ClientRtpPorts() {
 }
 
-std::string ClientRtpPorts::to_string() const {
+std::string ClientRtpPorts::ToString() const {
   std::string ret = PropertyName::wfd_client_rtp_ports + std::string(SEMICOLON)
     + std::string(SPACE) + profile
     + std::string(SPACE) + std::to_string(rtp_port_0_)

@@ -90,7 +90,7 @@ UIBCCapability::UIBCCapability(
 UIBCCapability::~UIBCCapability() {
 }
 
-std::string UIBCCapability::to_string() const {
+std::string UIBCCapability::ToString() const {
   std::string ret;
   ret = PropertyName::wfd_uibc_capability + std::string(SEMICOLON)
   + std::string(SPACE);

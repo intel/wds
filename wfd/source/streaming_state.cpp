@@ -35,7 +35,7 @@ class M9Handler final : public MessageReceiver<Request::M9> {
     : MessageReceiver<Request::M9>(init_params) {
   }
 
-  virtual std::unique_ptr<Reply> HandleMessage(
+  std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     int response_code = 406;
     if (!manager_->IsPaused()) {
@@ -51,7 +51,7 @@ class M5Sender final : public OptionalMessageSender<Request::M5> {
   M5Sender(const InitParams& init_params)
     : OptionalMessageSender<Request::M5>(init_params) {
   }
-  virtual bool HandleReply(Reply* reply) override {
+  bool HandleReply(Reply* reply) override {
     return (reply->response_code() == 200);
   }
 };

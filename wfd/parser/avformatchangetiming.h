@@ -30,12 +30,12 @@ namespace wfd {
 class AVFormatChangeTiming: public Property {
 public:
   AVFormatChangeTiming(unsigned long long int pts, unsigned long long int dts);
-  virtual ~AVFormatChangeTiming();
+  ~AVFormatChangeTiming() override;
 
   unsigned long long int pts() const { return pts_; }
   unsigned long long int dts() const { return dts_; }
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned long long int pts_;

@@ -36,10 +36,10 @@ class Route: public Property {
 
  public:
   explicit Route(const Route::Destination& destination);
-  virtual ~Route();
+  ~Route() override;
 
   Route::Destination destination() const { return destination_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   Route::Destination destination_;

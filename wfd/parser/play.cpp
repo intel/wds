@@ -28,14 +28,11 @@ Play::Play(const std::string& request_uri)
  : Request(Request::MethodPlay, request_uri) {
 }
 
-Play::~Play() {
-}
-
-std::string Play::to_string() const {
+std::string Play::ToString() const {
   std::string ret = MethodName::PLAY
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);
-  return ret + Message::to_string();
+  return ret + Message::ToString();
 }
 
 } /* namespace wfd */

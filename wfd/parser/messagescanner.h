@@ -40,7 +40,7 @@ class MessageScanner : public yyFlexLexer, public BaseLexer {
 
  private:
   bool is_reply_message_;
-  virtual int yylex() override;
+  int yylex() override;
 };
 
 }  // namespace wfd

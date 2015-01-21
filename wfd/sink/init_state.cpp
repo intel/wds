@@ -78,8 +78,5 @@ InitState::InitState(const InitParams& init_params)
   AddSequencedHandler(make_ptr(new M2Handler(init_params)));
 }
 
-InitState::~InitState() {
-}
-
 }  // sink
 }  // wfd

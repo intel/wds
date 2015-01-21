@@ -128,7 +128,7 @@ bool Header::has_method(const Method& method) const {
       method) != supported_methods_.end();
 }
 
-std::string Header::to_string() const {
+std::string Header::ToString() const {
   std::string ret;
 
   ret += kCSeq + std::to_string(cseq_) + wfd::CRLF;
@@ -147,7 +147,7 @@ std::string Header::to_string() const {
   if (content_length_)
     ret += kContentLenght + std::to_string(content_length_) + wfd::CRLF;
 
-  ret += transport().to_string();
+  ret += transport().ToString();
 
   if (supported_methods_.size()) {
     auto i = supported_methods_.begin();

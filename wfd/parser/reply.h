@@ -30,12 +30,12 @@ namespace wfd {
 class Reply: public Message {
  public:
   explicit Reply(int response_code = 200);
-  virtual ~Reply();
+  ~Reply() override;
 
   int response_code() const { return response_code_; }
   void set_response_code(int response_code) { response_code_ = response_code; }
 
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   int response_code_;

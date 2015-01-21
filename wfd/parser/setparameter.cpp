@@ -29,14 +29,11 @@ SetParameter::SetParameter(const std::string& request_uri)
  : Request(Request::MethodSetParameter, request_uri) {
 }
 
-SetParameter::~SetParameter() {
-}
-
-std::string SetParameter::to_string() const {
+std::string SetParameter::ToString() const {
   std::string ret = MethodName::SET_PARAMETER
       + std::string(SPACE) + request_uri()
       + std::string(SPACE) + std::string(RTSP_END) + std::string(CRLF);
-  return ret + Message::to_string();
+  return ret + Message::ToString();
 }
 
 } /* namespace wfd */

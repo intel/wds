@@ -31,10 +31,10 @@ class ConnectorType: public Property {
  public:
   ConnectorType();
   explicit ConnectorType(unsigned short connector_type);
-  virtual ~ConnectorType();
+  ~ConnectorType() override;
 
   unsigned short connector_type() const { return connector_type_; }
-  virtual std::string to_string() const override;
+  std::string ToString() const override;
 
  private:
   unsigned short connector_type_;

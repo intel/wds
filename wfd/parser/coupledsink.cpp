@@ -40,7 +40,7 @@ CoupledSink::CoupledSink(): Property(WFD_COUPLED_SINK, true){
 CoupledSink::~CoupledSink(){
 }
 
-std::string CoupledSink::to_string() const {
+std::string CoupledSink::ToString() const {
   std::string ret =
       PropertyName::wfd_coupled_sink + std::string(SEMICOLON)
     + std::string(SPACE);

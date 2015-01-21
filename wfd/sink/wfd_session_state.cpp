@@ -106,8 +106,5 @@ WfdSessionState::WfdSessionState(const InitParams& init_params, MessageHandlerPt
   AddOptionalHandler(m16_handler);
 }
 
-WfdSessionState::~WfdSessionState() {
-}
-
 }  // namespace sink
 }  // namespace wfd

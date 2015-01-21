@@ -116,14 +116,14 @@ const std::vector<std::string>& Payload::get_parameter_properties() const {
   return request_properties_;
 }
 
-std::string Payload::to_string() const {
+std::string Payload::ToString() const {
   std::string ret;
   auto i = properties_.begin();
   auto end = properties_.end();
 
   while(i != end) {
     if ((*i).second) {
-      ret += (*i).second->to_string();
+      ret += (*i).second->ToString();
       ret += "\r\n";
     }
     ++i;
@@ -139,7 +139,7 @@ std::string Payload::to_string() const {
 
   auto error_i = property_errors_.rbegin();
   while(error_i != property_errors_.rend()) {
-    ret += error_i->second->to_string();
+    ret += error_i->second->ToString();
     ret += "\r\n";
     error_i++;
   }

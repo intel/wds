@@ -156,7 +156,7 @@ static bool test_valid_options ()
   ASSERT_EQUAL(request->header().cseq(), 0);
   ASSERT_EQUAL(request->header().content_length(), 0);
   ASSERT_EQUAL(request->header().require_wfd_support(), true);
-  ASSERT_EQUAL (request->to_string(), header);
+  ASSERT_EQUAL (request->ToString(), header);
 
   return true;
 }
@@ -194,7 +194,7 @@ static bool test_valid_options_reply ()
     ASSERT(method != methods.end());
   }
 
-  ASSERT_EQUAL (reply->to_string(), header);
+  ASSERT_EQUAL (reply->ToString(), header);
 
   return true;
 }
@@ -234,7 +234,7 @@ static bool test_valid_extra_properties ()
   auto extra_property = std::static_pointer_cast<wfd::GenericProperty>(property);
   ASSERT_EQUAL(extra_property->value(), "1!!1! non standard value");
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -273,7 +273,7 @@ static bool test_valid_extra_errors ()
   ASSERT_EQUAL(error->error_codes()[0], 101);
   ASSERT_EQUAL(error->error_codes()[1], 102);
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -304,7 +304,7 @@ static bool test_valid_extra_properties_in_get ()
   ASSERT_EQUAL(properties[0], "nonstandard_property");
   ASSERT_EQUAL(properties[1], "wfd_audio_codecs");
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -355,7 +355,7 @@ static bool test_valid_get_parameter ()
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
   ASSERT(property_type_exists (properties, wfd::PropertyType::WFD_CONTENT_PROTECTION));
 
-  ASSERT_EQUAL (message->to_string(), header + payload_buffer)
+  ASSERT_EQUAL (message->ToString(), header + payload_buffer)
 
   return true;
 }
@@ -469,7 +469,7 @@ static bool test_valid_get_parameter_reply_with_all_none ()
   auto uibc_setting = std::static_pointer_cast<wfd::UIBCSetting> (prop);
   ASSERT_EQUAL(uibc_setting->is_enabled(), false);
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -580,7 +580,7 @@ static bool test_valid_get_parameter_reply ()
       payload.get_property(wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
   ASSERT(!prop->is_none());
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -679,7 +679,7 @@ static bool test_valid_get_parameter_reply_with_errors ()
   ASSERT_EQUAL(error->error_codes().size(), 1);
   ASSERT_EQUAL(error->error_codes()[0], 404);
 
-  ASSERT_EQUAL(message->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(message->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -744,7 +744,7 @@ static bool test_valid_set_parameter ()
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_PRESENTATION_URL));
 
-  ASSERT_EQUAL(request->to_string(), header + payload_buffer);
+  ASSERT_EQUAL(request->ToString(), header + payload_buffer);
 
   return true;
 }
@@ -775,7 +775,7 @@ static bool test_valid_setup ()
   ASSERT_EQUAL(request->header().transport().server_port(), 0);
   ASSERT_EQUAL(request->header().transport().server_supports_rtcp(), false);
 
-  ASSERT_EQUAL(request->to_string(), header);
+  ASSERT_EQUAL(request->ToString(), header);
 
   return true;
 }
@@ -807,7 +807,7 @@ static bool test_valid_setup_reply ()
   ASSERT_EQUAL(reply->header().transport().server_port(), 5000);
   ASSERT_EQUAL(reply->header().transport().server_supports_rtcp(), true);
 
-  ASSERT_EQUAL(reply->to_string(), header);
+  ASSERT_EQUAL(reply->ToString(), header);
 
   return true;
 }
@@ -832,7 +832,7 @@ static bool test_valid_play ()
   ASSERT_EQUAL(request->header().require_wfd_support(), false);
   ASSERT_EQUAL(request->header().session(), "6B8B4567");
 
-  ASSERT_EQUAL(request->to_string(), header);
+  ASSERT_EQUAL(request->ToString(), header);
 
   return true;
 }
