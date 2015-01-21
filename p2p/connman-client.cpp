@@ -85,7 +85,7 @@ void Client::scan_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
         return;
     }
 
-    std::cout << "* scan started "<< std::endl;
+    std::cout << "* scan complete"<< std::endl;
 }
 
 /* static C callback */
@@ -292,7 +292,7 @@ void Client::scan()
                        "Scan",
                        NULL,
                        G_DBUS_CALL_FLAGS_NONE,
-                       -1,
+                       60 * 1000,
                        NULL,
                        Client::scan_cb,
                        this);
