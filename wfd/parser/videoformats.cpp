@@ -119,7 +119,7 @@ EnumType MaskToEnum(ArgType from, EnumType biggest_value) {
 }
 
 inline H264VideoFormat::H264Profile ToH264Profile(unsigned char profile) {
-  return MaskToEnum<H264VideoFormat::H264Profile>(profile, H264VideoFormat::CBP);
+  return MaskToEnum<H264VideoFormat::H264Profile>(profile, H264VideoFormat::CHP);
 }
 
 inline H264VideoFormat::H264Level ToH264Level(unsigned char level) {
