@@ -41,7 +41,7 @@ class MiracBroker : public wfd::Peer::Delegate
 {
     public:
         MiracBroker (const std::string& listen_port);
-        MiracBroker(const std::string& peer_address, const std::string& peer_port, uint timeout = 2000);
+        MiracBroker(const std::string& peer_address, const std::string& peer_port, uint timeout = 3000);
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
         std::string get_peer_address() const;

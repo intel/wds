@@ -19,6 +19,8 @@
  * 02110-1301 USA
  */
 
+#include <iostream>
+
 #include "desktop_media_manager.h"
 #include "mirac_broker_source.h"
 
@@ -38,6 +40,10 @@ void MiracBrokerSource::on_connected() {
   media_manager_.reset(new DesktopMediaManager(get_peer_address()));
   wfd_source_.reset(wfd::Source::Create(this, media_manager_.get()));
   wfd_source_->Start();
+}
+
+void MiracBrokerSource::on_connect_timeout() {
+  std::cout << "* RTSP connection failed: timeout" << std::endl;
 }
 
 wfd::Peer* MiracBrokerSource::Peer() const {
