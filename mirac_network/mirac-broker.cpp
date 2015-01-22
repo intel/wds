@@ -82,6 +82,7 @@ gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
 {
     std::string msg;
     if (connection_->Receive(msg)) {
+      g_log("rtsp", G_LOG_LEVEL_DEBUG, "Received RTSP message:\n%s", msg.c_str());
       got_message (msg);
     }
     return G_SOURCE_CONTINUE;
@@ -178,8 +179,9 @@ MiracBroker::~MiracBroker ()
 }
 
 void MiracBroker::SendRTSPData(const std::string& data) {
-    if (connection_ && !connection_->Send(data))
-        g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
+  g_log("rtsp", G_LOG_LEVEL_DEBUG, "Sending RTSP message:\n%s", data.c_str());
+  if (connection_ && !connection_->Send(data))
+      g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
 }
 
 static gboolean on_timeout(gpointer user_data) {
