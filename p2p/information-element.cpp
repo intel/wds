@@ -37,16 +37,21 @@ Subelement* new_subelement (SubelementId id)
             break;
         case ASSOCIATED_BSSID:
             element = (Subelement*)new AssociatedBSSIDSubelement;
+            break;
         case COUPLED_SINK_INFORMATION:
             element = (Subelement*)new CoupledSinkInformationSubelement;
             break;
         default:
-            assert(false);
+            element = NULL;
+            break;
     }
 
-    memset(element, 0, SubelementSize[id]);
-    element->id = id;
-    element->length = htons(SubelementSize[id] - 3);
+    if (element) {
+        /* Fill in the common values */
+        memset(element, 0, SubelementSize[id]);
+        element->id = id;
+        element->length = htons(SubelementSize[id] - 3);
+    }
 
     return element;
 }
@@ -80,10 +85,11 @@ InformationElement::InformationElement(const std::unique_ptr<InformationElementA
         size_t subelement_size = SubelementSize[id];
 
         Subelement *element = new_subelement(id);
-        memcpy (element, array->bytes + pos, subelement_size);
+        if (element) {
+            memcpy (element, array->bytes + pos, subelement_size);
+            subelements_[id] = element;
+        }
         pos += subelement_size;
-
-        subelements_[id] = element;
     }
 }
 
