@@ -31,12 +31,6 @@
 #include "wfd/public/peer.h"
 #include "mirac-network.hpp"
 
-class MiracBrokerObserver
-{
-    public:
-        virtual ~MiracBrokerObserver();
-};
-
 class MiracBroker : public wfd::Peer::Delegate
 {
     public:
@@ -49,6 +43,11 @@ class MiracBroker : public wfd::Peer::Delegate
         void OnTimeout(uint timer_id);
 
     protected:
+        enum ConnectionFailure {
+            CONNECTION_TIMEOUT,
+            CONNECTION_LOST,
+        };
+
         // wfd::Peer::Delegate
         virtual void SendRTSPData(const std::string& data) override;
         virtual uint CreateTimer(int seconds);
@@ -56,7 +55,7 @@ class MiracBroker : public wfd::Peer::Delegate
 
         virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};
-        virtual void on_connect_timeout() {};
+        virtual void on_connection_failure(ConnectionFailure failure) {};
 
     private:
         static gboolean send_cb (gint fd, GIOCondition condition, gpointer data_ptr);

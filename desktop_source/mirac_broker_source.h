@@ -41,7 +41,7 @@ class MiracBrokerSource : public MiracBroker {
  private:
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;
-  void on_connect_timeout() override;
+  void on_connection_failure(ConnectionFailure failure) override;
   virtual wfd::Peer* Peer() const override;
 
   std::unique_ptr<wfd::SourceMediaManager> media_manager_;

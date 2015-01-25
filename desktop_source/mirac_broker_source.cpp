@@ -42,8 +42,13 @@ void MiracBrokerSource::on_connected() {
   wfd_source_->Start();
 }
 
-void MiracBrokerSource::on_connect_timeout() {
-  std::cout << "* RTSP connection failed: timeout" << std::endl;
+void MiracBrokerSource::on_connection_failure(ConnectionFailure failure) {
+  switch (failure) {
+      case CONNECTION_LOST:
+          std::cout << "* RTSP connection lost" << std::endl;
+      case CONNECTION_TIMEOUT:
+          std::cout << "* RTSP connection failed: timeout" << std::endl;
+  }
 }
 
 wfd::Peer* MiracBrokerSource::Peer() const {
