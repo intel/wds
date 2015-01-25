@@ -38,6 +38,9 @@ void SinkApp::on_availability_changed(P2P::Peer *peer)
         std::cout << "* Connecting to source at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
 
         sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port()), peer->local_host()));
+    } else if (sink_ && !peer->is_available()) {
+        sink_.reset(NULL);
+        std::cout << "* Source disappeared" << std::endl;
     }
 }
 
