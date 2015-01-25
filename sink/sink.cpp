@@ -19,6 +19,8 @@
  * 02110-1301 USA
  */
 
+#include <iostream>
+
 #include "sink.h"
 #include "gst_sink_media_manager.h"
 
@@ -37,6 +39,15 @@ void Sink::on_connected() {
   media_manager_.reset(new GstSinkMediaManager(local_host_));
   wfd_sink_.reset(wfd::Sink::Create(this, media_manager_.get()));
   wfd_sink_->Start();
+}
+
+void Sink::on_connection_failure(ConnectionFailure failure) {
+  switch (failure) {
+      case CONNECTION_LOST:
+          std::cout << "* RTSP connection lost" << std::endl;
+      case CONNECTION_TIMEOUT:
+          ;
+  }
 }
 
 void Sink::Play() {

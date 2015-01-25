@@ -71,6 +71,8 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
 {
     try {
         return connection_->Send() ? G_SOURCE_REMOVE : G_SOURCE_CONTINUE;
+    } catch (MiracConnectionLostException &exception) {
+        on_connection_failure(CONNECTION_LOST);
     } catch (std::exception &x) {
         g_warning("exception: %s", x.what());
     }
@@ -81,9 +83,14 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
 gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
 {
     std::string msg;
-    if (connection_->Receive(msg)) {
-      g_log("rtsp", G_LOG_LEVEL_DEBUG, "Received RTSP message:\n%s", msg.c_str());
-      got_message (msg);
+    try {
+        if (connection_->Receive(msg)) {
+            g_log("rtsp", G_LOG_LEVEL_DEBUG, "Received RTSP message:\n%s", msg.c_str());
+            got_message (msg);
+        }
+    } catch (MiracConnectionLostException &exception) {
+        on_connection_failure(CONNECTION_LOST);
+        return G_SOURCE_REMOVE;
     }
     return G_SOURCE_CONTINUE;
 }
@@ -114,7 +121,7 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
     } catch (std::exception &x) {
         gdouble elapsed = 1000 * g_timer_elapsed(connect_timer_, NULL);
         if (elapsed + connect_wait_ > connect_timeout_) {
-            on_connect_timeout();
+            on_connection_failure(CONNECTION_TIMEOUT);
         } else {
             connect_wait_id_ = g_timeout_add (connect_wait_, try_connect, this);
         }
