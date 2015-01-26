@@ -36,6 +36,7 @@ class SinkApp: public P2P::Client::Observer, public P2P::Peer::Observer {
 		Sink& sink() { return *sink_; }
 
 		void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
+		void on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
 		void on_initialized(P2P::Client *client) override {};
 		
 		void on_availability_changed(P2P::Peer *peer) override;
@@ -44,6 +45,7 @@ class SinkApp: public P2P::Client::Observer, public P2P::Peer::Observer {
 	private:
 		std::unique_ptr<P2P::Client> p2p_client_;
 		std::unique_ptr<Sink> sink_;
+		P2P::Peer *peer_;
 };
 
 #endif // SINK_APP_H
