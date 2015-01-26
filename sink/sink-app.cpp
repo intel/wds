@@ -32,15 +32,27 @@ void SinkApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer
 	peer->set_observer (this);
 }
 
+void SinkApp::on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
+{
+    std::cout << "* Peer removed: " << peer->name() << std::endl;
+    if (peer.get() == peer_) {
+        sink_.reset(NULL);
+        peer_ = NULL;
+    }
+}
+
 void SinkApp::on_availability_changed(P2P::Peer *peer)
 {
     if (!sink_ && peer->is_available() && peer->device_type() == P2P::SOURCE) {
         std::cout << "* Connecting to source at " << peer->remote_host() << ":" << ntohs(peer->remote_port()) << std::endl;
 
         sink_.reset(new Sink (peer->remote_host(), ntohs(peer->remote_port()), peer->local_host()));
-    } else if (sink_ && !peer->is_available()) {
+        peer_ = peer;
+    } else if (sink_ && !peer->is_available() && peer == peer_) {
+        std::cout << "* Source unavailable" << std::endl;
+
         sink_.reset(NULL);
-        std::cout << "* Source disappeared" << std::endl;
+        peer_ = NULL;
     }
 }
 
