@@ -34,29 +34,29 @@ struct TimerCallbackData {
 /* static C callback wrapper */
 gboolean MiracBroker::send_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = static_cast<MiracBroker*> (data_ptr);
-    return broker->send_cb(fd, condition);
+    auto broker = static_cast<MiracBroker**> (data_ptr);
+    return (*broker)->send_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = static_cast<MiracBroker*> (data_ptr);
-    return broker->receive_cb(fd, condition);
+    auto broker = static_cast<MiracBroker**> (data_ptr);
+    return (*broker)->receive_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = static_cast<MiracBroker*> (data_ptr);
-    return broker->listen_cb(fd, condition);
+    auto broker = static_cast<MiracBroker**> (data_ptr);
+    return (*broker)->listen_cb(fd, condition);
 }
 
 /* static C callback wrapper */
 gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition, gpointer data_ptr)
 {
-    auto broker = static_cast<MiracBroker*> (data_ptr);
-    return broker->connect_cb(fd, condition);
+    auto broker = static_cast<MiracBroker**> (data_ptr);
+    return (*broker)->connect_cb(fd, condition);
 }
 
 /* static C callback wrapper */
@@ -70,7 +70,8 @@ gboolean MiracBroker::try_connect (gpointer data_ptr)
 gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
 {
     try {
-        return connection_->Send() ? G_SOURCE_REMOVE : G_SOURCE_CONTINUE;
+        if (!connection_->Send())
+            return G_SOURCE_CONTINUE;
     } catch (MiracConnectionLostException &exception) {
         on_connection_failure(CONNECTION_LOST);
     } catch (std::exception &x) {
@@ -98,9 +99,8 @@ gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
 gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
 {
     try {
-        connection_.reset(network_->Accept());
+        connection(network_->Accept());
         g_message("connection from: %s", connection_->GetPeerAddress().c_str());
-        g_unix_fd_add(connection_->GetHandle(), G_IO_IN, receive_cb, this);
         on_connected();
     } catch (std::exception &x) {
         g_warning("exception: %s", x.what());
@@ -115,8 +115,11 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
         if (!network_->Connect(NULL, NULL))
             return G_SOURCE_CONTINUE;
         g_message("connection success to: %s", network_->GetPeerAddress().c_str());
-        connection_.reset(network_.release());
-        g_unix_fd_add(connection_->GetHandle(), G_IO_IN, receive_cb, this);
+        connection(network_.release());
+
+        /* make sure any network event sources are removed */
+        network(NULL);
+
         on_connected();
     } catch (std::exception &x) {
         gdouble elapsed = 1000 * g_timer_elapsed(connect_timer_, NULL);
@@ -129,17 +132,37 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
     return G_SOURCE_REMOVE;
 }
 
+void MiracBroker::network(MiracNetwork *connection)
+{
+    while (g_source_remove_by_user_data(&network_source_ptr_))
+        ;
+    network_.reset(connection);
+}
+
+void MiracBroker::connection(MiracNetwork *connection)
+{
+    while (g_source_remove_by_user_data(&connection_source_ptr_))
+        ;
+    connection_.reset(connection);
+
+    if (connection_)
+        g_unix_fd_add(connection_->GetHandle(), G_IO_IN,
+                      receive_cb, &connection_source_ptr_);
+}
+
 void MiracBroker::try_connect()
 {
     g_message("Trying to connect...");
 
     connect_wait_id_ = 0;
-    network_.reset(new MiracNetwork());
+    network(new MiracNetwork());
 
     if (network_->Connect(peer_address_.c_str(), peer_port_.c_str())) {
-        g_unix_fd_add(network_->GetHandle(), G_IO_OUT, MiracBroker::send_cb, this);
+        g_unix_fd_add(network_->GetHandle(), G_IO_OUT,
+                      MiracBroker::send_cb, &network_source_ptr_);
     } else {
-        g_unix_fd_add(network_->GetHandle(), G_IO_OUT, MiracBroker::connect_cb, this);
+        g_unix_fd_add(network_->GetHandle(), G_IO_OUT,
+                      MiracBroker::connect_cb, &network_source_ptr_);
     }
 }
 
@@ -156,11 +179,14 @@ std::string MiracBroker::get_peer_address() const
 MiracBroker::MiracBroker (const std::string& listen_port):
     connect_timer_(NULL)
 {
-    network_.reset (new MiracNetwork());
+    network_source_ptr_ = this;
+    connection_source_ptr_ = this;
+
+    network(new MiracNetwork());
 
     network_->Bind(NULL, listen_port.c_str());
     g_unix_fd_add(network_->GetHandle(), G_IO_IN,
-                  MiracBroker::listen_cb, this);
+                  MiracBroker::listen_cb, &network_source_ptr_);
 }
 
 MiracBroker::MiracBroker(const std::string& peer_address, const std::string& peer_port, uint timeout):
@@ -168,12 +194,18 @@ MiracBroker::MiracBroker(const std::string& peer_address, const std::string& pee
     peer_port_(peer_port),
     connect_timeout_(timeout)
 {
+    network_source_ptr_ = this;
+    connection_source_ptr_ = this;
+
     connect_timer_ = g_timer_new();
     try_connect();
 }
 
 MiracBroker::~MiracBroker ()
 {
+    network(NULL);
+    connection(NULL);
+
     if (connect_timer_) {
         g_timer_destroy(connect_timer_);
         connect_timer_ = NULL;
@@ -187,8 +219,10 @@ MiracBroker::~MiracBroker ()
 
 void MiracBroker::SendRTSPData(const std::string& data) {
   g_log("rtsp", G_LOG_LEVEL_DEBUG, "Sending RTSP message:\n%s", data.c_str());
+
   if (connection_ && !connection_->Send(data))
-      g_unix_fd_add(connection_->GetHandle(), G_IO_OUT, send_cb, (void*)this);
+      g_unix_fd_add(connection_->GetHandle(), G_IO_OUT,
+                    send_cb, &connection_source_ptr_);
 }
 
 static gboolean on_timeout(gpointer user_data) {

@@ -73,8 +73,14 @@ class MiracBroker : public wfd::Peer::Delegate
         void handle_body(const std::string msg);
         void handle_header(const std::string msg);
 
+        void network(MiracNetwork* connection);
         std::unique_ptr<MiracNetwork> network_;
+        MiracBroker *network_source_ptr_;
+
+        void connection(MiracNetwork* connection);
         std::unique_ptr<MiracNetwork> connection_;
+        MiracBroker *connection_source_ptr_;
+
         std::vector<uint> timers_;
 
         std::string peer_address_;
