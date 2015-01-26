@@ -79,15 +79,19 @@ void Peer::handle_property_change (const char *name, GVariant *property)
         GVariantIter *ips;
         GVariant *spec_val;
         char *name;
+        const char *remote = "";
+        const char *local = "";
 
         g_variant_get (property, "a{sv}", &ips);
         while (g_variant_iter_loop (ips, "{sv}", &name, &spec_val)) {
             if (g_strcmp0 (name, "Remote") == 0) {
-                remote_ip_changed (g_variant_get_string (spec_val, NULL));
+                remote = g_variant_get_string (spec_val, NULL);
             } else if (g_strcmp0 (name, "Local") == 0) {
-                local_ip_changed (g_variant_get_string (spec_val, NULL));
+                local = g_variant_get_string (spec_val, NULL);
             }
         }
+        ips_changed (remote, local);
+
         g_variant_iter_free (ips);
     }
 }
@@ -144,42 +148,29 @@ void Peer::proxy_cb (GAsyncResult *result)
 		observer_->on_initialized(this);
 }
 
-void Peer::remote_ip_changed (const char *ip)
+void Peer::ips_changed (const char *remote, const char *local)
 {
-	if (g_strcmp0 (ip, remote_host_.c_str()) == 0)
-		return;
+    if (g_strcmp0 (remote, remote_host_.c_str()) == 0 &&
+        g_strcmp0 (local, local_host_.c_str()) == 0)
+        return;
 
-	auto was_available = is_available();
+    auto was_available = is_available();
 
-	if (g_strcmp0 (ip, "0.0.0.0") == 0)
-		remote_host_.clear();
-	else
-		remote_host_ = std::string(ip);
+    if (g_strcmp0 (remote, "0.0.0.0") == 0)
+        remote_host_.clear();
+    else
+        remote_host_ = std::string(remote);
 
-	if (!observer_)
-		return;
+    if (g_strcmp0 (local, "0.0.0.0") == 0)
+        local_host_.clear();
+    else
+        local_host_ = std::string(local);
 
-	if (was_available != is_available())
-		observer_->on_availability_changed(this);
-}
+    if (!observer_)
+        return;
 
-void Peer::local_ip_changed (const char *ip)
-{
-	if (g_strcmp0 (ip, local_host_.c_str()) == 0)
-		return;
-
-	auto was_available = is_available();
-
-	if (g_strcmp0 (ip, "0.0.0.0") == 0)
-		local_host_.clear();
-	else
-		local_host_ = std::string(ip);
-
-	if (!observer_)
-		return;
-
-	if (was_available != is_available())
-		observer_->on_availability_changed(this);
+    if (was_available != is_available())
+        observer_->on_availability_changed(this);
 }
 
 void Peer::state_changed (const char *state)
