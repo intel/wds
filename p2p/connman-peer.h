@@ -62,8 +62,7 @@ class Peer {
         static void connect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void disconnect_cb (GObject *object, GAsyncResult *res, gpointer data_ptr);
 
-		void remote_ip_changed (const char *ip);
-		void local_ip_changed (const char *ip);
+		void ips_changed (const char *remote, const char *local);
 		void state_changed (const char *state);
 		void name_changed (const char *name);
         void proxy_cb (GAsyncResult *res);
