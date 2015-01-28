@@ -62,7 +62,7 @@ namespace PropertyName {
   const char wfd_display_edid[] = "wfd_display_edid";
   const char wfd_coupled_sink[] = "wfd_coupled_sink";
   const char wfd_trigger_method[] = "wfd_trigger_method";
-  const char wfd_presentation_url[] = "wfd_presentation_url";
+  const char wfd_presentation_url[] = "wfd_presentation_URL";
   const char wfd_client_rtp_ports[] = "wfd_client_rtp_ports";
   const char wfd_route[] = "wfd_route";
   const char wfd_I2C[] = "wfd_I2C";
