@@ -72,9 +72,9 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
     try {
         if (!connection_->Send())
             return G_SOURCE_CONTINUE;
-    } catch (MiracConnectionLostException &exception) {
+    } catch (const MiracConnectionLostException &exception) {
         on_connection_failure(CONNECTION_LOST);
-    } catch (std::exception &x) {
+    } catch (const std::exception &x) {
         g_warning("exception: %s", x.what());
     }
     return G_SOURCE_REMOVE;
@@ -89,7 +89,7 @@ gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
             g_log("rtsp", G_LOG_LEVEL_DEBUG, "Received RTSP message:\n%s", msg.c_str());
             got_message (msg);
         }
-    } catch (MiracConnectionLostException &exception) {
+    } catch (const MiracConnectionLostException &exception) {
         on_connection_failure(CONNECTION_LOST);
         return G_SOURCE_REMOVE;
     }
@@ -102,7 +102,7 @@ gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
         connection(network_->Accept());
         g_message("connection from: %s", connection_->GetPeerAddress().c_str());
         on_connected();
-    } catch (std::exception &x) {
+    } catch (const std::exception &x) {
         g_warning("exception: %s", x.what());
     }
 
@@ -121,7 +121,7 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
         network(NULL);
 
         on_connected();
-    } catch (std::exception &x) {
+    } catch (const std::exception &x) {
         gdouble elapsed = 1000 * g_timer_elapsed(connect_timer_, NULL);
         if (elapsed + connect_wait_ > connect_timeout_) {
             on_connection_failure(CONNECTION_TIMEOUT);
