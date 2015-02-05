@@ -118,6 +118,28 @@ EnumType MaskToEnum(ArgType from, EnumType biggest_value) {
   return static_cast<EnumType>(result);
 }
 
+template <typename EnumType, typename ArgType>
+std::vector<EnumType> MaskToEnumList(ArgType from, EnumType biggest_value) {
+  assert(from != 0);
+  ArgType copy = from;
+  unsigned enum_value = 0;
+  std::vector<EnumType> result;
+
+  while (copy != 0) {
+    if ((copy & 1) != 0) {
+      if (enum_value > static_cast<unsigned>(biggest_value)) {
+        assert(false);
+        break;
+      }
+      result.push_back(static_cast<EnumType>(enum_value));
+    }
+    copy = copy >> 1;
+    ++enum_value;
+  }
+
+  return result;
+}
+
 inline H264VideoFormat::H264Profile ToH264Profile(unsigned char profile) {
   return MaskToEnum<H264VideoFormat::H264Profile>(profile, H264VideoFormat::CHP);
 }
@@ -126,27 +148,29 @@ inline H264VideoFormat::H264Level ToH264Level(unsigned char level) {
   return MaskToEnum<H264VideoFormat::H264Level>(level, H264VideoFormat::k4_2);
 }
 
-
 }  // namespace
 
-H264VideoFormat H264Codec::ToVideoFormat() const {
+void H264Codec::ToVideoFormats(std::vector<H264VideoFormat>& formats) const {
   auto profile = ToH264Profile(profile_);
   auto level = ToH264Level(level_);
-  if (cea_support_ != 0)
-    return H264VideoFormat(
-        profile, level, MaskToEnum<CEARatesAndResolutions>(
-            cea_support_, CEA1920x1080p24));
-  if (vesa_support_ != 0)
-    return H264VideoFormat(
-        profile, level, MaskToEnum<VESARatesAndResolutions>(
-             vesa_support_, VESA1920x1200p30));
-  if (hh_support_ != 0)
-    return H264VideoFormat(
-        profile, level, MaskToEnum<HHRatesAndResolutions>(
-             hh_support_, HH848x480p60));
-
-  assert(false);
-  return H264VideoFormat(profile, level, CEA640x480p60);
+  if (cea_support_ != 0) {
+    auto list = MaskToEnumList<CEARatesAndResolutions>(
+        cea_support_, CEA1920x1080p24);
+    for(auto rate_resolution: list)
+      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+  }
+  if (vesa_support_ != 0) {
+    auto list = MaskToEnumList<VESARatesAndResolutions>(
+        vesa_support_, VESA1920x1200p30);
+    for(auto rate_resolution: list)
+      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+  }
+  if (hh_support_ != 0) {
+    auto list = MaskToEnumList<HHRatesAndResolutions>(
+        hh_support_, HH848x480p60);
+    for(auto rate_resolution: list)
+      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+  }
 }
 
 VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
@@ -207,7 +231,7 @@ NativeVideoFormat VideoFormats::GetNativeFormat() const {
 std::vector<H264VideoFormat> VideoFormats::GetSupportedH264Formats() const {
   std::vector<H264VideoFormat> result;
   for (const auto& codec : h264_codecs_)
-    result.push_back(codec.ToVideoFormat());
+    codec.ToVideoFormats(result);
   return result;
 }
 
