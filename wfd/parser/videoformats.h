@@ -41,7 +41,7 @@ struct H264Codec {
 
   H264Codec(H264VideoFormat format);
 
-  H264VideoFormat ToVideoFormat() const;
+  void ToVideoFormats(std::vector<H264VideoFormat>& formats) const;
 
   std::string ToString() const;
 
