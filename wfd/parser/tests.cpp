@@ -97,29 +97,6 @@ static bool test_audio_codec (wfd::AudioCodec codec, wfd::AudioFormat::Type form
   return true;
 }
 
-static bool test_h264_codec (wfd::H264Codec codec,
-                             unsigned char profile, unsigned char level,
-                             unsigned int cea_support, unsigned int vesa_support,
-                             unsigned int hh_support, unsigned char latency,
-                             unsigned short min_slice_size, unsigned short slice_enc_params,
-                             unsigned char frame_rate_control_support, int max_hres,
-                             int max_vres)
-{
-//  ASSERT_EQUAL(codec.profile_, profile);
-//  ASSERT_EQUAL(codec.level_, level);
-//  ASSERT_EQUAL(codec.cea_support_, cea_support);
-//  ASSERT_EQUAL(codec.vesa_support_, vesa_support);
-//  ASSERT_EQUAL(codec.hh_support_, hh_support);
-//  ASSERT_EQUAL(codec.latency_, latency);
-//  ASSERT_EQUAL(codec.min_slice_size_, min_slice_size);
-//  ASSERT_EQUAL(codec.slice_enc_params_, slice_enc_params);
-//  ASSERT_EQUAL(codec.frame_rate_control_support_, frame_rate_control_support);
-
-  // TODO test max-hres and max-vres
-
-  return true;
-}
-
 static bool test_h264_codec_3d (wfd::H264Codec3d codec,
                                 unsigned char profile, unsigned char level,
                                 unsigned long long int video_capability_3d, unsigned char latency,
@@ -127,15 +104,13 @@ static bool test_h264_codec_3d (wfd::H264Codec3d codec,
                                 unsigned char frame_rate_control_support, int max_hres,
                                 int max_vres)
 {
-//  ASSERT_EQUAL(codec.profile_, profile);
-//  ASSERT_EQUAL(codec.level_, level);
-//  ASSERT_EQUAL(codec.video_capability_3d_, video_capability_3d);
-//  ASSERT_EQUAL(codec.latency_, latency);
-//  ASSERT_EQUAL(codec.min_slice_size_, min_slice_size);
-//  ASSERT_EQUAL(codec.slice_enc_params_, slice_enc_params);
-//  ASSERT_EQUAL(codec.frame_rate_control_support_, frame_rate_control_support);
-
-  // TODO test max-hres and max-vres
+  ASSERT_EQUAL(codec.profile_, profile);
+  ASSERT_EQUAL(codec.level_, level);
+  ASSERT_EQUAL(codec.video_capability_3d_, video_capability_3d);
+  ASSERT_EQUAL(codec.latency_, latency);
+  ASSERT_EQUAL(codec.min_slice_size_, min_slice_size);
+  ASSERT_EQUAL(codec.slice_enc_params_, slice_enc_params);
+  ASSERT_EQUAL(codec.frame_rate_control_support_, frame_rate_control_support);
 
   return true;
 }
@@ -522,24 +497,22 @@ static bool test_valid_get_parameter_reply ()
                            wfd::AudioFormat::LPCM, 3, 0));
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[1],
                            wfd::AudioFormat::AAC, 1, 0));
-//  ASSERT_NO_EXCEPTION (prop =
-//      payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));
-//  std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
-//  ASSERT_EQUAL(video_formats->native_resolution(), 0x40);
-//  ASSERT_EQUAL(video_formats->preferred_display_mode(), 0);
-//  ASSERT_EQUAL(video_formats->h264_codecs().size(), 2);
-//  ASSERT(test_h264_codec (video_formats->h264_codecs()[0],
-//                          0x02, 0x04, 0x0001DEFF, 0x053C7FFF, 0x00000FFF, 0, 0, 0, 0x11, 0, 0));
-//  ASSERT(test_h264_codec (video_formats->h264_codecs()[1],
-//                          0x01, 0x04, 0x0001DEFF, 0x053C7FFF, 0x00000FFF, 0, 0, 0, 0x11, 0, 0));
-//  ASSERT_NO_EXCEPTION (prop =
-//      payload.get_property(wfd::PropertyType::WFD_3D_FORMATS));
-//  std::shared_ptr<wfd::Formats3d> formats_3d = std::static_pointer_cast<wfd::Formats3d> (prop);
-//  ASSERT_EQUAL(formats_3d->native_resolution(), 0x80);
-//  ASSERT_EQUAL(formats_3d->preferred_display_mode(), 0);
-//  ASSERT_EQUAL(formats_3d->codecs().size(), 1);
-//  ASSERT(test_h264_codec_3d (formats_3d->codecs()[0],
-//                             0x03, 0x0F, 0x0000000000000005, 0, 0x0001, 0x1401, 0x13, 0, 0));
+  ASSERT_NO_EXCEPTION (prop =
+      payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));
+  std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
+  ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 8);
+  ASSERT_EQUAL(video_formats->GetNativeFormat().type, 0);
+  ASSERT_EQUAL(video_formats->GetSupportedH264Formats().size(), 96);
+
+  ASSERT_NO_EXCEPTION (prop =
+      payload.get_property(wfd::PropertyType::WFD_3D_FORMATS));
+  std::shared_ptr<wfd::Formats3d> formats_3d = std::static_pointer_cast<wfd::Formats3d> (prop);
+
+  ASSERT_EQUAL(formats_3d->native_resolution(), 0x80);
+  ASSERT_EQUAL(formats_3d->preferred_display_mode(), 0);
+  ASSERT_EQUAL(formats_3d->codecs().size(), 1);
+  ASSERT(test_h264_codec_3d (formats_3d->codecs()[0],
+                             0x03, 0x0F, 0x0000000000000005, 0, 0x0001, 0x1401, 0x13, 0, 0));
 
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_CONTENT_PROTECTION));
@@ -696,7 +669,7 @@ static bool test_valid_set_parameter ()
                       "wfd_client_rtp_ports: RTP/AVP/UDP;unicast 19000 0 mode=play\r\n"
                       "wfd_presentation_URL: rtsp://192.168.173.1/wfd1.0/streamid=0 none\r\n"
                       "wfd_trigger_method: SETUP\r\n"
-                      "wfd_video_formats: 00 00 02 04 00000020 00000000 00000000 00 0000 0000 11 none none\r\n");
+                      "wfd_video_formats: 5A 00 02 04 00000020 00000000 00000000 00 0000 0000 11 none none\r\n");
 
   std::unique_ptr<wfd::Message> message;
   driver.Parse(header, message);
@@ -721,14 +694,12 @@ static bool test_valid_set_parameter ()
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[0],
                            wfd::AudioFormat::AAC, 1, 0));
 
-//  ASSERT_NO_EXCEPTION (prop =
-//      payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));
-//  std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
-//  ASSERT_EQUAL(video_formats->native_resolution(), 0);
-//  ASSERT_EQUAL(video_formats->preferred_display_mode(), 0);
-//  ASSERT_EQUAL(video_formats->h264_codecs().size(), 1);
-//  ASSERT(test_h264_codec (video_formats->h264_codecs()[0],
-//                          0x02, 0x04, 0x00000020, 0, 0, 0, 0, 0, 0x11, 0, 0));
+  ASSERT_NO_EXCEPTION (prop =
+      payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));
+  std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
+  ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 11);
+  ASSERT_EQUAL(video_formats->GetNativeFormat().type, 2);
+  ASSERT_EQUAL(video_formats->GetSupportedH264Formats().size(), 1);
 
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_CLIENT_RTP_PORTS));
