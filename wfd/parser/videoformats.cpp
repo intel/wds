@@ -180,9 +180,8 @@ VideoFormats::VideoFormats(NativeVideoFormat format,
     bool preferred_display_mode,
     const std::vector<H264VideoFormat>& h264_formats)
   : Property(WFD_VIDEO_FORMATS),
-    native_(format.rate_resolution),
     preferred_display_mode_(preferred_display_mode ? 1 : 0) {
-  native_ = (native_ << 2) | format.type;
+  native_ = (format.rate_resolution << 3) | format.type;
   for(auto h264_format : h264_formats)
     h264_codecs_.push_back(H264Codec(h264_format));
 }
@@ -212,8 +211,8 @@ NativeVideoFormat GetFormatFromIndex(unsigned index, EnumType biggest_value) {
 }
 
 NativeVideoFormat VideoFormats::GetNativeFormat() const {
-  unsigned index  = native_ >> 2;
-  unsigned selection_bits = native_ & 3;
+  unsigned index  = native_ >> 3;
+  unsigned selection_bits = native_ & 7;
   switch (selection_bits) {
   case 0: // 0b000 CEA
     return GetFormatFromIndex<CEARatesAndResolutions>(index, CEA1920x1080p24);
