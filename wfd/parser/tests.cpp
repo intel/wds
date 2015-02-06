@@ -377,7 +377,7 @@ static bool test_valid_get_parameter_reply_with_all_none ()
                       "wfd_content_protection: none\r\n"
                       "wfd_coupled_sink: none\r\n"
                       "wfd_display_edid: none\r\n"
-                      "wfd_presentation_url: none none\r\n"
+                      "wfd_presentation_URL: none none\r\n"
                       "wfd_route: primary\r\n"
                       "wfd_standby_resume_capability: none\r\n"
                       "wfd_trigger_method: TEARDOWN\r\n"
@@ -694,7 +694,7 @@ static bool test_valid_set_parameter ()
                      "Content-Length: 275\r\n\r\n");
   std::string payload_buffer("wfd_audio_codecs: AAC 00000001 00\r\n"
                       "wfd_client_rtp_ports: RTP/AVP/UDP;unicast 19000 0 mode=play\r\n"
-                      "wfd_presentation_url: rtsp://192.168.173.1/wfd1.0/streamid=0 none\r\n"
+                      "wfd_presentation_URL: rtsp://192.168.173.1/wfd1.0/streamid=0 none\r\n"
                       "wfd_trigger_method: SETUP\r\n"
                       "wfd_video_formats: 00 00 02 04 00000020 00000000 00000000 00 0000 0000 11 none none\r\n");
 
