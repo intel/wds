@@ -32,28 +32,29 @@ namespace P2P {
 
 class Client {
     public:
-		class Observer {
-			public:
-				virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
-				virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
-				virtual void on_initialized(Client *client) {}
+        class Observer {
+            public:
+                virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+                virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
+                virtual void on_initialized(Client *client) {}
 
-			protected:
-				virtual ~Observer() {}
-		};
+            protected:
+                virtual ~Observer() {}
+        };
 
         Client(std::unique_ptr<P2P::InformationElementArray> &take_array);
         Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
         virtual ~Client();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
-		void set_observer(Observer* observer) {
-			observer_ = observer;
-		}
+        void set_observer(Observer* observer) {
+            observer_ = observer;
+        }
 
-		/* TODO error / finished handling */
-		void scan();
+        /* TODO error / finished handling */
+        void scan();
 
+    private:
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void technology_proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
@@ -73,9 +74,9 @@ class Client {
         GDBusProxy *proxy_;
         GDBusProxy *technology_proxy_;
 
-		Observer* observer_;
+        Observer* observer_;
         std::unique_ptr<P2P::InformationElementArray>array_;
-		std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
+        std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };
 
 }

@@ -130,7 +130,7 @@ void Client::peers_changed (GVariant *params)
     while (g_variant_iter_loop (removed, "o", &path)) {
         auto it = peers_.find(path);
         if (it == peers_.end())
-			return;
+            return;
 
         if (observer_)
             observer_->on_peer_removed(this, it->second);
@@ -220,8 +220,8 @@ void Client::proxy_cb (GAsyncResult *result)
     initialize_peers();
     register_peer_service();
 
-	if(technology_proxy_ && observer_)
-		observer_->on_initialized(this);
+    if(technology_proxy_ && observer_)
+        observer_->on_initialized(this);
 }
 
 void Client::technology_proxy_cb (GAsyncResult *result)
@@ -234,12 +234,12 @@ void Client::technology_proxy_cb (GAsyncResult *result)
         g_clear_error (&error);
     }
 
-	if(proxy_ && observer_)
-		observer_->on_initialized(this);
+    if(proxy_ && observer_)
+        observer_->on_initialized(this);
 }
 
 Client::Client(std::unique_ptr<P2P::InformationElementArray> &take_array):
-	Client(take_array, NULL) {}
+    Client(take_array, NULL) {}
 
 Client::Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer):
     proxy_(NULL),
@@ -257,8 +257,8 @@ Client::Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observ
                               this);
 
 
-	/* TODO should get the p2p object path
-	 * by watching Manager.TechnologyAdded/TechnologyRemoved */
+    /* TODO should get the p2p object path
+     * by watching Manager.TechnologyAdded/TechnologyRemoved */
     g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
                               G_DBUS_PROXY_FLAGS_NONE,
                               NULL,

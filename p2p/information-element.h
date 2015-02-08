@@ -67,12 +67,12 @@ const uint16_t SubelementSize[] = {
     9,
 };
 
-typedef struct Subelement_ {
+struct __attribute__ ((packed)) Subelement {
     uint8_t id;
     uint16_t length;
-} __attribute__ ((packed)) Subelement;
+};
 
-typedef struct DeviceinformationBits1_{
+struct __attribute__ ((packed)) DeviceinformationBits1 {
     unsigned device_type : 2; // DeviceType
     unsigned coupled_sink_support_at_source : 1;
     unsigned coupled_sink_support_at_sink : 1;
@@ -80,9 +80,9 @@ typedef struct DeviceinformationBits1_{
     unsigned reserved : 1;
     unsigned service_discovery_support : 1;
     unsigned preferred_connectivity : 1;
-} __attribute__ ((packed)) DeviceinformationBits1;
+};
 
-typedef struct DeviceinformationBits2_{
+struct __attribute__ ((packed)) DeviceinformationBits2 {
     unsigned hdcp_support : 1;
     unsigned time_synchronization_support : 1;
     unsigned audio_unsupport_at_primary_sink : 1;
@@ -90,34 +90,34 @@ typedef struct DeviceinformationBits2_{
     unsigned tdls_persistent_group : 1;
     unsigned tdls_persistent_group_reinvoke : 1;
     unsigned reserved2 : 2;
-} __attribute__ ((packed)) DeviceinformationBits2;
+};
 
-typedef struct DeviceInformationSubelement_{
+struct __attribute__ ((packed)) DeviceInformationSubelement {
     uint8_t id;
     uint16_t length;
     DeviceinformationBits2 field2;
     DeviceinformationBits1 field1;
     uint16_t session_management_control_port;
     uint16_t maximum_throughput;
-} __attribute__ ((packed)) DeviceInformationSubelement;
+};
 
-typedef struct AssociatedBSSIDSubelement_ {
+struct __attribute__ ((packed)) AssociatedBSSIDSubelement {
     uint8_t id;
     uint16_t length;
     uint8_t bssid[6];
-} __attribute__ ((packed)) AssociatedBSSIDSubelement;
+};
 
-typedef struct CoupledSinkStatus_ {
+struct __attribute__ ((packed)) CoupledSinkStatus {
     unsigned status : 2;
     unsigned reserved : 6; 
-} __attribute__ ((packed)) CoupledSinkStatus;
+};
 
-typedef struct CoupledSinkInformationSubelement_ {
+struct __attribute__ ((packed)) CoupledSinkInformationSubelement {
     uint8_t id;
     uint16_t length;
     CoupledSinkStatus status;
     uint8_t mac_address[6];
-} __attribute__ ((packed)) CoupledSinkInformationSubelement;
+};
 
 struct InformationElementArray {
     uint8_t *bytes;
@@ -128,11 +128,11 @@ struct InformationElementArray {
     }
 
     InformationElementArray(uint len, uint8_t* in_bytes) :
-		length(len) {
+        length(len) {
         bytes = new uint8_t[length];
         memcpy (bytes, in_bytes, length);
 
-	}
+    }
 
     ~InformationElementArray() {
         delete[] bytes;
