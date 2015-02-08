@@ -28,8 +28,8 @@
 
 void SinkApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
 {
-	std::cout << "* New peer: " << peer->name() << std::endl;
-	peer->set_observer (this);
+    std::cout << "* New peer: " << peer->name() << std::endl;
+    peer->set_observer (this);
 }
 
 void SinkApp::on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
@@ -65,7 +65,7 @@ SinkApp::SinkApp(){
     // TODO port number is a lie -- we should start the sink first, then 
     // use the port from there (and sink should probably default to 7236)
 
-	// TODO InformationElement could have constructors for this stuff...
+    // TODO InformationElement could have constructors for this stuff...
     dev_info->session_management_control_port = htons(7236);
     dev_info->maximum_throughput = htons(50);
     dev_info->field1.device_type = P2P::PRIMARY_SINK;
@@ -87,5 +87,4 @@ SinkApp::SinkApp(const std::string& hostname, int port)
 }
 
 SinkApp::~SinkApp() {
-	
 }
