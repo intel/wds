@@ -24,9 +24,10 @@
 
 #include "source-app.h"
 
-void SourceApp::on_initialized(P2P::Client *client)
+void SourceApp::on_availability_changed(P2P::Client *client)
 {
-    scan();
+    if (client->is_available())
+        scan();
 }
 
 void SourceApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
