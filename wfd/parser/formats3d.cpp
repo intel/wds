@@ -60,7 +60,7 @@ std::string H264Codec3d::ToString() const {
       + slice_enc_params + std::string(SPACE)
       + frame_rate_control_support + std::string(SPACE);
 
-  if (max_hres_ >= 0) {
+  if (max_hres_ > 0) {
     MAKE_HEX_STRING_4(max_hres, max_hres_);
     ret += max_hres;
   } else {
@@ -68,7 +68,7 @@ std::string H264Codec3d::ToString() const {
   }
   ret += std::string(SPACE);
 
-  if (max_vres_ >= 0) {
+  if (max_vres_ > 0) {
     MAKE_HEX_STRING_4(max_vres, max_vres_);
     ret += max_vres;
   } else {

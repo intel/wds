@@ -763,14 +763,14 @@ wfd_h264_codec_3d:
 
 wfd_max_hres:
     WFD_NONE {
-      $$ = -1;
+      $$ = 0;
     }
   | WFD_NUM
   ;
   
 wfd_max_vres:
     WFD_NONE {
-      $$ = -1;
+      $$ = 0;
     }
   | WFD_NUM
   ;
