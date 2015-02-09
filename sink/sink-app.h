@@ -28,24 +28,24 @@
 #include "connman-client.h"
 
 class SinkApp: public P2P::Client::Observer, public P2P::Peer::Observer {
-	public:
-		SinkApp();
-		SinkApp(const std::string& hostname, int port);
-		~SinkApp();
+ public:
+  SinkApp();
+  SinkApp(const std::string& hostname, int port);
+  ~SinkApp();
 
-		Sink& sink() { return *sink_; }
+  Sink& sink() { return *sink_; }
 
-		void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
-		void on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
-		void on_initialized(P2P::Client *client) override {};
-		
-		void on_availability_changed(P2P::Peer *peer) override;
-		void on_initialized(P2P::Peer *peer) override {};
+  void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
+  void on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
+  void on_initialized(P2P::Client *client) override {};
 
-	private:
-		std::unique_ptr<P2P::Client> p2p_client_;
-		std::unique_ptr<Sink> sink_;
-		P2P::Peer *peer_;
+  void on_availability_changed(P2P::Peer *peer) override;
+  void on_initialized(P2P::Peer *peer) override {};
+
+ private:
+  std::unique_ptr<P2P::Client> p2p_client_;
+  std::unique_ptr<Sink> sink_;
+  P2P::Peer *peer_;
 };
 
 #endif // SINK_APP_H

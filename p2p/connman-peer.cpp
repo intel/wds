@@ -37,8 +37,8 @@ void Peer::proxy_cb (GObject *object, GAsyncResult *res, gpointer data_ptr)
 /* static C callback */
 void Peer::proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr)
 {
-	GVariant *property;
-	char *name;
+    GVariant *property;
+    char *name;
     auto peer = static_cast<Peer*> (data_ptr);
 
     if (g_strcmp0(signal, "PropertyChanged") != 0)
@@ -144,8 +144,8 @@ void Peer::proxy_cb (GAsyncResult *result)
 
     /* TODO check the ip address in case it's up to date already */
 
-	if (observer_)
-		observer_->on_initialized(this);
+    if (observer_)
+        observer_->on_initialized(this);
 }
 
 void Peer::ips_changed (const char *remote, const char *local)
@@ -175,27 +175,27 @@ void Peer::ips_changed (const char *remote, const char *local)
 
 void Peer::state_changed (const char *state)
 {
-	bool ready = (g_strcmp0 (state, "ready") == 0);
+    bool ready = (g_strcmp0 (state, "ready") == 0);
 
-	if (ready_ == ready)
-		return;
-	
-	auto was_available = is_available();
-	ready_ = ready;
+    if (ready_ == ready)
+        return;
+    
+    auto was_available = is_available();
+    ready_ = ready;
 
-	if (!observer_)
-		return;
+    if (!observer_)
+        return;
 
-	if (was_available != is_available())
-		observer_->on_availability_changed(this);
+    if (was_available != is_available())
+        observer_->on_availability_changed(this);
 }
 
 void Peer::name_changed (const char *name)
 {
-	if (g_strcmp0 (name, name_.c_str()) == 0)
-		return;
+    if (g_strcmp0 (name, name_.c_str()) == 0)
+        return;
 
-	name_ = std::string (name);
+    name_ = std::string (name);
 }
 
 

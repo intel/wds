@@ -115,26 +115,26 @@ void InformationElement::add_subelement(P2P::Subelement* subelement)
 
 const DeviceType InformationElement::get_device_type() const
 {
-	auto it = subelements_.find (DEVICE_INFORMATION);
-	if (it == subelements_.end()) {
-	   /* FIXME : exception ? */
-	   return DUAL_ROLE;
-	}
-	
-	auto dev_info = (P2P::DeviceInformationSubelement*)(*it).second;
-	return (DeviceType)dev_info->field1.device_type;
+    auto it = subelements_.find (DEVICE_INFORMATION);
+    if (it == subelements_.end()) {
+        /* FIXME : exception ? */
+        return DUAL_ROLE;
+    }
+
+    auto dev_info = (P2P::DeviceInformationSubelement*)(*it).second;
+    return (DeviceType)dev_info->field1.device_type;
 }
 
 const int InformationElement::get_rtsp_port() const
 {
-	auto it = subelements_.find (DEVICE_INFORMATION);
-	if (it == subelements_.end()) {
-	   /* FIXME : exception ? */
-	   return -1;
-	}
+    auto it = subelements_.find (DEVICE_INFORMATION);
+    if (it == subelements_.end()) {
+       /* FIXME : exception ? */
+       return -1;
+    }
 
-	auto dev_info = (P2P::DeviceInformationSubelement*)(*it).second;
-	return dev_info->session_management_control_port;
+    auto dev_info = (P2P::DeviceInformationSubelement*)(*it).second;
+    return dev_info->session_management_control_port;
 }
 
 std::unique_ptr<InformationElementArray> InformationElement::serialize () const
