@@ -26,6 +26,10 @@
 
 namespace wfd {
 
+namespace {
+  const char kDefaultContentType[] = "text/parameters";
+}
+
 Message::Message(bool is_reply)
   : is_reply_(is_reply) {
 }
@@ -57,6 +61,8 @@ std::string Message::ToString() const {
 
   if (header_) {
     header_->set_content_length (ret.length());
+    if(ret.length() > 0 && header_->content_type().length() == 0)
+        header_->set_content_type (kDefaultContentType);
     ret = header_->ToString() + ret;
   }
 

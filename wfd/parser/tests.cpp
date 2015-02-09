@@ -180,6 +180,7 @@ static bool test_valid_extra_properties ()
 
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 2\r\n"
+                     "Content-Type: text/parameters\r\n"
                      "Content-Length: 72\r\n"
                      "My-Header: 123 testing testing\r\n\r\n");
   std::unique_ptr<wfd::Message> message;
@@ -220,6 +221,7 @@ static bool test_valid_extra_errors ()
 
   std::string header("RTSP/1.0 303 OK\r\n"
                      "CSeq: 0\r\n"
+                     "Content-Type: text/parameters\r\n"
                      "Content-Length: 55\r\n\r\n");
 
   std::unique_ptr<wfd::Message> message;
