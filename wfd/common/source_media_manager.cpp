@@ -21,10 +21,18 @@
 
 #include "wfd/public/media_manager.h"
 
+#include "wfd/public/logging.h"
+
 #include <algorithm>
 #include <assert.h>
 
 namespace wfd {
+
+static void Dummy(const char*, ...) {}
+LogSystem::LogFunction LogSystem::log_func_ = &Dummy;
+LogSystem::LogFunction LogSystem::vlog_func_ = &Dummy;
+LogSystem::LogFunction LogSystem::warning_func_ = &Dummy;
+LogSystem::LogFunction LogSystem::error_func_ = &Dummy;
 
 // Quality weight is calculated using following formula:
 // width * height * fps * 2 for progressive or 1 for interlaced frames

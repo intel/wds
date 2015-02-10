@@ -30,6 +30,7 @@
 
 #include "wfd/parser/message.h"
 #include "wfd/parser/reply.h"
+#include "wfd/public/logging.h"
 #include "wfd/public/peer.h"
 
 namespace wfd {

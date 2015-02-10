@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include "mirac-glib-logging.hpp"
+
 #include "sink-app.h"
 #include "sink.h"
 
@@ -83,6 +85,7 @@ static gboolean _user_input_handler (
 
 int main (int argc, char *argv[])
 {
+    InitGlibLogging();
     char* hostname = NULL;
     int port = 7236;
     std::unique_ptr<SinkApp> app;

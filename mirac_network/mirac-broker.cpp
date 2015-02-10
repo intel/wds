@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "mirac-broker.hpp"
+#include "mirac-glib-logging.hpp"
 
 struct TimerCallbackData {
   TimerCallbackData(MiracBroker* delegate)
@@ -75,7 +76,7 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
     } catch (const MiracConnectionLostException &exception) {
         on_connection_failure(CONNECTION_LOST);
     } catch (const std::exception &x) {
-        g_warning("exception: %s", x.what());
+        WFD_WARNING("exception: %s", x.what());
     }
     return G_SOURCE_REMOVE;
 }
@@ -86,7 +87,7 @@ gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
     std::string msg;
     try {
         if (connection_->Receive(msg)) {
-            g_log("rtsp", G_LOG_LEVEL_DEBUG, "Received RTSP message:\n%s", msg.c_str());
+            WFD_VLOG("Received RTSP message:\n%s", msg.c_str());
             got_message (msg);
         }
     } catch (const MiracConnectionLostException &exception) {
@@ -100,10 +101,10 @@ gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
 {
     try {
         connection(network_->Accept());
-        g_message("connection from: %s", connection_->GetPeerAddress().c_str());
+        WFD_LOG("connection from: %s", connection_->GetPeerAddress().c_str());
         on_connected();
     } catch (const std::exception &x) {
-        g_warning("exception: %s", x.what());
+        WFD_WARNING("exception: %s", x.what());
     }
 
     return G_SOURCE_CONTINUE;
@@ -114,7 +115,7 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
     try {
         if (!network_->Connect(NULL, NULL))
             return G_SOURCE_CONTINUE;
-        g_message("connection success to: %s", network_->GetPeerAddress().c_str());
+        WFD_LOG("connection success to: %s", network_->GetPeerAddress().c_str());
         connection(network_.release());
 
         /* make sure any network event sources are removed */
@@ -152,7 +153,7 @@ void MiracBroker::connection(MiracNetwork *connection)
 
 void MiracBroker::try_connect()
 {
-    g_message("Trying to connect...");
+    WFD_LOG("Trying to connect...");
 
     connect_wait_id_ = 0;
     network(new MiracNetwork());
@@ -196,7 +197,6 @@ MiracBroker::MiracBroker(const std::string& peer_address, const std::string& pee
 {
     network_source_ptr_ = this;
     connection_source_ptr_ = this;
-
     connect_timer_ = g_timer_new();
     try_connect();
 }
@@ -218,7 +218,7 @@ MiracBroker::~MiracBroker ()
 }
 
 void MiracBroker::SendRTSPData(const std::string& data) {
-  g_log("rtsp", G_LOG_LEVEL_DEBUG, "Sending RTSP message:\n%s", data.c_str());
+  WFD_VLOG("Sending RTSP message:\n%s", data.c_str());
 
   if (connection_ && !connection_->Send(data))
       g_unix_fd_add(connection_->GetHandle(), G_IO_OUT,
