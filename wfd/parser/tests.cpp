@@ -466,7 +466,7 @@ static bool test_valid_get_parameter_reply ()
                       "wfd_display_edid: none\r\n"
                       "wfd_standby_resume_capability: supported\r\n"
                       "wfd_uibc_capability: none\r\n"
-                      "wfd_video_formats: 40 00 02 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 none none, 01 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 none none\r\n");
+                      "wfd_video_formats: 40 01 02 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 0400 0300, 01 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 0400 0300\r\n");
   std::unique_ptr<wfd::Message> message;
   driver.Parse(header, message);
   ASSERT(message != NULL);

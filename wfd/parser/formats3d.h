@@ -36,8 +36,8 @@ struct H264Codec3d {
   H264Codec3d(unsigned char profile, unsigned char level,
       unsigned long long int video_capability_3d, unsigned char latency,
       unsigned short min_slice_size, unsigned short slice_enc_params,
-      unsigned char frame_rate_control_support, int max_hres,
-      int max_vres)
+      unsigned char frame_rate_control_support,
+      unsigned short max_hres, unsigned short max_vres)
     : profile_(profile),
       level_(level),
       video_capability_3d_(video_capability_3d),
@@ -57,8 +57,8 @@ struct H264Codec3d {
   unsigned short min_slice_size_;
   unsigned short slice_enc_params_;
   unsigned char frame_rate_control_support_;
-  int max_hres_;
-  int max_vres_;
+  unsigned short max_hres_;
+  unsigned short max_vres_;
 };
 
 typedef std::vector<wfd::H264Codec3d> H264Codecs3d;

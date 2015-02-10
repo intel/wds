@@ -36,8 +36,8 @@ struct H264Codec {
       unsigned int cea_support, unsigned int vesa_support,
       unsigned int hh_support, unsigned char latency,
       unsigned short min_slice_size, unsigned short slice_enc_params,
-      unsigned char frame_rate_control_support, int max_hres,
-      int max_vres);
+      unsigned char frame_rate_control_support,
+      unsigned short max_hres, unsigned short max_vres);
 
   H264Codec(H264VideoFormat format);
 
@@ -55,8 +55,8 @@ struct H264Codec {
   unsigned short min_slice_size_;
   unsigned short slice_enc_params_;
   unsigned char frame_rate_control_support_;
-  int max_hres_;
-  int max_vres_;
+  unsigned short max_hres_;
+  unsigned short max_vres_;
 };
 
 typedef std::vector<wfd::H264Codec> H264Codecs;

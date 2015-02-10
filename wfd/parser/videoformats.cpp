@@ -31,8 +31,8 @@ H264Codec::H264Codec(unsigned char profile, unsigned char level,
     unsigned int cea_support, unsigned int vesa_support,
     unsigned int hh_support, unsigned char latency,
     unsigned short min_slice_size, unsigned short slice_enc_params,
-    unsigned char frame_rate_control_support, int max_hres,
-    int max_vres)
+    unsigned char frame_rate_control_support,
+    unsigned short max_hres, unsigned short max_vres)
   : profile_(profile),
     level_(level),
     cea_support_(cea_support),
@@ -82,7 +82,7 @@ std::string H264Codec::ToString() const {
       + slice_enc_params + std::string(SPACE)
       + frame_rate_control_support + std::string(SPACE);
 
-  if (max_hres_ >= 0) {
+  if (max_hres_ > 0) {
     MAKE_HEX_STRING_4(max_hres, max_hres_);
     ret += max_hres;
   } else {
@@ -90,7 +90,7 @@ std::string H264Codec::ToString() const {
   }
   ret += std::string(SPACE);
 
-  if (max_vres_ >= 0) {
+  if (max_vres_ > 0) {
     MAKE_HEX_STRING_4(max_vres, max_vres_);
     ret += max_vres;
   } else {
