@@ -127,10 +127,9 @@ std::vector<EnumType> MaskToEnumList(ArgType from, EnumType biggest_value) {
 
   while (copy != 0) {
     if ((copy & 1) != 0) {
-      if (enum_value > static_cast<unsigned>(biggest_value)) {
-        assert(false);
+      if (enum_value > static_cast<unsigned>(biggest_value))
         break;
-      }
+
       result.push_back(static_cast<EnumType>(enum_value));
     }
     copy = copy >> 1;
