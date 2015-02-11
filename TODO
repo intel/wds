@@ -1,129 +1,22 @@
-Background
-==========
+GOAL: Make a release with the proper librarization by the time all dependencies are released, namely
+	a. wpa_supplicant, past 2.3 (likely 2.4)
+	b. connman, past 1.28	(likely 1.29)
+	c. gst_plugins_bad past 1.4.5+ (likely 1.4.6) 
 
-- Priority scale: High, Medium and Low
 
-- Complexity scale:
- C1, C2, C4 and C8.
-   The complexity scale is exponential, with complexity 1 being the
-   lowest complexity. Complexity is a function of both task 'complexity'
-   and task 'scope'.
+Big tasks (see issue tracker for the rest)
+==========================================
 
-Tasks
-=====
+Inspect and beautify P2P API
 
-Miracast sink proof of concept
-==============================
-21.11 -- POC works!!! (*)
+Create an installable library from the current source tree
 
-Current hacks: 
-	a. IP address guessing/hardcoding for the to-be-connected client (Tomasz works on patch)
-	b. (bug) state inconsistency for connman, cannot run demo more than once on the same instance
-	c. connection and connection re-try logic, we do not know when the peer is in 'accepting' state
-	d. (bug) streaming stops suddenly at some point	
+Create C/gobject interface to the library so that language bindings can be done easliy
 	
-Things to fix
-	a: Desirable
-	b: Desirable
-	c: Mandatory
-	d: Desirable
-	
+Create API for HDCP plugin implementation
 
-- Extend P2P library to cover the source use cases so 
-	that it can be used by Miracast source POC
-	Priority: Low
-	Complexity: C2
-	Owner: alexander.shalamov@intel.com
-	Owner: jussi.kukkonen@intel.com
-	Status: (02.12) Open. 
-	
-- Patch hostnamed/systemd that would tell the device type. Device type 
-	will be set with hostnamectl
-	Priority: High
-	Complexity: C2
-	Owner: jussi.kukkonen@intel.com
-	Status: (02.12) -- Still open.  Patch is to be sent. ConnMan also needs that case handled (goes to Tomasz)
-	
-- Create/improve sink application
-	For Sink, state machine code needs to be improved/verified, and all 
-	other compontents (Gst, p2P, RTSP) to be integrated into a single nice app
-	Priority: Medium
-	Complexity: C4
-	Owner: alexander.kanavin@intel.com
-	Status:  (12.11) -- DONE
-	
-- Create/improve source application
-	For source, state machine code needs to be improved/verified, and all 
-	other compontents (Gst, p2P, RTSP) to be integrated into a single nice app
-	Priority: Medium
-	Complexity: C4
-	Owner: alexander.kanavin@intel.com
-	Status:  (02.12) -- Works on pre-established connection
+Implement UIBC 
 
-- Start working on 01.org/WYSIWiDi presence
-        Set up mailing list and repository
-	NB: Consider GitHub issues vs JIRA
-	Priority: Medium
-	Complexity: C1
-	Owner: andrei.laperie@intel.com
-	Status:  (02.12) --  Content in progress
-
-- Create reference configuration and document it on the site
- NUC with Yocto 1.7 and VM, possibly
-	Priority: High
-	Complexity: C2
-	Owner: andrei.laperie@intel.com
-	Status:  (02.12) --  In progress. 
-	
-	
-
-- Create an (own RTSP implementation-based) state machine for establishing and maintaining
-WiDi connection in the form of shared library. SM needs to be mainloop and toolkit independent.
-	Priority: High
-	Complexity: C2
-	Owner: alexander.shalamov@intel.com
-	Status:  (02.12) --  Work in progress. ETA 10.12.
+Use accelerated encoders/decoders for demo apps
 
 
-Miracast Sink implementation
-============================
-- Study and document requirements for HDCP and I2C plugins for the 
-	stack and document them  
-	Priority: Medium
-	Complexity: C2
-	Owner: jussi.laako@intel.com
-	Status: (29.10) -- Open
-				
-- Implement WiDi IE Handling for P2P.  We need to be able to collect and
-	encode system caps (codecs, bandwidths etc) into IE
-	Note: needed only after POC for proper WiDi service integration
-	Priority: Medium
-	Complexity: C2
-	Owner:
-	Status: Not started
-
-- Create interface code to query  Gstreamer for available codecs
-    and device caps so that they can be communicated in connection established
-	Priority: Low
-	Complexity: C2
-	Owner: alexander.kanavin@intel.com
-	Status:  (15.10) --  new. Note there are number of system parameters that cannot
-		be obtained from gstreamer, so we will need to have some way of handing that
-
-- Figure out the certification practicalities for Miracast
-	Priority: Medium
-	Complexity: C4
-	Owner: andrei.laperie@intel.com
-	Status: (15.10) - new
-	
-- Create  a summary of wpa_supplicant P2P patches 
-	Priority: Low
-	Complexity: C1
-	Owner: tomasz.bursztyka@intel.com
-	Status:  not started
-	
-- Sink-specific: Implement agent interface for ConnMan to handle P2P PIN code request
-	Priority: Medium
-	Complexity: C4
-	Owner:
-	Status:
