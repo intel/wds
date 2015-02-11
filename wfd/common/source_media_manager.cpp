@@ -156,7 +156,11 @@ bool operator == (const SelectableH264VideoFormat& a, const SelectableH264VideoF
 }
 
 bool operator < (const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
-  return get_quality_info(a).weight < get_quality_info(b).weight;
+  if (get_quality_info(a).weight != get_quality_info(b).weight)
+    return get_quality_info(a).weight < get_quality_info(b).weight;
+  if (a.profile != b.profile)
+    return a.profile < b.profile;
+  return a.level < b.level;
 }
 
 bool video_format_sort_func(const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
