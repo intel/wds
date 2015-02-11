@@ -39,9 +39,11 @@ struct H264Codec {
       unsigned char frame_rate_control_support,
       unsigned short max_hres, unsigned short max_vres);
 
-  H264Codec(H264VideoFormat format);
+  H264Codec(SelectableH264VideoFormat format);
 
-  void ToVideoFormats(std::vector<H264VideoFormat>& formats) const;
+  H264Codec(SupportedH264VideoFormats format);
+
+  void ToSelectableVideoFormats(std::vector<SelectableH264VideoFormat>& formats) const;
 
   std::string ToString() const;
 
@@ -66,14 +68,17 @@ class VideoFormats: public Property {
   VideoFormats();
   VideoFormats(NativeVideoFormat format,
                bool preferred_display_mode,
-               const std::vector<H264VideoFormat>& h264_formats);
+               const std::vector<SelectableH264VideoFormat>& h264_formats);
+  VideoFormats(NativeVideoFormat format,
+               bool preferred_display_mode,
+               const std::vector<SupportedH264VideoFormats>& h264_formats);
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);
   ~VideoFormats() override;
 
   NativeVideoFormat GetNativeFormat() const;
-  std::vector<H264VideoFormat> GetSupportedH264Formats() const;
+  std::vector<SelectableH264VideoFormat> GetSelectableH264Formats() const;
 
   std::string ToString() const override;
 

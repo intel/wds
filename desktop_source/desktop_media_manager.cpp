@@ -41,21 +41,17 @@ int DesktopMediaManager::SourceRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
 
-std::vector<wfd::H264VideoFormat>
-DesktopMediaManager::SupportedH264VideoFormats() const {
-  return {format_};
-}
-
-wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
-  return wfd::NativeVideoFormat();
+std::vector<wfd::SelectableH264VideoFormat>
+DesktopMediaManager::GetSelectableH264VideoFormats() const {
+  return {wfd::SelectableH264VideoFormat()};
 }
 
 bool DesktopMediaManager::SetOptimalFormat(
-    const wfd::H264VideoFormat& optimal_format) {
+    const wfd::SelectableH264VideoFormat& optimal_format) {
   format_ = optimal_format;
   return true;
 }
 
-wfd::H264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
+wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
   return format_;
 }

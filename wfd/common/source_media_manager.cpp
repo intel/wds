@@ -108,25 +108,25 @@ static QualityInfo hh_info_table[] = {
 
 #define HH_TABLE_LENGTH  sizeof(hh_info_table) / sizeof(QualityInfo)
 
-QualityInfo get_cea_info(const H264VideoFormat& format) {
+QualityInfo get_cea_info(const SelectableH264VideoFormat& format) {
   if (format.rate_resolution > CEA_TABLE_LENGTH)
     assert(false);
   return cea_info_table[format.rate_resolution];
 }
 
-QualityInfo get_vesa_info(const H264VideoFormat& format) {
+QualityInfo get_vesa_info(const SelectableH264VideoFormat& format) {
   if (format.rate_resolution > VESA_TABLE_LENGTH)
     assert(false);
   return vesa_info_table[format.rate_resolution];
 }
 
-QualityInfo get_hh_info(const H264VideoFormat& format) {
+QualityInfo get_hh_info(const SelectableH264VideoFormat& format) {
   if (format.rate_resolution > HH_TABLE_LENGTH)
     assert(false);
   return hh_info_table[format.rate_resolution];
 }
 
-QualityInfo get_quality_info(const H264VideoFormat& format) {
+QualityInfo get_quality_info(const SelectableH264VideoFormat& format) {
   QualityInfo info;
   switch (format.type) {
   case CEA:
@@ -145,29 +145,29 @@ QualityInfo get_quality_info(const H264VideoFormat& format) {
   return info;
 }
 
-std::pair<uint, uint> get_resolution(const H264VideoFormat& format) {
+std::pair<uint, uint> get_resolution(const SelectableH264VideoFormat& format) {
   QualityInfo info = get_quality_info(format);
   return std::pair<uint, uint>(info.width, info.height);
 }
 
-bool operator == (const H264VideoFormat& a, const H264VideoFormat& b) {
+bool operator == (const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
   return (a.type == b.type)
       && (get_resolution(a) == get_resolution(b));
 }
 
-bool operator < (const H264VideoFormat& a, const H264VideoFormat& b) {
+bool operator < (const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
   return get_quality_info(a).weight < get_quality_info(b).weight;
 }
 
-bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) {
+bool video_format_sort_func(const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
   return b < a;
 }
 
-H264VideoFormat SourceMediaManager::FindOptimalFormat(const NativeVideoFormat& native,
-      const std::vector<H264VideoFormat>& formats) const {
-  std::vector<H264VideoFormat> locally_supported_formats =
-      SupportedH264VideoFormats();
-  std::vector<H264VideoFormat> remotely_supported_formats = formats;
+SelectableH264VideoFormat SourceMediaManager::FindOptimalFormat(const NativeVideoFormat& native,
+      const std::vector<SelectableH264VideoFormat>& formats) const {
+  std::vector<SelectableH264VideoFormat> locally_supported_formats =
+      GetSelectableH264VideoFormats();
+  std::vector<SelectableH264VideoFormat> remotely_supported_formats = formats;
 
   std::sort(locally_supported_formats.begin(), locally_supported_formats.end(),
       video_format_sort_func);
@@ -177,8 +177,8 @@ H264VideoFormat SourceMediaManager::FindOptimalFormat(const NativeVideoFormat& n
   auto it = locally_supported_formats.begin();
   auto end = locally_supported_formats.end();
 
-  H264VideoFormat format(H264VideoFormat::CBP,
-      H264VideoFormat::k3_1, CEA640x480p60);
+  SelectableH264VideoFormat format(CBP,
+      k3_1, CEA640x480p60);
 
   while(it != end) {
     auto match = std::find(

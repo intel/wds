@@ -64,31 +64,19 @@ class MediaManager {
   virtual bool IsPaused() const = 0;
 
   /**
-   * Returns list of supported H264 video formats
-   * @return vector of supported H264 video formats
-   */
-  virtual std::vector<H264VideoFormat> SupportedH264VideoFormats() const = 0;
-
-  /**
-   * Returns native video format of a device
-   * @return native video format
-   */
-  virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
-
-  /**
    * Sets optimal H264 format that would be used to send / receive video stream
    *
    * @param optimal H264 format
    * @return true if format can be used by media manager
    */
-  virtual bool SetOptimalFormat(const H264VideoFormat& optimal_format) = 0;
+  virtual bool SetOptimalFormat(const SelectableH264VideoFormat& optimal_format) = 0;
 
   /**
    * Gets optimal H264 format @see SetOptimalFormat
    *
    * @return optimal H264 format
    */
-  virtual H264VideoFormat GetOptimalFormat() const = 0;
+  virtual SelectableH264VideoFormat GetOptimalFormat() const = 0;
 };
 
 class SinkMediaManager : public MediaManager {
@@ -128,6 +116,17 @@ class SinkMediaManager : public MediaManager {
    */
   virtual std::string Session() const = 0;
 
+  /**
+   * Returns list of supported H264 video formats
+   * @return vector of supported H264 video formats
+   */
+  virtual std::vector<SupportedH264VideoFormats> GetSupportedH264VideoFormats() const = 0;
+
+  /**
+   * Returns native video format of a device
+   * @return native video format
+   */
+  virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
 };
 
 class WFD_EXPORT SourceMediaManager : public MediaManager {
@@ -155,6 +154,12 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
   virtual int SourceRtpPort() const = 0;
 
   /**
+   * Returns list of supported H264 video formats
+   * @return vector of supported H264 video formats
+   */
+  virtual std::vector<SelectableH264VideoFormat> GetSelectableH264VideoFormats() const = 0;
+
+  /**
    * Finds optimal format for streaming.
    * Default quality selection algorithm will pick codec with higher bandwidth
    *
@@ -162,9 +167,9 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
    * @param list of H264 formats that are supported by remote device
    * @return optimal H264 video format
    */
-  virtual H264VideoFormat FindOptimalFormat(
+  virtual SelectableH264VideoFormat FindOptimalFormat(
       const NativeVideoFormat& remote_device_native_format,
-      const std::vector<H264VideoFormat>& remotely_supported_formats) const;
+      const std::vector<SelectableH264VideoFormat>& remotely_supported_formats) const;
 };
 
 inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng) {

@@ -77,9 +77,9 @@ bool M3Handler::HandleReply(Reply* reply) {
   auto video_formats = static_cast<VideoFormats*>(
       reply->payload().get_property(WFD_VIDEO_FORMATS).get());
   assert(video_formats);
-  H264VideoFormat optimal_format = source_manager->FindOptimalFormat(
+  SelectableH264VideoFormat optimal_format = source_manager->FindOptimalFormat(
       video_formats->GetNativeFormat(),
-      video_formats->GetSupportedH264Formats());
+      video_formats->GetSelectableH264Formats());
   return source_manager->SetOptimalFormat(optimal_format);
 }
 
@@ -96,7 +96,7 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
 
   set_param->payload().add_property(
       std::shared_ptr<VideoFormats>(new VideoFormats(
-          manager_->SupportedNativeVideoFormat(),
+          NativeVideoFormat(),
           false,
           {manager_->GetOptimalFormat()})));
 
