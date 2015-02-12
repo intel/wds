@@ -27,6 +27,19 @@
 
 namespace wfd {
 
+namespace {
+template <typename EnumType>
+unsigned int EnumListToMask(const std::vector<EnumType>& from) {
+  unsigned int result = 0;
+
+  for (auto item : from) {
+    result = result | (1 << item);
+  }
+
+  return result;
+}
+} //namespace
+
 H264Codec::H264Codec(unsigned char profile, unsigned char level,
     unsigned int cea_support, unsigned int vesa_support,
     unsigned int hh_support, unsigned char latency,
@@ -45,7 +58,7 @@ H264Codec::H264Codec(unsigned char profile, unsigned char level,
     max_hres_(max_hres),
     max_vres_(max_vres) {}
 
-H264Codec::H264Codec(H264VideoFormat format)
+H264Codec::H264Codec(SelectableH264VideoFormat format)
   : profile_(1 << format.profile),
     level_(1 << format.level),
     cea_support_((format.type == CEA) ? 1 << format.rate_resolution : 0),
@@ -59,6 +72,22 @@ H264Codec::H264Codec(H264VideoFormat format)
     max_vres_(0) {
 
 }
+
+H264Codec::H264Codec(SupportedH264VideoFormats format)
+  : profile_(1 << format.profile),
+    level_(1 << format.level),
+    cea_support_(EnumListToMask(format.cea_rr)),
+    vesa_support_(EnumListToMask(format.vesa_rr)),
+    hh_support_(EnumListToMask(format.hh_rr)),
+    latency_(0),
+    min_slice_size_(0),
+    slice_enc_params_(0),
+    frame_rate_control_support_(0),
+    max_hres_(0),
+    max_vres_(0) {
+
+}
+
 
 std::string H264Codec::ToString() const {
   std::string ret;
@@ -139,36 +168,36 @@ std::vector<EnumType> MaskToEnumList(ArgType from, EnumType biggest_value) {
   return result;
 }
 
-inline H264VideoFormat::H264Profile ToH264Profile(unsigned char profile) {
-  return MaskToEnum<H264VideoFormat::H264Profile>(profile, H264VideoFormat::CHP);
+inline H264Profile ToH264Profile(unsigned char profile) {
+  return MaskToEnum<H264Profile>(profile, CHP);
 }
 
-inline H264VideoFormat::H264Level ToH264Level(unsigned char level) {
-  return MaskToEnum<H264VideoFormat::H264Level>(level, H264VideoFormat::k4_2);
+inline H264Level ToH264Level(unsigned char level) {
+  return MaskToEnum<H264Level>(level, k4_2);
 }
 
 }  // namespace
 
-void H264Codec::ToVideoFormats(std::vector<H264VideoFormat>& formats) const {
+void H264Codec::ToSelectableVideoFormats(std::vector<SelectableH264VideoFormat>& formats) const {
   auto profile = ToH264Profile(profile_);
   auto level = ToH264Level(level_);
   if (cea_support_ != 0) {
     auto list = MaskToEnumList<CEARatesAndResolutions>(
         cea_support_, CEA1920x1080p24);
     for(auto rate_resolution: list)
-      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+      formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
   }
   if (vesa_support_ != 0) {
     auto list = MaskToEnumList<VESARatesAndResolutions>(
         vesa_support_, VESA1920x1200p30);
     for(auto rate_resolution: list)
-      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+      formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
   }
   if (hh_support_ != 0) {
     auto list = MaskToEnumList<HHRatesAndResolutions>(
         hh_support_, HH848x480p60);
     for(auto rate_resolution: list)
-      formats.push_back(H264VideoFormat(profile, level, rate_resolution));
+      formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
   }
 }
 
@@ -177,7 +206,17 @@ VideoFormats::VideoFormats() : Property(WFD_VIDEO_FORMATS, true) {
 
 VideoFormats::VideoFormats(NativeVideoFormat format,
     bool preferred_display_mode,
-    const std::vector<H264VideoFormat>& h264_formats)
+    const std::vector<SelectableH264VideoFormat>& h264_formats)
+  : Property(WFD_VIDEO_FORMATS),
+    preferred_display_mode_(preferred_display_mode ? 1 : 0) {
+  native_ = (format.rate_resolution << 3) | format.type;
+  for(auto h264_format : h264_formats)
+    h264_codecs_.push_back(H264Codec(h264_format));
+}
+
+VideoFormats::VideoFormats(NativeVideoFormat format,
+    bool preferred_display_mode,
+    const std::vector<SupportedH264VideoFormats>& h264_formats)
   : Property(WFD_VIDEO_FORMATS),
     preferred_display_mode_(preferred_display_mode ? 1 : 0) {
   native_ = (format.rate_resolution << 3) | format.type;
@@ -226,10 +265,10 @@ NativeVideoFormat VideoFormats::GetNativeFormat() const {
   return NativeVideoFormat(CEA640x480p60);
 }
 
-std::vector<H264VideoFormat> VideoFormats::GetSupportedH264Formats() const {
-  std::vector<H264VideoFormat> result;
+std::vector<SelectableH264VideoFormat> VideoFormats::GetSelectableH264Formats() const {
+  std::vector<SelectableH264VideoFormat> result;
   for (const auto& codec : h264_codecs_)
-    codec.ToVideoFormats(result);
+    codec.ToSelectableVideoFormats(result);
   return result;
 }
 

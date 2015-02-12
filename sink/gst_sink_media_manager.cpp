@@ -23,7 +23,7 @@
 
 GstSinkMediaManager::GstSinkMediaManager(const std::string& hostname)
   : gst_pipeline_(new MiracGstSink(hostname, 0)),
-    format_() {
+    optimal_format_ () {
 }
 
 void GstSinkMediaManager::Play() {
@@ -62,22 +62,38 @@ std::string GstSinkMediaManager::Session() const {
   return session_;
 }
 
-std::vector<wfd::H264VideoFormat>
-GstSinkMediaManager::SupportedH264VideoFormats() const {
-  return {format_};
+std::vector<wfd::SupportedH264VideoFormats>
+GstSinkMediaManager::GetSupportedH264VideoFormats() const {
+  // declare that we support all resolutions, CHP and level 4.2
+  // gstreamer should handle all of it :)
+  std::vector<wfd::CEARatesAndResolutions> cea_rr;
+  std::vector<wfd::VESARatesAndResolutions> vesa_rr;
+  std::vector<wfd::HHRatesAndResolutions> hh_rr;
+  wfd::RateAndResolution i;
+
+  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
+      cea_rr.push_back(static_cast<wfd::CEARatesAndResolutions>(i));
+  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
+      vesa_rr.push_back(static_cast<wfd::VESARatesAndResolutions>(i));
+  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
+      hh_rr.push_back(static_cast<wfd::HHRatesAndResolutions>(i));
+  return {wfd::SupportedH264VideoFormats(wfd::CHP, wfd::k4_2, cea_rr, vesa_rr, hh_rr),
+          wfd::SupportedH264VideoFormats(wfd::CBP, wfd::k4_2, cea_rr, vesa_rr, hh_rr)};
 }
 
 wfd::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
-  return wfd::NativeVideoFormat();
+  // pick the maximum possible resolution, let gstreamer deal with it
+  // TODO: get the actual screen size of the system
+  return wfd::NativeVideoFormat(wfd::CEA1920x1080p60);
 }
 
 bool GstSinkMediaManager::SetOptimalFormat(
-    const wfd::H264VideoFormat& optimal_format) {
-  format_ = optimal_format;
+    const wfd::SelectableH264VideoFormat& optimal_format) {
+  optimal_format_ = optimal_format;
   return true;
 }
 
 
-wfd::H264VideoFormat GstSinkMediaManager::GetOptimalFormat() const {
-  return format_;
+wfd::SelectableH264VideoFormat GstSinkMediaManager::GetOptimalFormat() const {
+  return optimal_format_;
 }

@@ -41,21 +41,28 @@ int DesktopMediaManager::SourceRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
 
-std::vector<wfd::H264VideoFormat>
-DesktopMediaManager::SupportedH264VideoFormats() const {
-  return {format_};
-}
+std::vector<wfd::SelectableH264VideoFormat>
+DesktopMediaManager::GetSelectableH264VideoFormats() const {
+  std::vector<wfd::SelectableH264VideoFormat> formats;
 
-wfd::NativeVideoFormat DesktopMediaManager::SupportedNativeVideoFormat() const {
-  return wfd::NativeVideoFormat();
+  wfd::RateAndResolution i;
+
+  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::CEARatesAndResolutions>(i)));
+  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::VESARatesAndResolutions>(i)));
+  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::HHRatesAndResolutions>(i)));
+
+  return formats;
 }
 
 bool DesktopMediaManager::SetOptimalFormat(
-    const wfd::H264VideoFormat& optimal_format) {
+    const wfd::SelectableH264VideoFormat& optimal_format) {
   format_ = optimal_format;
   return true;
 }
 
-wfd::H264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
+wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
   return format_;
 }

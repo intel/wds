@@ -504,7 +504,7 @@ static bool test_valid_get_parameter_reply ()
   std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
   ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 8);
   ASSERT_EQUAL(video_formats->GetNativeFormat().type, 0);
-  ASSERT_EQUAL(video_formats->GetSupportedH264Formats().size(), 96);
+  ASSERT_EQUAL(video_formats->GetSelectableH264Formats().size(), 96);
 
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_3D_FORMATS));
@@ -701,7 +701,7 @@ static bool test_valid_set_parameter ()
   std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
   ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 11);
   ASSERT_EQUAL(video_formats->GetNativeFormat().type, 2);
-  ASSERT_EQUAL(video_formats->GetSupportedH264Formats().size(), 1);
+  ASSERT_EQUAL(video_formats->GetSelectableH264Formats().size(), 1);
 
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_CLIENT_RTP_PORTS));

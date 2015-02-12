@@ -22,6 +22,8 @@
 #ifndef VIDEO_FORMAT_H_
 #define VIDEO_FORMAT_H_
 
+#include <vector>
+
 namespace wfd {
 
 typedef unsigned RateAndResolution;
@@ -101,6 +103,20 @@ enum HHRatesAndResolutions {
   HH848x480p60
 };
 
+enum H264Profile {
+  CBP,
+  CHP
+};
+
+enum H264Level {
+  k3_1,
+  k3_2,
+  k4,
+  k4_1,
+  k4_2
+};
+
+
 struct NativeVideoFormat {
   NativeVideoFormat()
   : type(CEA), rate_resolution(CEA640x480p60) {}
@@ -115,30 +131,25 @@ struct NativeVideoFormat {
   RateAndResolution rate_resolution;
 };
 
-struct H264VideoFormat {
-  enum H264Profile {
-    CBP,
-    CHP
-  };
-
-  enum H264Level {
-    k3_1,
-    k3_2,
-    k4,
-    k4_1,
-    k4_2
-  };
-
-  H264VideoFormat()
+/**
+ * A single video format that the source selects for streaming.
+ *
+ * SelectableH264VideoFormat is a H264 profile, H264 level, and a single CEA,
+ * VESA or HH resolution. Sources are choosing the video format by matching what they
+ * support to what the sink supports, and then they communicate the chosen format back
+ * to the sink.
+ */
+struct SelectableH264VideoFormat {
+  SelectableH264VideoFormat()
   : profile(CBP), level(k3_1), type(CEA), rate_resolution(CEA640x480p60) {}
 
-  H264VideoFormat(H264Profile profile, H264Level level, CEARatesAndResolutions rr)
+  SelectableH264VideoFormat(H264Profile profile, H264Level level, CEARatesAndResolutions rr)
   : profile(profile), level(level), type(CEA), rate_resolution(rr) {}
 
-  H264VideoFormat(H264Profile profile, H264Level level, VESARatesAndResolutions rr)
+  SelectableH264VideoFormat(H264Profile profile, H264Level level, VESARatesAndResolutions rr)
   : profile(profile), level(level), type(VESA), rate_resolution(rr) {}
 
-  H264VideoFormat(H264Profile profile, H264Level level, HHRatesAndResolutions rr)
+  SelectableH264VideoFormat(H264Profile profile, H264Level level, HHRatesAndResolutions rr)
   : profile(profile), level(level), type(HH), rate_resolution(rr) {}
 
   H264Profile profile;
@@ -146,6 +157,33 @@ struct H264VideoFormat {
   ResolutionType type;
   RateAndResolution rate_resolution;
 };
+
+/**
+ * A list of video formats supported by the sink.
+ *
+ * SupportedH264VideoFormats is a H264 profile, H264 level, and three sets of
+ * CEA, VESA and HH resolutions. Sinks send one or several SupportedH264VideoFormats
+ * to sources (for example because supported resolutions might
+ * be different for CBP and CHP).
+ */
+struct SupportedH264VideoFormats {
+  SupportedH264VideoFormats()
+  : profile(CBP), level(k3_1), cea_rr({CEA640x480p60}) {}
+
+  SupportedH264VideoFormats(H264Profile profile, H264Level level,
+                  const std::vector<CEARatesAndResolutions>& cea,
+                  const std::vector<VESARatesAndResolutions>& vesa,
+                  const std::vector<HHRatesAndResolutions>& hh
+                 )
+  : profile(profile), level(level), cea_rr(cea), vesa_rr(vesa), hh_rr(hh) {}
+
+  H264Profile profile;
+  H264Level level;
+  std::vector<CEARatesAndResolutions> cea_rr;
+  std::vector<VESARatesAndResolutions> vesa_rr;
+  std::vector<HHRatesAndResolutions> hh_rr;
+};
+
 
 }  // namespace wfd
 

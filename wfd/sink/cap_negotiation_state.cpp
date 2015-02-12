@@ -57,7 +57,8 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
   for (auto it = props.begin(); it != props.end(); ++it) {
       std::shared_ptr<wfd::Property> new_prop;
       if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_AUDIO_CODECS]){
-          // declare that we support absolutely everything, let gstreamer deal with it
+          // FIXME: declare that we support absolutely every audio codec/format,
+          // but there should be a MediaManager API for it
           auto codec_lpcm = new wfd::AudioCodec (wfd::AudioFormat::LPCM, wfd::AudioFormat::Modes(3), 0);
           auto codec_aac = new wfd::AudioCodec (wfd::AudioFormat::AAC, wfd::AudioFormat::Modes(15), 0);
           auto codec_ac3 = new wfd::AudioCodec (wfd::AudioFormat::AC3, wfd::AudioFormat::Modes(7), 0);
@@ -68,9 +69,9 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new wfd::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_VIDEO_FORMATS]){
-          new_prop.reset(new wfd::VideoFormats(manager_->SupportedNativeVideoFormat(),
+          new_prop.reset(new wfd::VideoFormats(ToSinkMediaManager(manager_)->SupportedNativeVideoFormat(),
               false,
-              manager_->SupportedH264VideoFormats()));
+              ToSinkMediaManager(manager_)->GetSupportedH264VideoFormats()));
           reply->payload().add_property(new_prop);
       } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_3D_FORMATS]){
           new_prop.reset(new wfd::Formats3d());
@@ -123,7 +124,7 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto video_formats =
       static_cast<wfd::VideoFormats*>(message->payload().get_property(wfd::WFD_VIDEO_FORMATS).get());
   assert(video_formats);
-  if (!sink_media_manager->SetOptimalFormat(video_formats->GetSupportedH264Formats()[0])) {
+  if (!sink_media_manager->SetOptimalFormat(video_formats->GetSelectableH264Formats()[0])) {
     auto reply = std::unique_ptr<Reply>(new Reply(303));
     auto payload = std::unique_ptr<Payload>(new Payload());
     std::vector<unsigned short> error_codes = {415};
