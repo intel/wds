@@ -29,7 +29,7 @@ namespace wfd {
 
 namespace {
 template <typename EnumType>
-unsigned int EnumListToMask(std::vector<EnumType> from) {
+unsigned int EnumListToMask(const std::vector<EnumType>& from) {
   unsigned int result = 0;
 
   for (auto item : from) {

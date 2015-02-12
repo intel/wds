@@ -47,12 +47,12 @@ DesktopMediaManager::GetSelectableH264VideoFormats() const {
 
   wfd::RateAndResolution i;
 
-  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i = i + 1)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, wfd::CEARatesAndResolutions(i)));
-  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i = i + 1)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, wfd::VESARatesAndResolutions(i)));
-  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i = i + 1)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, wfd::HHRatesAndResolutions(i)));
+  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::CEARatesAndResolutions>(i)));
+  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::VESARatesAndResolutions>(i)));
+  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
+      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::HHRatesAndResolutions>(i)));
 
   return formats;
 }
