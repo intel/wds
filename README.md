@@ -16,8 +16,8 @@ More information can be found on the [mailing list](https://lists.01.org/mailman
 ### Requirements:
 
 wysiwidi test executables have runtime dependencies on just a few things (mostly GStreamer and GLib), but for successful Miracast sessions the following are adviced:
- * Wifi adapter from Intel 7260-family
- * [wpa_supplicant](http://w1.fi/wpa_supplicant/): master branch checked out after Dec 2014, built with	`CONFIG_P2P=y`, `CONFIG_WIFI_DISPLAY=y` and `CONFIG_CTRL_IFACE_DBUS_NEW=y`
+ * Wifi adapter from Intel 7260-family or Atheros ath9k
+ * [wpa_supplicant](http://w1.fi/wpa_supplicant/): master branch from Feb 2015 (e.g. commit eb88a5ba), built with	`CONFIG_P2P=y`, `CONFIG_WIFI_DISPLAY=y` and `CONFIG_CTRL_IFACE_DBUS_NEW=y`
  * [connman](https://01.org/connman): version 1.28 (released Feb 1st 2015) or later.
  * gstreamer: either master branch more recent than Feb 3rd 2015 (commit d0a50be2), or 1.4 branch more recent than 
 Feb 3rd 2005 (commit 1ce3260a638d or release 1.4.6 or later).
