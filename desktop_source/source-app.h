@@ -37,7 +37,7 @@ class SourceApp: public P2P::Client::Observer, public P2P::Peer::Observer {
 
     void on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
     void on_peer_removed(P2P::Client *client, std::shared_ptr<P2P::Peer> peer) override;
-    void on_initialized(P2P::Client *client) override;
+    void on_availability_changed(P2P::Client *client) override;
 
     void on_availability_changed(P2P::Peer *peer) override;
     void on_initialized(P2P::Peer *peer) override;

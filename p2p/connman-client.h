@@ -36,14 +36,13 @@ class Client {
             public:
                 virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
                 virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
-                virtual void on_initialized(Client *client) {}
+                virtual void on_availability_changed(Client *client) {}
 
             protected:
                 virtual ~Observer() {}
         };
 
-        Client(std::unique_ptr<P2P::InformationElementArray> &take_array);
-        Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer);
+        Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer = NULL);
         virtual ~Client();
 
         void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
@@ -51,17 +50,22 @@ class Client {
             observer_ = observer;
         }
 
+        bool is_available() const;
         /* TODO error / finished handling */
         void scan();
 
     private:
+        static void connman_appeared_cb(GDBusConnection *connection, const char *name, const char *owner, gpointer data_ptr);
+        static void connman_disappeared_cb(GDBusConnection *connection, const char *name, gpointer data_ptr);
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
         static void proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void technology_proxy_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
+        static void get_technologies_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void register_peer_service_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void scan_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
         static void get_peers_cb(GObject *object, GAsyncResult *res, gpointer data_ptr);
 
+        void connman_disappeared();
         void peers_changed (GVariant *params);
         void proxy_cb(GAsyncResult *res);
         void technology_proxy_cb(GAsyncResult *res);
@@ -71,6 +75,7 @@ class Client {
         void register_peer_service();
         void unregister_peer_service();
 
+        uint connman_watcher_;
         GDBusProxy *proxy_;
         GDBusProxy *technology_proxy_;
 
