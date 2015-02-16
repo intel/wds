@@ -26,6 +26,7 @@
 
 #include "source-app.h"
 #include "mirac_broker_source.h"
+#include "mirac-glib-logging.hpp"
 
 #include "wfd/public/source.h"
 
@@ -90,6 +91,7 @@ static gboolean _user_input_handler (
 
 int main (int argc, char *argv[])
 {
+    InitGlibLogging();
     int port = 7236;
 
     GOptionEntry main_entries[] =

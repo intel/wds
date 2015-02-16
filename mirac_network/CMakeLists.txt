@@ -17,7 +17,7 @@ include_directories(${GIO_INCLUDE_DIRS})
 pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
-add_library(mirac STATIC mirac-network.cpp mirac-gst-sink.cpp mirac-gst-test-source.cpp mirac-broker.cpp)
+add_library(mirac STATIC mirac-network.cpp mirac-gst-sink.cpp mirac-gst-test-source.cpp mirac-broker.cpp mirac-glib-logging.cpp)
 
 add_executable(network-test network-test.cpp)
 target_link_libraries (network-test ${GLIB2_LIBRARIES} mirac)
