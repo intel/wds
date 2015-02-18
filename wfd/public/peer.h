@@ -69,6 +69,11 @@ class Peer {
   virtual void Start() = 0;
 
   /**
+   * Reset wfd state machine (source or sink) to the initial state.
+   */
+  virtual void Reset() = 0;
+
+  /**
    * Whenever RTSP data is received, this method should be called, so that
    * the state machine could decide action based on current state.
    */

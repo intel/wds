@@ -96,19 +96,20 @@ class SinkImpl final : public Sink, public RTSPInputHandler, public MessageHandl
 
  private:
   // Sink implementation.
-  virtual void Start() override;
-  virtual void RTSPDataReceived(const std::string& message) override;
-  virtual bool Teardown() override;
-  virtual bool Play() override;
-  virtual bool Pause() override;
+  void Start() override;
+  void Reset() override;
+  void RTSPDataReceived(const std::string& message) override;
+  bool Teardown() override;
+  bool Play() override;
+  bool Pause() override;
 
   // RTSPInputHandler
-  virtual void MessageParsed(std::unique_ptr<Message> message) override;
+  void MessageParsed(std::unique_ptr<Message> message) override;
 
   // public MessageHandler::Observer
-  virtual void OnCompleted(MessageHandlerPtr handler) override;
-  virtual void OnError(MessageHandlerPtr handler) override;
-  virtual void OnTimerEvent(uint timer_id) override;
+  void OnCompleted(MessageHandlerPtr handler) override;
+  void OnError(MessageHandlerPtr handler) override;
+  void OnTimerEvent(uint timer_id) override;
 
   bool HandleCommand(std::unique_ptr<Message> command);
 
@@ -128,6 +129,10 @@ SinkImpl::SinkImpl(Delegate* delegate, SinkMediaManager* mng)
 
 void SinkImpl::Start() {
   state_machine_->Start();
+}
+
+void SinkImpl::Reset() {
+  state_machine_->Reset();
 }
 
 void SinkImpl::RTSPDataReceived(const std::string& message) {
