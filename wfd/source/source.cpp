@@ -100,6 +100,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
  private:
   // Source implementation.
   void Start() override;
+  void Reset() override;
   void RTSPDataReceived(const std::string& message) override;
   bool Teardown() override;
   bool Play() override;
@@ -133,6 +134,11 @@ SourceImpl::SourceImpl(Delegate* delegate, SourceMediaManager* mng)
 
 void SourceImpl::Start() {
   state_machine_->Start();
+}
+
+void SourceImpl::Reset() {
+  state_machine_->Reset();
+  delegate_->ReleaseTimer(keep_alive_timer_);
 }
 
 void SourceImpl::RTSPDataReceived(const std::string& message) {
