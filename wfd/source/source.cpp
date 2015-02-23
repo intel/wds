@@ -38,7 +38,7 @@ namespace wfd {
 namespace {
 
 bool InitializeRequestId(Request* request) {
-  Request::ID id;
+  Request::ID id = Request::UNKNOWN;
   switch(request->method()) {
   case Request::MethodOptions:
     id = Request::M2;
@@ -176,12 +176,12 @@ void SourceImpl::ResetAndTeardownMedia() {
 
 namespace  {
 
-std::unique_ptr<Message> CreateM5(int send_cseq, wfd::TriggerMethod::Method method) {
+std::unique_ptr<Message> CreateM5(int send_cseq, TriggerMethod::Method method) {
   auto set_param = std::unique_ptr<Request>(
       new SetParameter("rtsp://localhost/wfd1.0"));
   set_param->header().set_cseq(send_cseq);
   set_param->payload().add_property(
-      std::shared_ptr<wfd::Property>(new TriggerMethod(method)));
+      std::shared_ptr<Property>(new TriggerMethod(method)));
   set_param->set_id(Request::M5);
   return std::move(set_param);
 }
@@ -190,7 +190,7 @@ std::unique_ptr<Message> CreateM5(int send_cseq, wfd::TriggerMethod::Method meth
 
 bool SourceImpl::Teardown() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     wfd::TriggerMethod::TEARDOWN);
+                     TriggerMethod::TEARDOWN);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -200,7 +200,7 @@ bool SourceImpl::Teardown() {
 
 bool SourceImpl::Play() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     wfd::TriggerMethod::PLAY);
+                     TriggerMethod::PLAY);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -210,7 +210,7 @@ bool SourceImpl::Play() {
 
 bool SourceImpl::Pause() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     wfd::TriggerMethod::PAUSE);
+                     TriggerMethod::PAUSE);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -229,10 +229,14 @@ void SourceImpl::OnError(MessageHandlerPtr handler) {
 }
 
 void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
-  if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
-    return; // FIXME : Report error.
-  if (!state_machine_->CanHandle(message.get()))
-    return; // FIXME : Report error.
+  if (message->is_request() && !InitializeRequestId(ToRequest(message.get()))) {
+    WFD_ERROR("Cannot identify the received message");
+    return;
+  }
+  if (!state_machine_->CanHandle(message.get())) {
+    WFD_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
+    return;
+  }
   state_machine_->Handle(std::move(message));
 }
 

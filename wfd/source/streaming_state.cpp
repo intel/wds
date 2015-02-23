@@ -21,8 +21,8 @@
 
 #include "streaming_state.h"
 
-#include "wfd/public/media_manager.h"
 #include "cap_negotiation_state.h"
+#include "wfd/public/media_manager.h"
 #include "wfd_session_state.h"
 #include "wfd/parser/reply.h"
 
@@ -56,6 +56,19 @@ class M5Sender final : public OptionalMessageSender<Request::M5> {
   }
 };
 
+class M13Handler final : public MessageReceiver<Request::M13> {
+ public:
+  M13Handler(const InitParams& init_params)
+    : MessageReceiver<Request::M13>(init_params) {
+  }
+
+  std::unique_ptr<Reply> HandleMessage(
+      Message* message) override {
+    ToSourceMediaManager(manager_)->SendIDRPicture();
+    return std::unique_ptr<Reply>(new Reply(200));
+  }
+};
+
 StreamingState::StreamingState(const InitParams& init_params,
     MessageHandlerPtr m16_sender)
   : MessageSequenceWithOptionalSetHandler(init_params) {
@@ -64,6 +77,7 @@ StreamingState::StreamingState(const InitParams& init_params,
   AddOptionalHandler(make_ptr(new M5Sender(init_params)));
   AddOptionalHandler(make_ptr(new M7Handler(init_params)));
   AddOptionalHandler(make_ptr(new M9Handler(init_params)));
+  AddOptionalHandler(make_ptr(new M13Handler(init_params)));
   AddOptionalHandler(m16_sender);
 }
 

@@ -40,7 +40,7 @@ namespace {
 
 // todo: check mandatory parameters for each message
 bool InitializeRequestId(Request* request) {
-  Request::ID id;
+  Request::ID id = Request::UNKNOWN;
   switch(request->method()) {
   case Request::MethodOptions:
     id = Request::M1;
@@ -172,10 +172,14 @@ bool SinkImpl::Pause() {
 }
 
 void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
-  if (message->is_request() && !InitializeRequestId(ToRequest(message.get())))
-    return; // FIXME : Report error.
-  if (!state_machine_->CanHandle(message.get()))
-    return; // FIXME : Report error.
+  if (message->is_request() && !InitializeRequestId(ToRequest(message.get()))) {
+    WFD_ERROR("Cannot identify the received message");
+    return;
+  }
+  if (!state_machine_->CanHandle(message.get())) {
+    WFD_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
+    return;
+  }
   state_machine_->Handle(std::move(message));
 }
 
