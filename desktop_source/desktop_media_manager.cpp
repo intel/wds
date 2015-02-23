@@ -1,5 +1,5 @@
 #include "desktop_media_manager.h"
-
+#include "mirac-glib-logging.hpp"
 #include <cassert>
 
 DesktopMediaManager::DesktopMediaManager(const std::string& hostname)
@@ -65,4 +65,8 @@ bool DesktopMediaManager::SetOptimalFormat(
 
 wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
   return format_;
+}
+
+void DesktopMediaManager::SendIDRPicture() {
+  WFD_WARNING("Unimplemented IDR picture request");
 }

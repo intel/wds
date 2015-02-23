@@ -217,9 +217,7 @@ ERROR ({DIGIT}){3}
   }
 
 ^"wfd_idr_request" {
-    if (is_reply_message_)
-      return token::WFD_IDR_REQUEST_IN_RESPONSE;
-    return token::WFD_IDR_REQUEST_IN_REQUEST;
+    return token::WFD_IDR_REQUEST;
   }
 
 ^[[:alpha:]][[:alnum:]\-\_]* {

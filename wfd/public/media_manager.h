@@ -170,6 +170,12 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
   virtual SelectableH264VideoFormat FindOptimalFormat(
       const NativeVideoFormat& remote_device_native_format,
       const std::vector<SelectableH264VideoFormat>& remotely_supported_formats) const;
+
+  /**
+   * Sends of H.264 instantaneous decoding refresh (IDR) picture
+   * to recover the content streaming.
+   */
+  virtual void SendIDRPicture() = 0;
 };
 
 inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng) {
