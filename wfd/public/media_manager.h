@@ -151,7 +151,12 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
    * @return pair of RTP ports, port0 and port1
    */
   virtual std::pair<int,int> SinkRtpPorts() const = 0;
-  virtual int SourceRtpPort() const = 0;
+
+  /**
+   * Returns the source RTP port
+   * @return RTP port
+   */
+  virtual int GetLocalRtpPort() const = 0;
 
   /**
    * Returns list of supported H264 video formats

@@ -25,6 +25,7 @@
 
 #include "cap_negotiation_state.h"
 #include "streaming_state.h"
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/play.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setup.h"
@@ -46,7 +47,7 @@ std::unique_ptr<Reply> M16Handler::HandleMessage(Message* message) {
   sender_->ReleaseTimer(keep_alive_timer_);
   keep_alive_timer_ = sender_->CreateTimer(60);
 
-  return std::unique_ptr<Reply>(new Reply(200));
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
 }
 
 M6Handler::M6Handler(const InitParams& init_params, uint& keep_alive_timer)
@@ -67,7 +68,7 @@ std::unique_ptr<Message> M6Handler::CreateMessage() {
 
 bool M6Handler::HandleReply(Reply* reply) {
   const std::string& session_id = reply->header().session();
-  if(reply->response_code() == 200 && !session_id.empty()) {
+  if(reply->response_code() == RTSP_OK && !session_id.empty()) {
     ToSinkMediaManager(manager_)->SetSession(session_id);
     // FIXME : take timeout value from session.
     keep_alive_timer_ = sender_->CreateTimer(60);
@@ -91,7 +92,7 @@ class M7Handler final : public SequencedMessageSender {
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    return (reply->response_code() == RTSP_OK);
   }
 };
 

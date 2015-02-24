@@ -49,9 +49,10 @@ class MiracBroker : public wfd::Peer::Delegate
         };
 
         // wfd::Peer::Delegate
-        virtual void SendRTSPData(const std::string& data) override;
-        virtual uint CreateTimer(int seconds);
-        virtual void ReleaseTimer(uint timer_id);
+        void SendRTSPData(const std::string& data) override;
+        std::string GetLocalIPAddress() const override;
+        uint CreateTimer(int seconds) override;
+        void ReleaseTimer(uint timer_id) override;
 
         virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};

@@ -15,7 +15,7 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
   bool IsPaused() const override;
   void SetSinkRtpPorts(int port1, int port2) override;
   std::pair<int,int> SinkRtpPorts() const override;
-  int SourceRtpPort() const override;
+  int GetLocalRtpPort() const override;
 
   std::vector<wfd::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
   bool SetOptimalFormat(const wfd::SelectableH264VideoFormat& optimal_format) override;

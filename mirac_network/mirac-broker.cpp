@@ -225,6 +225,10 @@ void MiracBroker::SendRTSPData(const std::string& data) {
                     send_cb, &connection_source_ptr_);
 }
 
+std::string MiracBroker::GetLocalIPAddress() const {
+  return "127.0.0.1";  // FIXME : return the actual local IP address.
+}
+
 static gboolean on_timeout(gpointer user_data) {
   TimerCallbackData* data = static_cast<TimerCallbackData*>(user_data);
   data->delegate_->OnTimeout(data->timer_id_);

@@ -47,6 +47,11 @@ class Peer {
      */
     virtual void SendRTSPData(const std::string& data) = 0;
     /**
+     * Returns the local IP address
+     * @return IP address
+     */
+    virtual std::string GetLocalIPAddress() const = 0;
+    /**
      * The implementation should start a timer to be used by the state machine.
      * @param seconds the time interval in seconds
      * @return unique timer id within the session

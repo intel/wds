@@ -24,6 +24,7 @@
 #include "wfd/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/pause.h"
 #include "wfd/parser/play.h"
 #include "wfd/parser/reply.h"
@@ -67,7 +68,7 @@ class M7Sender final : public SequencedMessageSender {
   }
 
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == 200) {
+    if (reply->response_code() == RTSP_OK) {
       manager_->Play();
       return true;
     }
@@ -96,7 +97,7 @@ class M8Sender final : public SequencedMessageSender {
   }
 
   bool HandleReply(Reply* reply) override {
-    if (!ToSinkMediaManager(manager_)->Session().empty() && (reply->response_code() == 200)) {
+    if (!ToSinkMediaManager(manager_)->Session().empty() && (reply->response_code() == RTSP_OK)) {
       manager_->Teardown();
       return true;
     }
@@ -122,7 +123,7 @@ class M9Sender final : public SequencedMessageSender {
   }
 
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == 200) {
+    if (reply->response_code() == RTSP_OK) {
       manager_->Pause();
       return true;
     }
@@ -146,7 +147,7 @@ class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
   }
  private:
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == 200) {
+    if (reply->response_code() == RTSP_OK) {
       manager_->Play();
       return true;
     }
@@ -169,7 +170,7 @@ class M8SenderOptional final : public OptionalMessageSender<Request::M8> {
  private:
   bool HandleReply(Reply* reply) override {
     // todo: if successfull, switch to init state
-    if (reply->response_code() == 200) {
+    if (reply->response_code() == RTSP_OK) {
       manager_->Teardown();
       return true;
     }
@@ -185,7 +186,7 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
   }
  private:
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == 200) {
+    if (reply->response_code() == RTSP_OK) {
       manager_->Pause();
       return true;
     }
