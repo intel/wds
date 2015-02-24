@@ -23,6 +23,7 @@
 
 #include <iostream>
 
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/audiocodecs.h"
 #include "wfd/parser/clientrtpports.h"
 #include "wfd/parser/connectortype.h"
@@ -52,54 +53,54 @@ M3Handler::M3Handler(const InitParams& init_params)
 }
 
 std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
-  auto reply = std::unique_ptr<Reply>(new Reply(200));
+  auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
   auto props = message->payload().get_parameter_properties();
   for (auto it = props.begin(); it != props.end(); ++it) {
-      std::shared_ptr<wfd::Property> new_prop;
-      if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_AUDIO_CODECS]){
+      std::shared_ptr<Property> new_prop;
+      if (*it == PropertyName::name[PropertyType::WFD_AUDIO_CODECS]){
           // FIXME: declare that we support absolutely every audio codec/format,
           // but there should be a MediaManager API for it
-          auto codec_lpcm = new wfd::AudioCodec (wfd::AudioFormat::LPCM, wfd::AudioFormat::Modes(3), 0);
-          auto codec_aac = new wfd::AudioCodec (wfd::AudioFormat::AAC, wfd::AudioFormat::Modes(15), 0);
-          auto codec_ac3 = new wfd::AudioCodec (wfd::AudioFormat::AC3, wfd::AudioFormat::Modes(7), 0);
-          auto codec_list = std::vector<wfd::AudioCodec>();
+          auto codec_lpcm = new AudioCodec (AudioFormat::LPCM, AudioFormat::Modes(3), 0);
+          auto codec_aac = new AudioCodec (AudioFormat::AAC, AudioFormat::Modes(15), 0);
+          auto codec_ac3 = new AudioCodec (AudioFormat::AC3, AudioFormat::Modes(7), 0);
+          auto codec_list = std::vector<AudioCodec>();
           codec_list.push_back(*codec_lpcm);
           codec_list.push_back(*codec_aac);
           codec_list.push_back(*codec_ac3);
-          new_prop.reset(new wfd::AudioCodecs(codec_list));
+          new_prop.reset(new AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_VIDEO_FORMATS]){
-          new_prop.reset(new wfd::VideoFormats(ToSinkMediaManager(manager_)->SupportedNativeVideoFormat(),
+      } else if (*it == PropertyName::name[PropertyType::WFD_VIDEO_FORMATS]){
+          new_prop.reset(new VideoFormats(ToSinkMediaManager(manager_)->SupportedNativeVideoFormat(),
               false,
               ToSinkMediaManager(manager_)->GetSupportedH264VideoFormats()));
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_3D_FORMATS]){
-          new_prop.reset(new wfd::Formats3d());
+      } else if (*it == PropertyName::name[PropertyType::WFD_3D_FORMATS]){
+          new_prop.reset(new Formats3d());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CONTENT_PROTECTION]){
-          new_prop.reset(new wfd::ContentProtection());
+      } else if (*it == PropertyName::name[PropertyType::WFD_CONTENT_PROTECTION]){
+          new_prop.reset(new ContentProtection());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_DISPLAY_EDID]){
-          new_prop.reset(new wfd::DisplayEdid());
+      } else if (*it == PropertyName::name[PropertyType::WFD_DISPLAY_EDID]){
+          new_prop.reset(new DisplayEdid());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_COUPLED_SINK]){
-          new_prop.reset(new wfd::CoupledSink());
+      } else if (*it == PropertyName::name[PropertyType::WFD_COUPLED_SINK]){
+          new_prop.reset(new CoupledSink());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CLIENT_RTP_PORTS]){
-          new_prop.reset(new wfd::ClientRtpPorts(ToSinkMediaManager(manager_)->ListeningRtpPorts().first,
+      } else if (*it == PropertyName::name[PropertyType::WFD_CLIENT_RTP_PORTS]){
+          new_prop.reset(new ClientRtpPorts(ToSinkMediaManager(manager_)->ListeningRtpPorts().first,
                                                  ToSinkMediaManager(manager_)->ListeningRtpPorts().second));
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_I2C]){
-          new_prop.reset(new wfd::I2C(0));
+      } else if (*it == PropertyName::name[PropertyType::WFD_I2C]){
+          new_prop.reset(new I2C(0));
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_UIBC_CAPABILITY]){
-          new_prop.reset(new wfd::UIBCCapability());
+      } else if (*it == PropertyName::name[PropertyType::WFD_UIBC_CAPABILITY]){
+          new_prop.reset(new UIBCCapability());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_CONNECTOR_TYPE]){
-          new_prop.reset(new wfd::ConnectorType());
+      } else if (*it == PropertyName::name[PropertyType::WFD_CONNECTOR_TYPE]){
+          new_prop.reset(new ConnectorType());
           reply->payload().add_property(new_prop);
-      } else if (*it == wfd::PropertyName::name[wfd::PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
-          new_prop.reset(new wfd::StandbyResumeCapability(false));
+      } else if (*it == PropertyName::name[PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
+          new_prop.reset(new StandbyResumeCapability(false));
           reply->payload().add_property(new_prop);
       } else {
           std::cout << "** GET_PARAMETER: Property not supported" << std::endl;
@@ -116,26 +117,26 @@ M4Handler::M4Handler(const InitParams& init_params)
 
 std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto presentation_url =
-      static_cast<wfd::PresentationUrl*>(message->payload().get_property(wfd::WFD_PRESENTATION_URL).get());
+      static_cast<PresentationUrl*>(message->payload().get_property(WFD_PRESENTATION_URL).get());
   assert(presentation_url);
   SinkMediaManager* sink_media_manager= ToSinkMediaManager(manager_);
   sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
 
   auto video_formats =
-      static_cast<wfd::VideoFormats*>(message->payload().get_property(wfd::WFD_VIDEO_FORMATS).get());
+      static_cast<VideoFormats*>(message->payload().get_property(WFD_VIDEO_FORMATS).get());
   assert(video_formats);
   if (!sink_media_manager->SetOptimalFormat(video_formats->GetSelectableH264Formats()[0])) {
-    auto reply = std::unique_ptr<Reply>(new Reply(303));
+    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_SeeOther));
     auto payload = std::unique_ptr<Payload>(new Payload());
-    std::vector<unsigned short> error_codes = {415};
+    std::vector<unsigned short> error_codes = {RTSP_UnsupportedMediaType};
     auto property_errors =
-        std::make_shared<PropertyErrors>(wfd::WFD_VIDEO_FORMATS, error_codes);
+        std::make_shared<PropertyErrors>(WFD_VIDEO_FORMATS, error_codes);
     payload->add_property_error(property_errors);
     reply->set_payload(std::move(payload));
     return std::move(reply);
   }
 
-  return std::unique_ptr<Reply>(new Reply(200));
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
 }
 
 class M5Handler final : public MessageReceiver<Request::M5> {
@@ -145,12 +146,12 @@ class M5Handler final : public MessageReceiver<Request::M5> {
   }
   std::unique_ptr<Reply> HandleMessage(Message* message) override {
     auto property =
-        static_cast<wfd::TriggerMethod*>(message->payload().get_property(wfd::WFD_TRIGGER_METHOD).get());
+        static_cast<TriggerMethod*>(message->payload().get_property(WFD_TRIGGER_METHOD).get());
 
-    auto reply = std::unique_ptr<Reply>(new Reply(200));
+    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
     reply->header().set_cseq(message->cseq());
-    if (property->method() != wfd::TriggerMethod::SETUP) {
-      reply->set_response_code(303);
+    if (property->method() != TriggerMethod::SETUP) {
+      reply->set_response_code(RTSP_SeeOther);
     }
 
     return std::move(reply);

@@ -22,6 +22,7 @@
 #include "streaming_state.h"
 
 #include "cap_negotiation_state.h"
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/public/media_manager.h"
 #include "wfd_session_state.h"
 #include "wfd/parser/reply.h"
@@ -37,10 +38,10 @@ class M9Handler final : public MessageReceiver<Request::M9> {
 
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
-    int response_code = 406;
+    int response_code = RTSP_NotAcceptable;
     if (!manager_->IsPaused()) {
       manager_->Pause();
-      response_code = 200;
+      response_code = RTSP_OK;
     }
     return std::unique_ptr<Reply>(new Reply(response_code));
   }
@@ -52,7 +53,7 @@ class M5Sender final : public OptionalMessageSender<Request::M5> {
     : OptionalMessageSender<Request::M5>(init_params) {
   }
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    return (reply->response_code() == RTSP_OK);
   }
 };
 
@@ -65,7 +66,7 @@ class M13Handler final : public MessageReceiver<Request::M13> {
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     ToSourceMediaManager(manager_)->SendIDRPicture();
-    return std::unique_ptr<Reply>(new Reply(200));
+    return std::unique_ptr<Reply>(new Reply(RTSP_OK));
   }
 };
 

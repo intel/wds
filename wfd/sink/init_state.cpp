@@ -21,6 +21,7 @@
 
 #include "init_state.h"
 
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/options.h"
 #include "wfd/parser/reply.h"
 
@@ -33,7 +34,7 @@ class M1Handler final : public MessageReceiver<Request::M1> {
     : MessageReceiver<Request::M1>(init_params) {
   }
   virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
-    auto reply = std::unique_ptr<Reply>(new Reply(200));
+    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
     std::vector<Method> supported_methods;
     supported_methods.push_back(ORG_WFA_WFD_1_0);
     supported_methods.push_back(GET_PARAMETER);
@@ -57,7 +58,7 @@ class M2Handler final : public SequencedMessageSender {
   virtual bool HandleReply(Reply* reply) override {
     const Header& header = reply->header();
 
-    if (reply->response_code() == 200
+    if (reply->response_code() == RTSP_OK
         && header.has_method(Method::ORG_WFA_WFD_1_0)
         && header.has_method(Method::GET_PARAMETER)
         && header.has_method(Method::SET_PARAMETER)

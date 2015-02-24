@@ -24,6 +24,7 @@
 #include "wfd/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/parser/triggermethod.h"
@@ -45,7 +46,7 @@ class M5Handler final : public SequencedMessageSender {
   }
 
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == 200);
+    return (reply->response_code() == RTSP_OK);
   }
 
 };
@@ -59,7 +60,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
 
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
-    auto reply = std::unique_ptr<Reply>(new Reply(200));
+    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
     reply->header().set_timeout(kDefaultKeepAliveTimeout);
@@ -67,7 +68,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
     auto transport = new TransportHeader();
     // we assume here that there is no coupled secondary sink
     transport->set_client_port(ToSourceMediaManager(manager_)->SinkRtpPorts().first);
-    transport->set_server_port(ToSourceMediaManager(manager_)->SourceRtpPort());
+    transport->set_server_port(ToSourceMediaManager(manager_)->GetLocalRtpPort());
     reply->header().set_transport(transport);
 
     return std::move(reply);
@@ -91,7 +92,7 @@ std::unique_ptr<Reply> M7Handler::HandleMessage(
   if (!manager_->IsPaused())
     return nullptr; // FIXME : Shouldn't we just send error code?
   manager_->Play();
-  return std::unique_ptr<Reply>(new Reply(200));
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
 }
 
 M8Handler::M8Handler(const InitParams& init_params)
@@ -100,7 +101,7 @@ M8Handler::M8Handler(const InitParams& init_params)
 
 std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
   manager_->Teardown(); // FIXME : make proper reset.
-  return std::unique_ptr<Reply>(new Reply(200));
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
 }
 
 
@@ -109,7 +110,7 @@ M16Sender::M16Sender(const InitParams& init_params)
 }
 
 bool M16Sender::HandleReply(Reply* reply) {
-  return (reply->response_code() == 200);
+  return (reply->response_code() == RTSP_OK);
 }
 
 WfdSessionState::WfdSessionState(const InitParams& init_params, uint& timer_id,

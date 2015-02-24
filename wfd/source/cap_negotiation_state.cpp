@@ -21,6 +21,7 @@
 
 #include "cap_negotiation_state.h"
 
+#include "wfd/common/rtsp_status_code.h"
 #include "wfd/parser/clientrtpports.h"
 #include "wfd/public/media_manager.h"
 #include "wfd/parser/getparameter.h"
@@ -65,7 +66,7 @@ std::unique_ptr<Message> M3Handler::CreateMessage() {
 }
 
 bool M3Handler::HandleReply(Reply* reply) {
-  if (reply->response_code() != 200)
+  if (reply->response_code() != RTSP_OK)
     return false;
 
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
@@ -89,14 +90,13 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   set_param->payload().add_property(
       std::shared_ptr<Property>(new ClientRtpPorts(ToSourceMediaManager(manager_)->SinkRtpPorts().first,
                                                    ToSourceMediaManager(manager_)->SinkRtpPorts().second)));
+  std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
   set_param->payload().add_property(
-      std::shared_ptr<Property>(new PresentationUrl(
-          "rtsp://127.0.0.1/wfd1.0/streamid=0",
-          "")));
+      std::shared_ptr<Property>(new PresentationUrl(presentation_Url_1, "")));
 
   set_param->payload().add_property(
       std::shared_ptr<VideoFormats>(new VideoFormats(
-          NativeVideoFormat(),
+          NativeVideoFormat(),  // Should be all zeros.
           false,
           {manager_->GetOptimalFormat()})));
 
@@ -104,7 +104,7 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
 }
 
 bool M4Handler::HandleReply(Reply* reply) {
-  return (reply->response_code() == 200);
+  return (reply->response_code() == RTSP_OK);
 }
 
 CapNegotiationState::CapNegotiationState(const InitParams &init_params)

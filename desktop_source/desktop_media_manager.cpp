@@ -37,7 +37,7 @@ std::pair<int, int> DesktopMediaManager::SinkRtpPorts() const {
   return std::pair<int, int>(sink_port1_, sink_port2_);
 }
 
-int DesktopMediaManager::SourceRtpPort() const {
+int DesktopMediaManager::GetLocalRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
 
