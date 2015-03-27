@@ -43,15 +43,13 @@ class GstSinkMediaManager : public wfd::SinkMediaManager {
 
   virtual std::vector<wfd::SupportedH264VideoFormats> GetSupportedH264VideoFormats() const override;
   virtual wfd::NativeVideoFormat SupportedNativeVideoFormat() const override;
-  virtual bool SetOptimalFormat(const wfd::SelectableH264VideoFormat& optimal_format) override;
-  virtual wfd::SelectableH264VideoFormat GetOptimalFormat() const override;
+  virtual bool SetOptimalVideoFormat(const wfd::SelectableH264VideoFormat& optimal_format) override;
 
  private:
   std::string hostname_;
   std::string presentation_url_;
   std::string session_;
   std::unique_ptr<MiracGstSink> gst_pipeline_;
-  wfd::SelectableH264VideoFormat optimal_format_;
 };
 
 #endif // GST_SINK_MEDIA_MANAGER_H_

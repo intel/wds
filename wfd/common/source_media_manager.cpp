@@ -175,7 +175,7 @@ bool video_format_sort_func(const SelectableH264VideoFormat& a, const Selectable
   return b < a;
 }
 
-SelectableH264VideoFormat SourceMediaManager::FindOptimalFormat(const NativeVideoFormat& native,
+SelectableH264VideoFormat SourceMediaManager::FindOptimalVideoFormat(const NativeVideoFormat& native,
       const std::vector<SelectableH264VideoFormat>& formats) const {
   std::vector<SelectableH264VideoFormat> locally_supported_formats =
       GetSelectableH264VideoFormats();

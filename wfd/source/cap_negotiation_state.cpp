@@ -22,14 +22,15 @@
 #include "cap_negotiation_state.h"
 
 #include "wfd/common/rtsp_status_code.h"
+#include "wfd/parser/audiocodecs.h"
 #include "wfd/parser/clientrtpports.h"
-#include "wfd/public/media_manager.h"
 #include "wfd/parser/getparameter.h"
 #include "wfd/parser/payload.h"
 #include "wfd/parser/presentationurl.h"
 #include "wfd/parser/reply.h"
 #include "wfd/parser/setparameter.h"
 #include "wfd/parser/videoformats.h"
+#include "wfd/public/media_manager.h"
 
 namespace wfd {
 namespace source {
@@ -77,11 +78,24 @@ bool M3Handler::HandleReply(Reply* reply) {
 
   auto video_formats = static_cast<VideoFormats*>(
       reply->payload().get_property(WFD_VIDEO_FORMATS).get());
-  assert(video_formats);
-  SelectableH264VideoFormat optimal_format = source_manager->FindOptimalFormat(
+  if (!video_formats) {
+    WFD_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
+    return false;
+  }
+
+  SelectableH264VideoFormat optimal_format = source_manager->FindOptimalVideoFormat(
       video_formats->GetNativeFormat(),
       video_formats->GetSelectableH264Formats());
-  return source_manager->SetOptimalFormat(optimal_format);
+
+  auto audio_codecs = static_cast<AudioCodecs*>(
+      reply->payload().get_property(WFD_AUDIO_CODECS).get());
+  if (!audio_codecs) {
+    WFD_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
+    return false;
+  }
+
+  return source_manager->SetOptimalVideoFormat(optimal_format) &&
+         source_manager->InitOptimalAudioFormat(audio_codecs->audio_codecs());
 }
 
 std::unique_ptr<Message> M4Handler::CreateMessage() {
@@ -93,12 +107,14 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
   set_param->payload().add_property(
       std::shared_ptr<Property>(new PresentationUrl(presentation_Url_1, "")));
-
+  SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   set_param->payload().add_property(
       std::shared_ptr<VideoFormats>(new VideoFormats(
           NativeVideoFormat(),  // Should be all zeros.
           false,
-          {manager_->GetOptimalFormat()})));
+          {source_manager->GetOptimalVideoFormat()})));
+  set_param->payload().add_property(
+      std::shared_ptr<AudioCodecs>(new AudioCodecs({source_manager->GetOptimalAudioFormat()})));
 
   return std::unique_ptr<Message>(set_param);
 }
