@@ -111,7 +111,7 @@
    Message* message;
    Header* header;
    Payload* mpayload;
-   AudioFormat::Type audio_format;
+   AudioFormats audio_format;
    Property* property;
    std::vector<unsigned short>* error_list;
    PropertyErrors* property_errors;
@@ -709,9 +709,9 @@ wfd_audio_codec:
   ;
 
 wfd_audio_codec_type:
-    WFD_AUDIO_CODEC_LPCM { $$ = AudioFormat::Type::LPCM; }
-  | WFD_AUDIO_CODEC_AAC { $$ = AudioFormat::Type::AAC; }
-  | WFD_AUDIO_CODEC_AC3 { $$ = AudioFormat::Type::AC3; }
+    WFD_AUDIO_CODEC_LPCM { $$ = LPCM; }
+  | WFD_AUDIO_CODEC_AAC { $$ = AAC; }
+  | WFD_AUDIO_CODEC_AC3 { $$ = AC3; }
   ;
 
 wfd_property_video_formats:

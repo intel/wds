@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include "audio_codec.h"
 #include "video_format.h"
 #include "wfd_export.h"
 
@@ -69,14 +70,7 @@ class MediaManager {
    * @param optimal H264 format
    * @return true if format can be used by media manager
    */
-  virtual bool SetOptimalFormat(const SelectableH264VideoFormat& optimal_format) = 0;
-
-  /**
-   * Gets optimal H264 format @see SetOptimalFormat
-   *
-   * @return optimal H264 format
-   */
-  virtual SelectableH264VideoFormat GetOptimalFormat() const = 0;
+  virtual bool SetOptimalVideoFormat(const SelectableH264VideoFormat& optimal_format) = 0;
 };
 
 class SinkMediaManager : public MediaManager {
@@ -172,9 +166,32 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
    * @param list of H264 formats that are supported by remote device
    * @return optimal H264 video format
    */
-  virtual SelectableH264VideoFormat FindOptimalFormat(
+  virtual SelectableH264VideoFormat FindOptimalVideoFormat(
       const NativeVideoFormat& remote_device_native_format,
       const std::vector<SelectableH264VideoFormat>& remotely_supported_formats) const;
+
+  /**
+   * Gets optimal H264 format @see SetOptimalVideoFormat
+   *
+   * @return optimal H264 format
+   */
+  virtual SelectableH264VideoFormat GetOptimalVideoFormat() const = 0;
+
+  /**
+   * Initializes optimal audio codec
+   * The optimal audio codec will be returned by GetOptimalAudioFormat
+   *
+   * @param sink_supported_codecs list of the codecs supported by sink
+   * @return true if optimal codec can be found among the given list items, false otherwise
+   */
+  virtual bool InitOptimalAudioFormat(const std::vector<AudioCodec>& sink_supported_codecs) = 0;
+
+  /**
+   * Gets optimal audio codec @see InitOptimalAudioFormat
+   *
+   * @return optimal audio codec
+   */
+  virtual AudioCodec GetOptimalAudioFormat() const = 0;
 
   /**
    * Sends of H.264 instantaneous decoding refresh (IDR) picture

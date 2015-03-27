@@ -60,13 +60,13 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
       if (*it == PropertyName::name[PropertyType::WFD_AUDIO_CODECS]){
           // FIXME: declare that we support absolutely every audio codec/format,
           // but there should be a MediaManager API for it
-          auto codec_lpcm = new AudioCodec (AudioFormat::LPCM, AudioFormat::Modes(3), 0);
-          auto codec_aac = new AudioCodec (AudioFormat::AAC, AudioFormat::Modes(15), 0);
-          auto codec_ac3 = new AudioCodec (AudioFormat::AC3, AudioFormat::Modes(7), 0);
+          auto codec_lpcm = AudioCodec(LPCM, AudioModes(3), 0);
+          auto codec_aac = AudioCodec(AAC, AudioModes(15), 0);
+          auto codec_ac3 = AudioCodec(AC3, AudioModes(7), 0);
           auto codec_list = std::vector<AudioCodec>();
-          codec_list.push_back(*codec_lpcm);
-          codec_list.push_back(*codec_aac);
-          codec_list.push_back(*codec_ac3);
+          codec_list.push_back(codec_lpcm);
+          codec_list.push_back(codec_aac);
+          codec_list.push_back(codec_ac3);
           new_prop.reset(new AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_VIDEO_FORMATS]){
@@ -125,7 +125,7 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto video_formats =
       static_cast<VideoFormats*>(message->payload().get_property(WFD_VIDEO_FORMATS).get());
   assert(video_formats);
-  if (!sink_media_manager->SetOptimalFormat(video_formats->GetSelectableH264Formats()[0])) {
+  if (!sink_media_manager->SetOptimalVideoFormat(video_formats->GetSelectableH264Formats()[0])) {
     auto reply = std::unique_ptr<Reply>(new Reply(RTSP_SeeOther));
     auto payload = std::unique_ptr<Payload>(new Payload());
     std::vector<unsigned short> error_codes = {RTSP_UnsupportedMediaType};

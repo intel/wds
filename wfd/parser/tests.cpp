@@ -87,12 +87,12 @@ static bool property_type_exists (std::vector<std::string> properties,
                     wfd::PropertyName::name[type]) != properties.end();
 }
 
-static bool test_audio_codec (wfd::AudioCodec codec, wfd::AudioFormat::Type format,
+static bool test_audio_codec (wfd::AudioCodec codec, wfd::AudioFormats format,
                               unsigned long int modes, unsigned char latency)
 {
-  ASSERT_EQUAL(codec.audio_format(), format);
-  ASSERT_EQUAL(codec.audio_modes().to_ulong(), modes);
-  ASSERT_EQUAL(codec.latency(), latency);
+  ASSERT_EQUAL(codec.format, format);
+  ASSERT_EQUAL(codec.modes.to_ulong(), modes);
+  ASSERT_EQUAL(codec.latency, latency);
 
   return true;
 }
@@ -496,9 +496,9 @@ static bool test_valid_get_parameter_reply ()
   std::shared_ptr<wfd::AudioCodecs> audio_codecs = std::static_pointer_cast<wfd::AudioCodecs> (prop);
   ASSERT_EQUAL(audio_codecs->audio_codecs().size(), 2);
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[0],
-                           wfd::AudioFormat::LPCM, 3, 0));
+                           wfd::LPCM, 3, 0));
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[1],
-                           wfd::AudioFormat::AAC, 1, 0));
+                           wfd::AAC, 1, 0));
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));
   std::shared_ptr<wfd::VideoFormats> video_formats = std::static_pointer_cast<wfd::VideoFormats> (prop);
@@ -694,7 +694,7 @@ static bool test_valid_set_parameter ()
   std::shared_ptr<wfd::AudioCodecs> audio_codecs = std::static_pointer_cast<wfd::AudioCodecs> (prop);
   ASSERT_EQUAL(audio_codecs->audio_codecs().size(), 1);
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[0],
-                           wfd::AudioFormat::AAC, 1, 0));
+                           wfd::AAC, 1, 0));
 
   ASSERT_NO_EXCEPTION (prop =
       payload.get_property(wfd::PropertyType::WFD_VIDEO_FORMATS));

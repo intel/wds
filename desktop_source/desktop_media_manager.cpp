@@ -57,14 +57,29 @@ DesktopMediaManager::GetSelectableH264VideoFormats() const {
   return formats;
 }
 
-bool DesktopMediaManager::SetOptimalFormat(
+bool DesktopMediaManager::SetOptimalVideoFormat(
     const wfd::SelectableH264VideoFormat& optimal_format) {
   format_ = optimal_format;
   return true;
 }
 
-wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalFormat() const {
+wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalVideoFormat() const {
   return format_;
+}
+
+bool DesktopMediaManager::InitOptimalAudioFormat(const std::vector<wfd::AudioCodec>& sink_codecs) {
+  for (const auto& codec : sink_codecs) {
+     if (codec.format == wfd::AAC && codec.modes.test(wfd::AAC_48K_16B_2CH))
+       return true;
+  }
+  return false;
+}
+
+wfd::AudioCodec DesktopMediaManager::GetOptimalAudioFormat() const {
+  wfd::AudioModes audio_modes;
+  audio_modes.set(wfd::AAC_48K_16B_2CH);
+
+  return wfd::AudioCodec(wfd::AAC, audio_modes, 0);
 }
 
 void DesktopMediaManager::SendIDRPicture() {

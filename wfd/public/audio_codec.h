@@ -1,7 +1,7 @@
 /*
  * This file is part of wysiwidi
  *
- * Copyright (C) 2014 Intel Corporation.
+ * Copyright (C) 2015 Intel Corporation.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,30 +19,53 @@
  * 02110-1301 USA
  */
 
+#ifndef AUDIO_CODEC_H_
+#define AUDIO_CODEC_H_
 
-#ifndef AUDIOCODECS_H_
-#define AUDIOCODECS_H_
-
-#include "property.h"
-#include "wfd/public/audio_codec.h"
-
-#include <vector>
+#include <bitset>
 
 namespace wfd {
 
-class AudioCodecs: public Property {
- public:
-  AudioCodecs();
-  AudioCodecs(const std::vector<AudioCodec>& audio_codecs);
-  ~AudioCodecs() override;
+enum AudioFormats {
+  LPCM,
+  AAC,
+  AC3
+};
 
-  const std::vector<AudioCodec>& audio_codecs() const { return audio_codecs_; }
-  std::string ToString() const override;
+enum LPCMModes {
+  LPCM_44_1K_16B_2CH,
+  LPCM_48K_16B_2CH
+};
 
- private:
-  std::vector<AudioCodec> audio_codecs_;
+enum AACModes {
+  AAC_48K_16B_2CH,
+  AAC_48K_16B_4CH,
+  AAC_48K_16B_6CH,
+  AAC_48K_16B_8CH
+};
+
+enum AC3Modes {
+  AC3_48K_16B_2CH,
+  AC3_48K_16B_4CH,
+  AC3_48K_16B_6CH
+};
+
+using AudioModes = std::bitset<32>;
+
+/**
+ * @brief The AudioCodec struct
+ *
+ * Repersents a <audio-format, modes, latency> tuple used in 'wfd-audio-codecs'.
+ */
+struct AudioCodec {
+  AudioCodec(AudioFormats format, const AudioModes& modes, unsigned latency)
+  : format(format), modes(modes), latency(latency) {}
+
+  AudioFormats format;
+  AudioModes modes;
+  unsigned latency;
 };
 
 }  // namespace wfd
 
-#endif  // AUDIOCODECS_H_
+#endif  // AUDIO_CODEC_H_
