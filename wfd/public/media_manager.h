@@ -63,14 +63,6 @@ class MediaManager {
    * @return true if media stream is paused, false otherwise.
    */
   virtual bool IsPaused() const = 0;
-
-  /**
-   * Sets optimal H264 format that would be used to send / receive video stream
-   *
-   * @param optimal H264 format
-   * @return true if format can be used by media manager
-   */
-  virtual bool SetOptimalVideoFormat(const SelectableH264VideoFormat& optimal_format) = 0;
 };
 
 class SinkMediaManager : public MediaManager {
@@ -121,9 +113,17 @@ class SinkMediaManager : public MediaManager {
    * @return native video format
    */
   virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
+
+  /**
+   * Sets optimal H264 format that would be used to send / receive video stream
+   *
+   * @param optimal H264 format
+   * @return true if format can be used by media manager
+   */
+  virtual bool SetOptimalVideoFormat(const SelectableH264VideoFormat& optimal_format) = 0;
 };
 
-class WFD_EXPORT SourceMediaManager : public MediaManager {
+class SourceMediaManager : public MediaManager {
  public:
   /**
    * Sets RTP ports for media stream.
@@ -159,19 +159,19 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
   virtual std::vector<SelectableH264VideoFormat> GetSelectableH264VideoFormats() const = 0;
 
   /**
-   * Finds optimal format for streaming.
-   * Default quality selection algorithm will pick codec with higher bandwidth
+   * Initializes optimal video format
+   * The optimal video format will be returned by GetOptimalVideoFormat
    *
-   * @param native format of a remote device
-   * @param list of H264 formats that are supported by remote device
-   * @return optimal H264 video format
+   * @param sink_native_format format of the sink device
+   * @param sink_supported_formats of H264 formats that are supported by the sink device
+   * @return true if optimal video format is successfully initialized, false otherwise
    */
-  virtual SelectableH264VideoFormat FindOptimalVideoFormat(
-      const NativeVideoFormat& remote_device_native_format,
-      const std::vector<SelectableH264VideoFormat>& remotely_supported_formats) const;
+  virtual bool InitOptimalVideoFormat(
+      const NativeVideoFormat& sink_native_format,
+      const std::vector<SelectableH264VideoFormat>& sink_supported_formats) = 0;
 
   /**
-   * Gets optimal H264 format @see SetOptimalVideoFormat
+   * Gets optimal H264 format @see InitOptimalVideoFormat
    *
    * @return optimal H264 format
    */
@@ -182,7 +182,7 @@ class WFD_EXPORT SourceMediaManager : public MediaManager {
    * The optimal audio codec will be returned by GetOptimalAudioFormat
    *
    * @param sink_supported_codecs list of the codecs supported by sink
-   * @return true if optimal codec can be found among the given list items, false otherwise
+   * @return true if optimal audio codec is successfully initialized, false otherwise
    */
   virtual bool InitOptimalAudioFormat(const std::vector<AudioCodec>& sink_supported_codecs) = 0;
 
@@ -207,6 +207,20 @@ inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng) {
 inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng) {
   return static_cast<SinkMediaManager*>(mng);
 }
+
+/**
+ * An aux function to find the optimal format for streaming.
+ * The quality selection algorithm will pick codec with higher bandwidth
+ *
+ * @param native format of a remote device
+ * @param local_formats of H264 formats that are supported by local device
+ * @param remote_formats of H264 formats that are supported by remote device
+ * @return optimal H264 video format
+ */
+WFD_EXPORT SelectableH264VideoFormat FindOptimalVideoFormat(
+    const NativeVideoFormat& remote_device_native_format,
+    std::vector<SelectableH264VideoFormat> local_formats,
+    std::vector<SelectableH264VideoFormat> remote_formats);
 
 }  // namespace wfd
 

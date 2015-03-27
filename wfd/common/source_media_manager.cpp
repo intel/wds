@@ -175,30 +175,28 @@ bool video_format_sort_func(const SelectableH264VideoFormat& a, const Selectable
   return b < a;
 }
 
-SelectableH264VideoFormat SourceMediaManager::FindOptimalVideoFormat(const NativeVideoFormat& native,
-      const std::vector<SelectableH264VideoFormat>& formats) const {
-  std::vector<SelectableH264VideoFormat> locally_supported_formats =
-      GetSelectableH264VideoFormats();
-  std::vector<SelectableH264VideoFormat> remotely_supported_formats = formats;
-
-  std::sort(locally_supported_formats.begin(), locally_supported_formats.end(),
+SelectableH264VideoFormat FindOptimalVideoFormat(
+    const NativeVideoFormat& native,
+    std::vector<SelectableH264VideoFormat> local_formats,
+    std::vector<SelectableH264VideoFormat> remote_formats) {
+  std::sort(local_formats.begin(), local_formats.end(),
       video_format_sort_func);
-  std::sort(remotely_supported_formats.begin(), remotely_supported_formats.end(),
+  std::sort(remote_formats.begin(), remote_formats.end(),
       video_format_sort_func);
 
-  auto it = locally_supported_formats.begin();
-  auto end = locally_supported_formats.end();
+  auto it = local_formats.begin();
+  auto end = local_formats.end();
 
   SelectableH264VideoFormat format(CBP,
       k3_1, CEA640x480p60);
 
   while(it != end) {
     auto match = std::find(
-        remotely_supported_formats.begin(),
-        remotely_supported_formats.end(),
+        remote_formats.begin(),
+        remote_formats.end(),
         *it);
 
-    if (match != remotely_supported_formats.end()) {
+    if (match != remote_formats.end()) {
       format = *match;
       break;
     }

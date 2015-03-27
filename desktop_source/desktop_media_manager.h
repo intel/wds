@@ -18,7 +18,9 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
   int GetLocalRtpPort() const override;
 
   std::vector<wfd::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
-  bool SetOptimalVideoFormat(const wfd::SelectableH264VideoFormat& optimal_format) override;
+  bool InitOptimalVideoFormat(
+      const wfd::NativeVideoFormat& sink_native_format,
+      const std::vector<wfd::SelectableH264VideoFormat>& sink_supported_formats) override;
   wfd::SelectableH264VideoFormat GetOptimalVideoFormat() const override;
   bool InitOptimalAudioFormat(const std::vector<wfd::AudioCodec>& sink_supported_codecs) override;
   wfd::AudioCodec GetOptimalAudioFormat() const override;
