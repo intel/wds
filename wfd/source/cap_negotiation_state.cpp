@@ -73,7 +73,10 @@ bool M3Handler::HandleReply(Reply* reply) {
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   auto prop = reply->payload().get_property(WFD_CLIENT_RTP_PORTS);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
-  assert(ports);
+  if (!ports){
+    WFD_ERROR("Failed to obtain RTP ports from source.");
+    return false;
+  }
   source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
 
   auto video_formats = static_cast<VideoFormats*>(
@@ -83,10 +86,6 @@ bool M3Handler::HandleReply(Reply* reply) {
     return false;
   }
 
-  SelectableH264VideoFormat optimal_format = source_manager->FindOptimalVideoFormat(
-      video_formats->GetNativeFormat(),
-      video_formats->GetSelectableH264Formats());
-
   auto audio_codecs = static_cast<AudioCodecs*>(
       reply->payload().get_property(WFD_AUDIO_CODECS).get());
   if (!audio_codecs) {
@@ -94,8 +93,19 @@ bool M3Handler::HandleReply(Reply* reply) {
     return false;
   }
 
-  return source_manager->SetOptimalVideoFormat(optimal_format) &&
-         source_manager->InitOptimalAudioFormat(audio_codecs->audio_codecs());
+  if (!source_manager->InitOptimalVideoFormat(
+      video_formats->GetNativeFormat(),
+      video_formats->GetSelectableH264Formats())) {
+    WFD_ERROR("Failed to initalize optimal video format.");
+    return false;
+  }
+
+  if (!source_manager->InitOptimalAudioFormat(audio_codecs->audio_codecs())) {
+    WFD_ERROR("Failed to initalize optimal audio format.");
+    return false;
+  }
+
+  return true;
 }
 
 std::unique_ptr<Message> M4Handler::CreateMessage() {

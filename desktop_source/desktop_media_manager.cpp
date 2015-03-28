@@ -43,23 +43,27 @@ int DesktopMediaManager::GetLocalRtpPort() const {
 
 std::vector<wfd::SelectableH264VideoFormat>
 DesktopMediaManager::GetSelectableH264VideoFormats() const {
-  std::vector<wfd::SelectableH264VideoFormat> formats;
-
-  wfd::RateAndResolution i;
-
-  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::CEARatesAndResolutions>(i)));
-  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::VESARatesAndResolutions>(i)));
-  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
-      formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::HHRatesAndResolutions>(i)));
+  static std::vector<wfd::SelectableH264VideoFormat> formats;
+  if (formats.empty()) {
+    wfd::RateAndResolution i;
+    for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
+        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::CEARatesAndResolutions>(i)));
+    for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
+        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::VESARatesAndResolutions>(i)));
+    for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
+        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::HHRatesAndResolutions>(i)));
+  }
 
   return formats;
 }
 
-bool DesktopMediaManager::SetOptimalVideoFormat(
-    const wfd::SelectableH264VideoFormat& optimal_format) {
-  format_ = optimal_format;
+bool DesktopMediaManager::InitOptimalVideoFormat(
+    const wfd::NativeVideoFormat& sink_native_format,
+    const std::vector<wfd::SelectableH264VideoFormat>& sink_supported_formats) {
+
+  format_ = wfd::FindOptimalVideoFormat(sink_native_format,
+                                        GetSelectableH264VideoFormats(),
+                                        sink_supported_formats);
   return true;
 }
 
