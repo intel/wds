@@ -41,7 +41,7 @@ bool GstSinkMediaManager::IsPaused() const {
   return gst_pipeline_->IsPaused();
 }
 
-std::pair<int,int> GstSinkMediaManager::ListeningRtpPorts() const {
+std::pair<int,int> GstSinkMediaManager::GetLocalRtpPorts() const {
   return std::pair<int,int>(gst_pipeline_->sink_udp_port(), 0);
 }
 
@@ -49,15 +49,15 @@ void GstSinkMediaManager::SetPresentationUrl(const std::string& url) {
   presentation_url_ = url;
 }
 
-std::string GstSinkMediaManager::PresentationUrl() const {
+std::string GstSinkMediaManager::GetPresentationUrl() const {
   return presentation_url_;
 }
 
-void GstSinkMediaManager::SetSession(const std::string& session) {
+void GstSinkMediaManager::SetSessionId(const std::string& session) {
   session_ = session;
 }
 
-std::string GstSinkMediaManager::Session() const {
+std::string GstSinkMediaManager::GetSessionId() const {
   return session_;
 }
 
@@ -80,7 +80,7 @@ GstSinkMediaManager::GetSupportedH264VideoFormats() const {
           wds::SupportedH264VideoFormats(wds::CBP, wds::k4_2, cea_rr, vesa_rr, hh_rr)};
 }
 
-wds::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
+wds::NativeVideoFormat GstSinkMediaManager::GetSupportedNativeVideoFormat() const {
   // pick the maximum possible resolution, let gstreamer deal with it
   // TODO: get the actual screen size of the system
   return wds::NativeVideoFormat(wds::CEA1920x1080p60);

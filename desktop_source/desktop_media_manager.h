@@ -14,7 +14,7 @@ class DesktopMediaManager : public wds::SourceMediaManager {
   void Teardown() override;
   bool IsPaused() const override;
   void SetSinkRtpPorts(int port1, int port2) override;
-  std::pair<int,int> SinkRtpPorts() const override;
+  std::pair<int,int> GetSinkRtpPorts() const override;
   int GetLocalRtpPort() const override;
 
   std::vector<wds::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
