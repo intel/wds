@@ -1,17 +1,18 @@
-## Wysiwidi - Miracast & WiDi library
+## Wireless Display Software For Linux OS (WDS) - Miracast & WiDi library
 
-Wysiwidi is a set of libraries for developers who want to build Miracast/WiDi-enabled applications on linux. It is still an unreleased work-in-progress but can be tested already.
+WDS is a set of libraries for developers who want to build Miracast/WiDi-enabled applications on linux. It is still an unreleased work-in-progress but can be tested already.
 
-Wysiwidi consists of:
- * _wysiwidi-wfd:_ Main library that implements the Miracast-dialect of RTSP including the parser, actual negotiation logic for sink and source, and the related data structures. wfd is not tied to a specific connection manager, media framework or main loop.
- * _wysiwidi-network:_ Integration with GLib main loop and GStreamer
- * _wysiwidi-p2p:_ Integration with Connman Wifi P2P features.
+WDS consists of:
+ * _libwds: Main library implements a Miracast-dialect of RTSP that includes the parser, actual negotiation logic for sink and source, and the related data structures. It is not tied to any specific connection manager, media framework or main loop
+ * _network: Supports integration with GLib main loop and GStreamer
+ * _p2p: Supports integration with Connman Wifi P2P features
+
 
 The source code includes example implementations:
  * _sink:_ Miracast sink that depends on Gstreamer, Connman and GLib mainloop
  * _desktop_source:_ Miracast source that depends on Gstreamer, Connman and GLib mainloop
 
-More information can be found on the [mailing list](https://lists.01.org/mailman/listinfo/wysiwidi-dev) and the [wiki](https://github.com/01org/wysiwidi/wiki).
+More information can be found on the [mailing list](https://lists.01.org/mailman/listinfo/wds-dev) and the [wiki](https://github.com/01org/wds/wiki).
 
 ### Requirements:
 
@@ -24,14 +25,14 @@ Feb 3rd 2005 (commit 1ce3260a638d or release 1.4.6 or later).
 
 Test results with other Wifi adapters are very welcome but be warned that in many cases Wifi-P2P has not had the testing it needs on linux: you may run into problems in surprising places.
 
-### Building Wysiwidi from git:
+### Building WDS from git:
 
 ```
 cmake .
 make
 ```
 
-### Testing Wysiwidi
+### Testing WDS
 
 #### Pre-requisites
 
@@ -71,7 +72,7 @@ connmanctl> agent on
 Agent registered
 ```
 
-#### Testing Wysiwidi sink with an Android device (e.g. Nexus 5):
+#### Testing WDS sink with an Android device (e.g. Nexus 5):
 
 * start sink: `sink/sink-test`
 * Android: select the sink from the list in "Settings > Display > Cast Screen"
@@ -79,7 +80,7 @@ Agent registered
 
 In a few seconds, a window should open and a audio/video stream should start playing.
 
-#### Testing Wysiwidi source with another sink:
+#### Testing WDS source with another sink:
 
 * start source: `desktop_source/desktop_source`
 * Initial scan will be automatic, but `scan` command will re-scan.
