@@ -4,8 +4,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -std=c++11")
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/include")
-include_directories ("${PROJECT_SOURCE_DIR}/wfd/public")
-include_directories ("${PROJECT_SOURCE_DIR}/wfd/parser")
+include_directories ("${PROJECT_SOURCE_DIR}/libwds/public")
+include_directories ("${PROJECT_SOURCE_DIR}/libwds/parser")
 include_directories ("${PROJECT_SOURCE_DIR}/p2p")
 include_directories ("${PROJECT_SOURCE_DIR}/mirac_network")
 
@@ -21,4 +21,4 @@ pkg_check_modules (GST REQUIRED gstreamer-1.0)
 include_directories(${GST_INCLUDE_DIRS})
 
 add_executable(desktop-source-test main.cpp source-app.cpp mirac_broker_source.cpp desktop_media_manager.cpp)
-target_link_libraries (desktop-source-test  mirac wysiwidi p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})
+target_link_libraries (desktop-source-test  mirac wds p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})

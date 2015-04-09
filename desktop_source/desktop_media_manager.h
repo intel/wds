@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "wfd/public/media_manager.h"
+#include "libwds/public/media_manager.h"
 #include "mirac-gst-test-source.hpp"
 
 class DesktopMediaManager : public wfd::SourceMediaManager {

@@ -1,5 +1,5 @@
 /*
- * This file is part of wysiwidi
+ * This file is part of Wireless Display Software for Linux OS
  *
  * Copyright (C) 2015 Intel Corporation.
  *
@@ -23,7 +23,7 @@
 #ifndef MIRAC_LOGGING_HPP
 #define MIRAC_LOGGING_HPP
 
-#include "wfd/public/logging.h"
+#include "libwds/public/logging.h"
 
 void InitGlibLogging();
 
