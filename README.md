@@ -3,9 +3,9 @@
 WDS is a set of libraries for developers who want to build Miracast/WiDi-enabled applications on linux. It is still an unreleased work-in-progress but can be tested already.
 
 WDS consists of:
- * _libwds: Main library implements a Miracast-dialect of RTSP that includes the parser, actual negotiation logic for sink and source, and the related data structures. It is not tied to any specific connection manager, media framework or main loop
- * _network: Supports integration with GLib main loop and GStreamer
- * _p2p: Supports integration with Connman Wifi P2P features
+ * libwds: Main library implements a Miracast-dialect of RTSP that includes the parser, actual negotiation logic for sink and source, and the related data structures. It is not tied to any specific connection manager, media framework or main loop
+ * network: Supports integration with GLib main loop and GStreamer
+ * p2p: Supports integration with Connman Wifi P2P features
 
 
 The source code includes example implementations:
@@ -16,7 +16,7 @@ More information can be found on the [mailing list](https://lists.01.org/mailman
 
 ### Requirements:
 
-wysiwidi test executables have runtime dependencies on just a few things (mostly GStreamer and GLib), but for successful Miracast sessions the following are adviced:
+WDS test executables have runtime dependencies on just a few things (mostly GStreamer and GLib), but for successful Miracast sessions the following are adviced:
  * Wifi adapter from Intel 7260-family or Atheros ath9k
  * [wpa_supplicant](http://w1.fi/wpa_supplicant/): version 2.4 or later, built with	`CONFIG_P2P=y`, `CONFIG_WIFI_DISPLAY=y` and `CONFIG_CTRL_IFACE_DBUS_NEW=y`
  * [connman](https://01.org/connman): version 1.28 (released Feb 1st 2015) or later.
