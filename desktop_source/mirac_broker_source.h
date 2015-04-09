@@ -26,7 +26,7 @@
 
 #include "mirac-broker.hpp"
 
-namespace wfd {
+namespace wds {
 class SourceMediaManager;
 class Source;
 }
@@ -36,16 +36,16 @@ class MiracBrokerSource : public MiracBroker {
   explicit MiracBrokerSource(int rtsp_port);
   ~MiracBrokerSource();
 
-  wfd::Source* wfd_source() { return wfd_source_.get(); }
+  wds::Source* wfd_source() { return wfd_source_.get(); }
 
  private:
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;
   void on_connection_failure(ConnectionFailure failure) override;
-  virtual wfd::Peer* Peer() const override;
+  virtual wds::Peer* Peer() const override;
 
-  std::unique_ptr<wfd::SourceMediaManager> media_manager_;
-  std::unique_ptr<wfd::Source> wfd_source_;
+  std::unique_ptr<wds::SourceMediaManager> media_manager_;
+  std::unique_ptr<wds::Source> wfd_source_;
 };
 
 #endif // MIRAC_BROKER_SOURCE_H_

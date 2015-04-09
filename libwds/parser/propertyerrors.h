@@ -28,7 +28,7 @@
 #include "constants.h"
 
 
-namespace wfd {
+namespace wds {
 
 class PropertyErrors {
  public:
@@ -48,6 +48,6 @@ class PropertyErrors {
   std::vector<unsigned short> error_codes_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // PROPERTYERRORS_H_

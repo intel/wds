@@ -37,7 +37,7 @@ void Sink::got_message(const std::string& message) {
 
 void Sink::on_connected() {
   media_manager_.reset(new GstSinkMediaManager(local_host_));
-  wfd_sink_.reset(wfd::Sink::Create(this, media_manager_.get()));
+  wfd_sink_.reset(wds::Sink::Create(this, media_manager_.get()));
   wfd_sink_->Start();
 }
 
@@ -62,7 +62,7 @@ void Sink::Teardown() {
   wfd_sink_->Teardown();
 }
 
-wfd::Peer* Sink::Peer() const {
+wds::Peer* Sink::Peer() const {
   return wfd_sink_.get();
 }
 

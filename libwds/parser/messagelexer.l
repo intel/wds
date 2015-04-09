@@ -1,7 +1,7 @@
 %option debug
 %option nodefault
 %option c++
-%option yyclass="wfd::MessageScanner"
+%option yyclass="wds::MessageScanner"
 %option prefix="Msg_"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state
@@ -33,7 +33,7 @@
 
 #include <string>
 #include "messagescanner.h"
-typedef wfd::Parser::token token; 
+typedef wds::Parser::token token; 
 #define yyterminate() return(token::END)
 %}
 

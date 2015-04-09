@@ -24,7 +24,7 @@
 
 #include "macros.h"
 
-namespace wfd {
+namespace wds {
 
 Formats3d::Formats3d() : Property(WFD_3D_FORMATS, true) {
 }
@@ -85,7 +85,7 @@ std::string Formats3d::ToString() const {
       + std::string(SEMICOLON)+ std::string(SPACE);
 
   if (is_none())
-    return ret + wfd::NONE;
+    return ret + wds::NONE;
 
   MAKE_HEX_STRING_2(native, native_);
   MAKE_HEX_STRING_2(preferred_display_mode, preferred_display_mode_);
@@ -105,4 +105,4 @@ std::string Formats3d::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

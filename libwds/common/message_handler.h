@@ -33,7 +33,7 @@
 #include "libwds/public/logging.h"
 #include "libwds/public/peer.h"
 
-namespace wfd {
+namespace wds {
 
 // Default keep-alive timer is 60 seconds
 const int kDefaultKeepAliveTimeout = 60;
@@ -164,7 +164,7 @@ class MessageReceiverBase : public MessageHandler {
   ~MessageReceiverBase() override;
 
  protected:
-  virtual std::unique_ptr<wfd::Reply> HandleMessage(Message* message) = 0;
+  virtual std::unique_ptr<wds::Reply> HandleMessage(Message* message) = 0;
   bool CanHandle(Message* message) const override;
   void Handle(std::unique_ptr<Message> message) override;
 
@@ -247,5 +247,5 @@ class SequencedMessageSender : public MessageSenderBase {
   Message* to_be_send_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 #endif // MESSAGE_HANDLER_H_

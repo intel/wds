@@ -22,7 +22,7 @@
 
 #include "pause.h"
 
-namespace wfd {
+namespace wds {
 
 Pause::Pause(const std::string& request_uri)
  : Request(Request::MethodPause, request_uri) {
@@ -38,4 +38,4 @@ std::string Pause::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wfd */
+} /* namespace wds */

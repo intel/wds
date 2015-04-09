@@ -32,7 +32,7 @@
 #include "libwds/parser/videoformats.h"
 #include "libwds/public/media_manager.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 class M3Handler final : public SequencedMessageSender {
@@ -74,7 +74,7 @@ bool M3Handler::HandleReply(Reply* reply) {
   auto prop = reply->payload().get_property(WFD_CLIENT_RTP_PORTS);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
   if (!ports){
-    WFD_ERROR("Failed to obtain RTP ports from source.");
+    WDS_ERROR("Failed to obtain RTP ports from source.");
     return false;
   }
   source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
@@ -82,26 +82,26 @@ bool M3Handler::HandleReply(Reply* reply) {
   auto video_formats = static_cast<VideoFormats*>(
       reply->payload().get_property(WFD_VIDEO_FORMATS).get());
   if (!video_formats) {
-    WFD_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
+    WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
     return false;
   }
 
   auto audio_codecs = static_cast<AudioCodecs*>(
       reply->payload().get_property(WFD_AUDIO_CODECS).get());
   if (!audio_codecs) {
-    WFD_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
+    WDS_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
     return false;
   }
 
   if (!source_manager->InitOptimalVideoFormat(
       video_formats->GetNativeFormat(),
       video_formats->GetSelectableH264Formats())) {
-    WFD_ERROR("Failed to initalize optimal video format.");
+    WDS_ERROR("Failed to initalize optimal video format.");
     return false;
   }
 
   if (!source_manager->InitOptimalAudioFormat(audio_codecs->audio_codecs())) {
-    WFD_ERROR("Failed to initalize optimal audio format.");
+    WDS_ERROR("Failed to initalize optimal audio format.");
     return false;
   }
 
@@ -143,4 +143,4 @@ CapNegotiationState::~CapNegotiationState() {
 }
 
 }  // namespace source
-}  // namespace wfd
+}  // namespace wds

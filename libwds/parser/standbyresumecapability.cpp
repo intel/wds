@@ -22,7 +22,7 @@
 
 #include "standbyresumecapability.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 const char supported[] = "supported";
@@ -38,8 +38,8 @@ StandbyResumeCapability::~StandbyResumeCapability() {
 std::string StandbyResumeCapability::ToString() const {
   std::string ret =
       PropertyName::wfd_standby_resume_capability + std::string(SEMICOLON)
-     + std::string(SPACE) + (is_none() ? wfd::NONE : supported);
+     + std::string(SPACE) + (is_none() ? wds::NONE : supported);
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

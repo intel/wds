@@ -25,7 +25,7 @@
 
 #include "message.h"
 
-namespace wfd {
+namespace wds {
 
 class Play : public Request {
  public:
@@ -33,6 +33,6 @@ class Play : public Request {
     std::string ToString() const override;
 };
 
-} // namespace wfd
+} // namespace wds
 
 #endif // PLAY_H_

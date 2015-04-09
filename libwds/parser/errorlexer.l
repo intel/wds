@@ -1,7 +1,7 @@
 %option debug
 %option nodefault
 %option c++
-%option yyclass="wfd::ErrorScanner"
+%option yyclass="wds::ErrorScanner"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state
 %option case-insensitive
@@ -31,7 +31,7 @@
 
 #include <string>
 #include "errorscanner.h"
-typedef wfd::Parser::token token; 
+typedef wds::Parser::token token; 
 #define yyterminate() return(token::END)
 %}
 

@@ -22,7 +22,7 @@
 #ifndef RTSP_STATUS_CODE_H_
 #define RTSP_STATUS_CODE_H_
 
-namespace wfd {
+namespace wds {
 
 enum RTSPStatusCode {
   RTSP_OK = 200,
@@ -32,6 +32,6 @@ enum RTSPStatusCode {
   RTSP_NotImplemented = 501
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif

@@ -24,7 +24,7 @@
 
 #include <string>
 
-namespace wfd {
+namespace wds {
 
 /**
  * Peer interface.
@@ -69,12 +69,12 @@ class Peer {
   virtual ~Peer() {}
 
   /**
-   * Starts wfd state machine (source or sink)
+   * Starts wds state machine (source or sink)
    */
   virtual void Start() = 0;
 
   /**
-   * Reset wfd state machine (source or sink) to the initial state.
+   * Reset wds state machine (source or sink) to the initial state.
    */
   virtual void Reset() = 0;
 

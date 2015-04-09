@@ -22,7 +22,7 @@
 
 #include "getparameter.h"
 
-namespace wfd {
+namespace wds {
 
 GetParameter::GetParameter(const std::string& request_uri)
  : Request(Request::MethodGetParameter, request_uri) {
@@ -38,4 +38,4 @@ std::string GetParameter::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wfd */
+} /* namespace wds */

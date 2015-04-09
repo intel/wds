@@ -25,7 +25,7 @@
 #include "libwds/parser/options.h"
 #include "libwds/parser/reply.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 class M1Handler final : public SequencedMessageSender {
@@ -53,7 +53,7 @@ class M2Handler final : public MessageReceiver<Request::M2> {
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
-    std::vector<wfd::Method> supported_methods;
+    std::vector<wds::Method> supported_methods;
     supported_methods.push_back(ORG_WFA_WFD_1_0);
     supported_methods.push_back(GET_PARAMETER);
     supported_methods.push_back(SET_PARAMETER);
@@ -76,4 +76,4 @@ InitState::~InitState() {
 }
 
 }  // source
-}  // wfd
+}  // wds

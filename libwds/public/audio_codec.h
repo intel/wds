@@ -24,7 +24,7 @@
 
 #include <bitset>
 
-namespace wfd {
+namespace wds {
 
 enum AudioFormats {
   LPCM,
@@ -66,6 +66,6 @@ struct AudioCodec {
   unsigned latency;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // AUDIO_CODEC_H_

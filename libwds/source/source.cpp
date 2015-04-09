@@ -25,15 +25,15 @@
 #include "cap_negotiation_state.h"
 #include "init_state.h"
 #include "streaming_state.h"
-#include "wfd_session_state.h"
+#include "session_state.h"
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
-#include "libwds/public/wfd_export.h"
+#include "libwds/public/wds_export.h"
 #include "libwds/parser/getparameter.h"
 #include "libwds/parser/setparameter.h"
 #include "libwds/public/media_manager.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 
@@ -86,7 +86,7 @@ class SourceStateMachine : public MessageSequenceHandler {
      MessageHandlerPtr m16_sender = make_ptr(new source::M16Sender(init_params));
      AddSequencedHandler(make_ptr(new source::InitState(init_params)));
      AddSequencedHandler(make_ptr(new source::CapNegotiationState(init_params)));
-     AddSequencedHandler(make_ptr(new source::WfdSessionState(init_params, timer_id, m16_sender)));
+     AddSequencedHandler(make_ptr(new source::SessionState(init_params, timer_id, m16_sender)));
      AddSequencedHandler(make_ptr(new source::StreamingState(init_params, m16_sender)));
    }
 
@@ -230,18 +230,18 @@ void SourceImpl::OnError(MessageHandlerPtr handler) {
 
 void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get()))) {
-    WFD_ERROR("Cannot identify the received message");
+    WDS_ERROR("Cannot identify the received message");
     return;
   }
   if (!state_machine_->CanHandle(message.get())) {
-    WFD_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
+    WDS_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
     return;
   }
   state_machine_->Handle(std::move(message));
 }
 
-WFD_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng) {
+WDS_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng) {
   return new SourceImpl(delegate, mng);
 }
 
-}  // namespace wfd
+}  // namespace wds

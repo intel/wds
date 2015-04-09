@@ -44,7 +44,7 @@
 #include "libwds/parser/uibccapability.h"
 #include "libwds/parser/videoformats.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 
@@ -169,4 +169,4 @@ CapNegotiationState::CapNegotiationState(const InitParams &init_params)
 }
 
 }  // sink
-}  // wfd
+}  // wds

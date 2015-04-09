@@ -25,7 +25,7 @@
 
 #include "message.h"
 
-namespace wfd {
+namespace wds {
 
 class Reply: public Message {
  public:
@@ -41,6 +41,6 @@ class Reply: public Message {
   int response_code_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // REPLY_H_

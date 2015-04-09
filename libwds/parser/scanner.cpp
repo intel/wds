@@ -27,7 +27,7 @@
 
 #include "reply.h"
 
-namespace wfd {
+namespace wds {
 
 BaseLexer::~BaseLexer() {
 }
@@ -59,4 +59,4 @@ int Scanner::yylex(Parser::semantic_type *lval) {
   return lexer_->yylex(lval);
 }
 
-} /* namespace wfd */
+} /* namespace wds */

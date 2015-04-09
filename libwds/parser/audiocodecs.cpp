@@ -26,7 +26,7 @@
 
 #include "macros.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 
@@ -65,7 +65,7 @@ std::string AudioCodecs::ToString() const {
   auto it = audio_codecs_.begin();
   auto end = audio_codecs_.end();
   while (it != end) {
-    ret += wfd::ToString(*it);
+    ret += wds::ToString(*it);
     ++it;
     if (it != end)
       ret += ", ";
@@ -74,4 +74,4 @@ std::string AudioCodecs::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

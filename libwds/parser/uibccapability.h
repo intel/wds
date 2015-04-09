@@ -28,7 +28,7 @@
 #include <vector>
 #include <utility>
 
-namespace wfd {
+namespace wds {
 
 class UIBCCapability: public Property {
  public:
@@ -78,6 +78,6 @@ class UIBCCapability: public Property {
   bool has_capabilities_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // UIBCCAPABILITY_H_

@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-namespace wfd {
+namespace wds {
 
 namespace {
   const char kContentLenght[] = "Content-Length: ";
@@ -131,21 +131,21 @@ bool Header::has_method(const Method& method) const {
 std::string Header::ToString() const {
   std::string ret;
 
-  ret += kCSeq + std::to_string(cseq_) + wfd::CRLF;
+  ret += kCSeq + std::to_string(cseq_) + wds::CRLF;
 
   if (!session_.empty()) {
       if (timeout_ > 0)
           ret += kSession + session_
-            + kTimeout + std::to_string(timeout_) + wfd::CRLF;
+            + kTimeout + std::to_string(timeout_) + wds::CRLF;
       else
-          ret += kSession + session_ + wfd::CRLF;
+          ret += kSession + session_ + wds::CRLF;
   }
 
   if (content_type_.length())
-    ret += kContentType + content_type_ + wfd::CRLF;
+    ret += kContentType + content_type_ + wds::CRLF;
 
   if (content_length_)
-    ret += kContentLenght + std::to_string(content_length_) + wfd::CRLF;
+    ret += kContentLenght + std::to_string(content_length_) + wds::CRLF;
 
   ret += transport().ToString();
 
@@ -160,16 +160,16 @@ std::string Header::ToString() const {
       }
       ++i;
     }
-    ret += wfd::CRLF;
+    ret += wds::CRLF;
   }
 
   if (require_wfd_support_)
-    ret += std::string(kRequire) + wfd::CRLF;
+    ret += std::string(kRequire) + wds::CRLF;
 
   for (auto it = generic_headers_.begin(); it != generic_headers_.end(); it++)
-    ret += (*it).first + ": " + (*it).second + wfd::CRLF;
+    ret += (*it).first + ": " + (*it).second + wds::CRLF;
 
-  return ret + wfd::CRLF;
+  return ret + wds::CRLF;
 }
 
-} // namespace wfd
+} // namespace wds

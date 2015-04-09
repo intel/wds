@@ -22,7 +22,7 @@
 
 #include "triggermethod.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 const char* name[] = {MethodName::SETUP, MethodName::PAUSE,
@@ -44,4 +44,4 @@ std::string TriggerMethod::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

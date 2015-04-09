@@ -31,7 +31,7 @@
 #include "libwds/public/peer.h"
 #include "mirac-network.hpp"
 
-class MiracBroker : public wfd::Peer::Delegate
+class MiracBroker : public wds::Peer::Delegate
 {
     public:
         MiracBroker (const std::string& listen_port);
@@ -39,7 +39,7 @@ class MiracBroker : public wfd::Peer::Delegate
         virtual ~MiracBroker ();
         unsigned short get_host_port() const;
         std::string get_peer_address() const;
-        virtual wfd::Peer* Peer() const = 0;
+        virtual wds::Peer* Peer() const = 0;
         void OnTimeout(uint timer_id);
 
     protected:
@@ -48,7 +48,7 @@ class MiracBroker : public wfd::Peer::Delegate
             CONNECTION_LOST,
         };
 
-        // wfd::Peer::Delegate
+        // wds::Peer::Delegate
         void SendRTSPData(const std::string& data) override;
         std::string GetLocalIPAddress() const override;
         uint CreateTimer(int seconds) override;

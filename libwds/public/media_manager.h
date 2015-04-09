@@ -26,9 +26,9 @@
 #include <vector>
 #include "audio_codec.h"
 #include "video_format.h"
-#include "wfd_export.h"
+#include "wds_export.h"
 
-namespace wfd {
+namespace wds {
 
 /**
  * MediaManager interface.
@@ -77,7 +77,7 @@ class SinkMediaManager : public MediaManager {
   /**
    * Sets presentation URL for media stream.
    * Presentation URL can be referred in order to control media stream resource
-   * within wfd session.
+   * within wds session.
    *
    * @param presentation url that represents video / audio stream
    */
@@ -91,14 +91,14 @@ class SinkMediaManager : public MediaManager {
   virtual std::string PresentationUrl() const = 0;
 
   /**
-   * Sets unique ID for wfd session.
-   * @param string that uniquely identifies wfd session
+   * Sets unique ID for wds session.
+   * @param string that uniquely identifies wds session
    */
   virtual void SetSession(const std::string& session) = 0;
 
   /**
-   * Returns unique wfd session id.
-   * @return unique id for wfd session
+   * Returns unique wds session id.
+   * @return unique id for wds session
    */
   virtual std::string Session() const = 0;
 
@@ -217,12 +217,12 @@ inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng) {
  * @param remote_formats of H264 formats that are supported by remote device
  * @return optimal H264 video format
  */
-WFD_EXPORT SelectableH264VideoFormat FindOptimalVideoFormat(
+WDS_EXPORT SelectableH264VideoFormat FindOptimalVideoFormat(
     const NativeVideoFormat& remote_device_native_format,
     std::vector<SelectableH264VideoFormat> local_formats,
     std::vector<SelectableH264VideoFormat> remote_formats);
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif // MEDIA_MANAGER_H_
 

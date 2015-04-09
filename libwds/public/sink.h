@@ -24,7 +24,7 @@
 
 #include "peer.h"
 
-namespace wfd {
+namespace wds {
 
 class SinkMediaManager;
 

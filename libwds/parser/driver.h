@@ -31,7 +31,7 @@
 #include "payload.h"
 #include "parser.tab.hpp"
 
-namespace wfd {
+namespace wds {
 
 class Driver {
  public:
@@ -45,6 +45,6 @@ class Driver {
   std::unique_ptr<Scanner> scanner_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // DRIVER_H_

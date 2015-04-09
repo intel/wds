@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace wfd {
+namespace wds {
 
 class I2C: public Property {
  public:
@@ -40,6 +40,6 @@ class I2C: public Property {
   int port_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // I2C_H_

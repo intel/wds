@@ -25,7 +25,7 @@
 
 #include "message.h"
 
-namespace wfd {
+namespace wds {
 
 class Pause : public Request {
  public:
@@ -34,6 +34,6 @@ class Pause : public Request {
     std::string ToString() const override;
 };
 
-} // namespace wfd
+} // namespace wds
 
 #endif // PAUSE_H_

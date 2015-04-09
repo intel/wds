@@ -30,9 +30,9 @@
 #include "libwds/parser/reply.h"
 #include "libwds/parser/teardown.h"
 #include "libwds/parser/triggermethod.h"
-#include "wfd_session_state.h"
+#include "session_state.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 template <TriggerMethod::Method method>
@@ -107,7 +107,7 @@ class M8Sender final : public SequencedMessageSender {
 
 TeardownHandler::TeardownHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(make_ptr(new M5Handler<wfd::TriggerMethod::TEARDOWN>(init_params)));
+  AddSequencedHandler(make_ptr(new M5Handler<wds::TriggerMethod::TEARDOWN>(init_params)));
   AddSequencedHandler(make_ptr(new M8Sender(init_params)));
 }
 
@@ -217,4 +217,4 @@ StreamingState::StreamingState(const InitParams& init_params, MessageHandlerPtr 
 }
 
 }  // sink
-}  // wfd
+}  // wds

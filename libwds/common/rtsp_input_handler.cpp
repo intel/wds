@@ -23,7 +23,7 @@
 
 #include <cassert>
 
-namespace wfd {
+namespace wds {
 
 RTSPInputHandler::~RTSPInputHandler() {
 }
@@ -77,4 +77,4 @@ bool RTSPInputHandler::ParsePayload() {
   return true;
 }
 
-}  // namespace wfd
+}  // namespace wds

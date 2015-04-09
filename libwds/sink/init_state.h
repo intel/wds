@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 // Inital state for RTSP sink.
@@ -35,6 +35,6 @@ class InitState : public MessageSequenceHandler {
 };
 
 }  // sink
-}  // wfd
+}  // wds
 
 #endif // INIT_STATE_H_

@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace wfd {
+namespace wds {
 
 class Standby: public Property {
 public:
@@ -34,6 +34,6 @@ public:
   std::string ToString() const override;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // STANDBY_H_

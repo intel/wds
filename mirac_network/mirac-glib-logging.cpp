@@ -56,9 +56,9 @@ void MiracGlibError(const char* format, ...) {
 }  // namespace
 
 void InitGlibLogging() {
-    wfd::LogSystem::set_log_func(&MiracGlibLog);
-    wfd::LogSystem::set_vlog_func(&MiracGlibVLog);
-    wfd::LogSystem::set_warning_func(&MiracGlibWarning);
-    wfd::LogSystem::set_error_func(&MiracGlibError);
+    wds::LogSystem::set_log_func(&MiracGlibLog);
+    wds::LogSystem::set_vlog_func(&MiracGlibVLog);
+    wds::LogSystem::set_warning_func(&MiracGlibWarning);
+    wds::LogSystem::set_error_func(&MiracGlibError);
 }
 

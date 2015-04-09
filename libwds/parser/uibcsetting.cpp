@@ -22,7 +22,7 @@
 
 #include "uibcsetting.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 const char enable[] = "enable";
@@ -45,4 +45,4 @@ std::string UIBCSetting::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

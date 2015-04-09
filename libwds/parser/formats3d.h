@@ -27,7 +27,7 @@
 
 #include <vector>
 
-namespace wfd {
+namespace wds {
 
 // todo(shalamov): refactor, looks almost similar to VideoFormats
 
@@ -61,7 +61,7 @@ struct H264Codec3d {
   unsigned short max_vres_;
 };
 
-typedef std::vector<wfd::H264Codec3d> H264Codecs3d;
+typedef std::vector<wds::H264Codec3d> H264Codecs3d;
 
 class Formats3d: public Property {
  public:
@@ -83,6 +83,6 @@ class Formats3d: public Property {
   H264Codecs3d h264_codecs_3d_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // FORMATS3D_H_

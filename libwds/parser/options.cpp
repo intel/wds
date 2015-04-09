@@ -22,7 +22,7 @@
 
 #include "options.h"
 
-namespace wfd {
+namespace wds {
 
 Options::Options(const std::string& request_uri)
   : Request(Request::MethodOptions, request_uri) {
@@ -38,4 +38,4 @@ std::string Options::ToString() const {
   return ret + Message::ToString();
 }
 
-} // namespace wfd
+} // namespace wds

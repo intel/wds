@@ -25,7 +25,7 @@
 
 #include <string>
 
-namespace wfd {
+namespace wds {
 
 class TransportHeader {
   public:
@@ -53,6 +53,6 @@ class TransportHeader {
     bool server_supports_rtcp_;
 };
 
-} // namespace wfd
+} // namespace wds
 
 #endif // TRANSPORT_HEADER_H_

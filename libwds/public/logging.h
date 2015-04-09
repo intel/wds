@@ -24,14 +24,14 @@
 
 #include <cstdarg>
 
-#include "wfd_export.h"
+#include "wds_export.h"
 
-namespace wfd {
+namespace wds {
 
 /**
  * WFD logging subsystem.
  */
-class WFD_EXPORT LogSystem {
+class WDS_EXPORT LogSystem {
  public:
   typedef void (*LogFunction)(const char*, ...);
 
@@ -91,9 +91,9 @@ class WFD_EXPORT LogSystem {
 
 }
 
-#define WFD_LOG(...) (*wfd::LogSystem::log_func())(__VA_ARGS__);
-#define WFD_VLOG(...) (*wfd::LogSystem::vlog_func())(__VA_ARGS__);
-#define WFD_WARNING(...) (*wfd::LogSystem::warning_func())(__VA_ARGS__);
-#define WFD_ERROR(...) (*wfd::LogSystem::error_func())(__VA_ARGS__);
+#define WDS_LOG(...) (*wds::LogSystem::log_func())(__VA_ARGS__);
+#define WDS_VLOG(...) (*wds::LogSystem::vlog_func())(__VA_ARGS__);
+#define WDS_WARNING(...) (*wds::LogSystem::warning_func())(__VA_ARGS__);
+#define WDS_ERROR(...) (*wds::LogSystem::error_func())(__VA_ARGS__);
 
 #endif // LOGGING_H_

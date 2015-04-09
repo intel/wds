@@ -29,7 +29,7 @@
 #include "scanner.h"
 #include "parser.tab.hpp"
 
-namespace wfd {
+namespace wds {
 
 class HeaderScanner : public yyFlexLexer, public BaseLexer {
  public:
@@ -41,6 +41,6 @@ class HeaderScanner : public yyFlexLexer, public BaseLexer {
   int yylex() override;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif // HEADERSCANNER_H

@@ -24,7 +24,7 @@
 
 #include "macros.h"
 
-namespace wfd {
+namespace wds {
 
 AVFormatChangeTiming::AVFormatChangeTiming(unsigned long long int pts,
     unsigned long long int dts)
@@ -47,4 +47,4 @@ std::string AVFormatChangeTiming::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds
