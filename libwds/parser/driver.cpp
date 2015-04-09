@@ -27,7 +27,7 @@
 #include <cctype>
 #include <sstream>
 
-namespace wfd {
+namespace wds {
 
 Driver::~Driver() {
 }
@@ -47,5 +47,5 @@ void Driver::Parse(const std::string& input, std::unique_ptr<Message>& message) 
   parser_->parse();
 }
 
-} // namespace wfd
+} // namespace wds
 

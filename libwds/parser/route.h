@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace wfd {
+namespace wds {
 
 class Route: public Property {
  public:
@@ -45,6 +45,6 @@ class Route: public Property {
   Route::Destination destination_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // ROUTE_H_

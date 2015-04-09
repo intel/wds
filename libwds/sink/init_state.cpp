@@ -25,7 +25,7 @@
 #include "libwds/parser/options.h"
 #include "libwds/parser/reply.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 class M1Handler final : public MessageReceiver<Request::M1> {
@@ -80,4 +80,4 @@ InitState::InitState(const InitParams& init_params)
 }
 
 }  // sink
-}  // wfd
+}  // wds

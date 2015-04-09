@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 // Streaming state for RTSP sink.
@@ -40,6 +40,6 @@ class TeardownHandler : public MessageSequenceHandler {
 };
 
 }  // sink
-}  // wfd
+}  // wds
 
 #endif // STREAMING_STATE_H_

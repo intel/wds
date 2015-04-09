@@ -22,7 +22,7 @@
 
 #include "standby.h"
 
-namespace wfd {
+namespace wds {
 
 Standby::Standby() : Property(WFD_STANDBY) {
 }
@@ -34,4 +34,4 @@ std::string Standby::ToString() const {
   return std::string("wfd_standby");
 }
 
-}  // namespace wfd
+}  // namespace wds

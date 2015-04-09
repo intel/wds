@@ -29,7 +29,7 @@
 
 class yyFlexLexer;
 
-namespace wfd {
+namespace wds {
 
 class BaseLexer {
  public:
@@ -52,6 +52,6 @@ public:
   std::unique_ptr<BaseLexer> lexer_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif // SCANNER_H

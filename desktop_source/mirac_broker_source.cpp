@@ -38,7 +38,7 @@ void MiracBrokerSource::got_message(const std::string& message) {
 
 void MiracBrokerSource::on_connected() {
   media_manager_.reset(new DesktopMediaManager(get_peer_address()));
-  wfd_source_.reset(wfd::Source::Create(this, media_manager_.get()));
+  wfd_source_.reset(wds::Source::Create(this, media_manager_.get()));
   wfd_source_->Start();
 }
 
@@ -51,6 +51,6 @@ void MiracBrokerSource::on_connection_failure(ConnectionFailure failure) {
   }
 }
 
-wfd::Peer* MiracBrokerSource::Peer() const {
+wds::Peer* MiracBrokerSource::Peer() const {
   return wfd_source_.get();
 }

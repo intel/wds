@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 // Capability negotiation state for RTSP source.
@@ -36,6 +36,6 @@ class CapNegotiationState : public MessageSequenceHandler {
 };
 
 }  // source
-}  // wfd
+}  // wds
 
 #endif // CAP_NEGOTIATION_STATE_H_

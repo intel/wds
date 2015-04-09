@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace wfd {
+namespace wds {
 
 typedef unsigned RateAndResolution;
 
@@ -185,6 +185,6 @@ struct SupportedH264VideoFormats {
 };
 
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // VIDEO_FORMAT_H_

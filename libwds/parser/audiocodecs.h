@@ -28,7 +28,7 @@
 
 #include <vector>
 
-namespace wfd {
+namespace wds {
 
 class AudioCodecs: public Property {
  public:
@@ -43,6 +43,6 @@ class AudioCodecs: public Property {
   std::vector<AudioCodec> audio_codecs_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // AUDIOCODECS_H_

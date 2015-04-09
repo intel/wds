@@ -28,7 +28,7 @@
 #include "header.h"
 #include "payload.h"
 
-namespace wfd {
+namespace wds {
 
 class Message {
  public:
@@ -103,6 +103,6 @@ inline Request* ToRequest(Message* message) {
   return static_cast<Request*>(message);
 }
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // MESSAGE_H_

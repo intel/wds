@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <assert.h>
 
-namespace wfd {
+namespace wds {
 
 static void Dummy(const char*, ...) {}
 LogSystem::LogFunction LogSystem::log_func_ = &Dummy;
@@ -217,4 +217,4 @@ SelectableH264VideoFormat FindOptimalVideoFormat(
   return format;
 }
 
-}  // namespace wfd
+}  // namespace wds

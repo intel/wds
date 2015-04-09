@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 // Streaming state for RTSP source.
@@ -36,6 +36,6 @@ class StreamingState : public MessageSequenceWithOptionalSetHandler {
 };
 
 }  // source
-}  // wfd
+}  // wds
 
 #endif // STREAMING_STATE_H_

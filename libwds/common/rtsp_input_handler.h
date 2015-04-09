@@ -25,7 +25,7 @@
 #include <string>
 #include "libwds/parser/driver.h"
 
-namespace wfd {
+namespace wds {
 
 // An aux class to handle input buffer.
 class RTSPInputHandler {

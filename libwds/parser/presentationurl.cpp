@@ -22,7 +22,7 @@
 
 #include "presentationurl.h"
 
-namespace wfd {
+namespace wds {
 
 PresentationUrl::PresentationUrl(const std::string& presentation_url_1,
     const std::string presentation_url_2)
@@ -38,10 +38,10 @@ std::string PresentationUrl::ToString() const {
   std::string ret =
       PropertyName::wfd_presentation_url + std::string(SEMICOLON)
     + std::string(SPACE)
-    + (presentation_url_1_.length() ? presentation_url_1_ : wfd::NONE)
+    + (presentation_url_1_.length() ? presentation_url_1_ : wds::NONE)
     + std::string(SPACE)
-    + (presentation_url_2_.length() ? presentation_url_2_ : wfd::NONE);
+    + (presentation_url_2_.length() ? presentation_url_2_ : wds::NONE);
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

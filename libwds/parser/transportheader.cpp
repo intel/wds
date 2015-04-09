@@ -23,7 +23,7 @@
 #include "transportheader.h"
 #include "constants.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
   const char kTransport[] = "Transport: RTP/AVP/UDP;unicast;client_port=";
@@ -87,9 +87,9 @@ std::string TransportHeader::ToString() const {
         ret += "-" + std::to_string(server_port_ + 1);
     }
 
-    ret += wfd::CRLF;
+    ret += wds::CRLF;
   }
   return ret;
 }
 
-} // namespace wfd
+} // namespace wds

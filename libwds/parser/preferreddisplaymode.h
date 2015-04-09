@@ -27,7 +27,7 @@
 
 #include "videoformats.h"
 
-namespace wfd {
+namespace wds {
 
 class PreferredDisplayMode: public Property {
  public:
@@ -71,6 +71,6 @@ class PreferredDisplayMode: public Property {
   H264Codec h264_codec_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // PREFERREDDISPLAYMODE_H_

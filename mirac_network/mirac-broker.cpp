@@ -76,7 +76,7 @@ gboolean MiracBroker::send_cb (gint fd, GIOCondition condition)
     } catch (const MiracConnectionLostException &exception) {
         on_connection_failure(CONNECTION_LOST);
     } catch (const std::exception &x) {
-        WFD_WARNING("exception: %s", x.what());
+        WDS_WARNING("exception: %s", x.what());
     }
     return G_SOURCE_REMOVE;
 }
@@ -87,7 +87,7 @@ gboolean MiracBroker::receive_cb (gint fd, GIOCondition condition)
     std::string msg;
     try {
         if (connection_->Receive(msg)) {
-            WFD_VLOG("Received RTSP message:\n%s", msg.c_str());
+            WDS_VLOG("Received RTSP message:\n%s", msg.c_str());
             got_message (msg);
         }
     } catch (const MiracConnectionLostException &exception) {
@@ -101,10 +101,10 @@ gboolean MiracBroker::listen_cb (gint fd, GIOCondition condition)
 {
     try {
         connection(network_->Accept());
-        WFD_LOG("connection from: %s", connection_->GetPeerAddress().c_str());
+        WDS_LOG("connection from: %s", connection_->GetPeerAddress().c_str());
         on_connected();
     } catch (const std::exception &x) {
-        WFD_WARNING("exception: %s", x.what());
+        WDS_WARNING("exception: %s", x.what());
     }
 
     return G_SOURCE_CONTINUE;
@@ -115,7 +115,7 @@ gboolean MiracBroker::connect_cb (gint fd, GIOCondition condition)
     try {
         if (!network_->Connect(NULL, NULL))
             return G_SOURCE_CONTINUE;
-        WFD_LOG("connection success to: %s", network_->GetPeerAddress().c_str());
+        WDS_LOG("connection success to: %s", network_->GetPeerAddress().c_str());
         connection(network_.release());
 
         /* make sure any network event sources are removed */
@@ -153,7 +153,7 @@ void MiracBroker::connection(MiracNetwork *connection)
 
 void MiracBroker::try_connect()
 {
-    WFD_LOG("Trying to connect...");
+    WDS_LOG("Trying to connect...");
 
     connect_wait_id_ = 0;
     network(new MiracNetwork());
@@ -218,7 +218,7 @@ MiracBroker::~MiracBroker ()
 }
 
 void MiracBroker::SendRTSPData(const std::string& data) {
-  WFD_VLOG("Sending RTSP message:\n%s", data.c_str());
+  WDS_VLOG("Sending RTSP message:\n%s", data.c_str());
 
   if (connection_ && !connection_->Send(data))
       g_unix_fd_add(connection_->GetHandle(), G_IO_OUT,

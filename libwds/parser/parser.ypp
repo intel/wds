@@ -3,7 +3,7 @@
 %debug 
 %verbose
 %defines
-%define api.namespace {wfd}
+%define api.namespace {wds}
 %define parser_class_name {Parser}
 %start start
 
@@ -17,7 +17,7 @@
    #include "uibcsetting.h"
    #include "uibccapability.h"
    
-   namespace wfd {
+   namespace wds {
       class Driver;
       class Scanner;
       class Message;
@@ -121,7 +121,7 @@
    Property* property;
    std::vector<unsigned short>* error_list;
    PropertyErrors* property_errors;
-   std::map<wfd::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
+   std::map<wds::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
    std::vector<H264Codec>* codecs;
    H264Codec* codec;
    std::vector<H264Codec3d>* codecs_3d;
@@ -506,14 +506,14 @@ wfd_methods:
   ;
 
 wfd_method: 
-    WFD_OPTIONS { $$ = wfd::OPTIONS; }
-  | WFD_SET_PARAMETER { $$ = wfd::SET_PARAMETER; }
-  | WFD_GET_PARAMETER { $$ = wfd::GET_PARAMETER; }
-  | WFD_SETUP { $$ = wfd::SETUP; }
-  | WFD_PLAY { $$ = wfd::PLAY; }
-  | WFD_TEARDOWN { $$ = wfd::TEARDOWN; }
-  | WFD_PAUSE { $$ = wfd::PAUSE; }
-  | WFD_TAG { $$ = wfd::ORG_WFA_WFD_1_0; }
+    WFD_OPTIONS { $$ = wds::OPTIONS; }
+  | WFD_SET_PARAMETER { $$ = wds::SET_PARAMETER; }
+  | WFD_GET_PARAMETER { $$ = wds::GET_PARAMETER; }
+  | WFD_SETUP { $$ = wds::SETUP; }
+  | WFD_PLAY { $$ = wds::PLAY; }
+  | WFD_TEARDOWN { $$ = wds::TEARDOWN; }
+  | WFD_PAUSE { $$ = wds::PAUSE; }
+  | WFD_TAG { $$ = wds::ORG_WFA_WFD_1_0; }
   ;
   
 wfd_ows: 
@@ -1097,7 +1097,7 @@ wfd_connector_type:
 
 %%
 
-void wfd::Parser::error(const std::string &err_message)
+void wds::Parser::error(const std::string &err_message)
 {
   message = nullptr;
 }

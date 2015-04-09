@@ -25,7 +25,7 @@
 
 #include "message.h"
 
-namespace wfd {
+namespace wds {
 
 class SetParameter : public Request {
  public:
@@ -33,6 +33,6 @@ class SetParameter : public Request {
     std::string ToString() const override;
 };
 
-} // namespace wfd
+} // namespace wds
 
 #endif // SETPARAMETER_H_

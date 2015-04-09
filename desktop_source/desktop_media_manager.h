@@ -6,7 +6,7 @@
 #include "libwds/public/media_manager.h"
 #include "mirac-gst-test-source.hpp"
 
-class DesktopMediaManager : public wfd::SourceMediaManager {
+class DesktopMediaManager : public wds::SourceMediaManager {
  public:
   explicit DesktopMediaManager(const std::string& hostname);
   void Play() override;
@@ -17,13 +17,13 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
   std::pair<int,int> SinkRtpPorts() const override;
   int GetLocalRtpPort() const override;
 
-  std::vector<wfd::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
+  std::vector<wds::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
   bool InitOptimalVideoFormat(
-      const wfd::NativeVideoFormat& sink_native_format,
-      const std::vector<wfd::SelectableH264VideoFormat>& sink_supported_formats) override;
-  wfd::SelectableH264VideoFormat GetOptimalVideoFormat() const override;
-  bool InitOptimalAudioFormat(const std::vector<wfd::AudioCodec>& sink_supported_codecs) override;
-  wfd::AudioCodec GetOptimalAudioFormat() const override;
+      const wds::NativeVideoFormat& sink_native_format,
+      const std::vector<wds::SelectableH264VideoFormat>& sink_supported_formats) override;
+  wds::SelectableH264VideoFormat GetOptimalVideoFormat() const override;
+  bool InitOptimalAudioFormat(const std::vector<wds::AudioCodec>& sink_supported_codecs) override;
+  wds::AudioCodec GetOptimalAudioFormat() const override;
   void SendIDRPicture() override;
 
  private:
@@ -31,7 +31,7 @@ class DesktopMediaManager : public wfd::SourceMediaManager {
   std::unique_ptr<MiracGstTestSource> gst_pipeline_;
   int sink_port1_;
   int sink_port2_;
-  wfd::SelectableH264VideoFormat format_;
+  wds::SelectableH264VideoFormat format_;
 };
 
 #endif // DESKTOP_MEDIA_MANAGER_H_

@@ -24,7 +24,7 @@
 #include "message_handler.h"
 #include "libwds/public/media_manager.h"
 
-namespace wfd {
+namespace wds {
 
 int MessageHandler::send_cseq_ = 1;
 

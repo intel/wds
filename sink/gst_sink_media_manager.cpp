@@ -61,32 +61,32 @@ std::string GstSinkMediaManager::Session() const {
   return session_;
 }
 
-std::vector<wfd::SupportedH264VideoFormats>
+std::vector<wds::SupportedH264VideoFormats>
 GstSinkMediaManager::GetSupportedH264VideoFormats() const {
   // declare that we support all resolutions, CHP and level 4.2
   // gstreamer should handle all of it :)
-  std::vector<wfd::CEARatesAndResolutions> cea_rr;
-  std::vector<wfd::VESARatesAndResolutions> vesa_rr;
-  std::vector<wfd::HHRatesAndResolutions> hh_rr;
-  wfd::RateAndResolution i;
+  std::vector<wds::CEARatesAndResolutions> cea_rr;
+  std::vector<wds::VESARatesAndResolutions> vesa_rr;
+  std::vector<wds::HHRatesAndResolutions> hh_rr;
+  wds::RateAndResolution i;
 
-  for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
-      cea_rr.push_back(static_cast<wfd::CEARatesAndResolutions>(i));
-  for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
-      vesa_rr.push_back(static_cast<wfd::VESARatesAndResolutions>(i));
-  for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
-      hh_rr.push_back(static_cast<wfd::HHRatesAndResolutions>(i));
-  return {wfd::SupportedH264VideoFormats(wfd::CHP, wfd::k4_2, cea_rr, vesa_rr, hh_rr),
-          wfd::SupportedH264VideoFormats(wfd::CBP, wfd::k4_2, cea_rr, vesa_rr, hh_rr)};
+  for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; i++)
+      cea_rr.push_back(static_cast<wds::CEARatesAndResolutions>(i));
+  for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; i++)
+      vesa_rr.push_back(static_cast<wds::VESARatesAndResolutions>(i));
+  for (i = wds::HH800x480p30; i <= wds::HH848x480p60; i++)
+      hh_rr.push_back(static_cast<wds::HHRatesAndResolutions>(i));
+  return {wds::SupportedH264VideoFormats(wds::CHP, wds::k4_2, cea_rr, vesa_rr, hh_rr),
+          wds::SupportedH264VideoFormats(wds::CBP, wds::k4_2, cea_rr, vesa_rr, hh_rr)};
 }
 
-wfd::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
+wds::NativeVideoFormat GstSinkMediaManager::SupportedNativeVideoFormat() const {
   // pick the maximum possible resolution, let gstreamer deal with it
   // TODO: get the actual screen size of the system
-  return wfd::NativeVideoFormat(wfd::CEA1920x1080p60);
+  return wds::NativeVideoFormat(wds::CEA1920x1080p60);
 }
 
 bool GstSinkMediaManager::SetOptimalVideoFormat(
-    const wfd::SelectableH264VideoFormat& optimal_format) {
+    const wds::SelectableH264VideoFormat& optimal_format) {
   return true;
 }

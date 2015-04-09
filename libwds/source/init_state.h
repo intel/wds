@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 // Inital state for RTSP source.
@@ -36,6 +36,6 @@ class InitState : public MessageSequenceHandler {
 };
 
 }  // source
-}  // wfd
+}  // wds
 
 #endif // INIT_STATE_H_

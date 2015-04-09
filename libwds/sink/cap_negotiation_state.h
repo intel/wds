@@ -24,7 +24,7 @@
 
 #include "libwds/common/message_handler.h"
 
-namespace wfd {
+namespace wds {
 namespace sink {
 
 // Capability negotiation state for RTSP sink.
@@ -47,6 +47,6 @@ class M3Handler final : public MessageReceiver<Request::M3> {
 };
 
 }  // namespace sink
-}  // namespace wfd
+}  // namespace wds
 
 #endif // CAP_NEGOTIATION_STATE_H_

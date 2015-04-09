@@ -32,10 +32,10 @@
 #include "genericproperty.h"
 #include "propertyerrors.h"
 
-typedef std::map<std::string, std::shared_ptr<wfd::Property>> PropertyMap;
-typedef std::map<std::string, std::shared_ptr<wfd::PropertyErrors>> PropertyErrorMap;
+typedef std::map<std::string, std::shared_ptr<wds::Property>> PropertyMap;
+typedef std::map<std::string, std::shared_ptr<wds::PropertyErrors>> PropertyErrorMap;
 
-namespace wfd {
+namespace wds {
 
 class Payload {
  public:
@@ -45,19 +45,19 @@ class Payload {
   explicit Payload(const PropertyErrorMap& property_errors);
   virtual ~Payload();
 
-  std::shared_ptr<wfd::Property> get_property(std::string name) const;
-  std::shared_ptr<wfd::Property> get_property(wfd::PropertyType type) const;
-  bool has_property(wfd::PropertyType type) const;
-  void add_property(const std::shared_ptr<wfd::Property>& property);
+  std::shared_ptr<wds::Property> get_property(std::string name) const;
+  std::shared_ptr<wds::Property> get_property(wds::PropertyType type) const;
+  bool has_property(wds::PropertyType type) const;
+  void add_property(const std::shared_ptr<wds::Property>& property);
   const PropertyMap& properties() const;
 
   void add_get_parameter_property(const PropertyType& property);
   void add_get_parameter_property(const std::string& generic_property);
   const std::vector<std::string>& get_parameter_properties() const;
 
-  std::shared_ptr<wfd::PropertyErrors> get_property_error(std::string name) const;
-  std::shared_ptr<wfd::PropertyErrors> get_property_error(wfd::PropertyType type) const;
-  void add_property_error(const std::shared_ptr<wfd::PropertyErrors>& errors);
+  std::shared_ptr<wds::PropertyErrors> get_property_error(std::string name) const;
+  std::shared_ptr<wds::PropertyErrors> get_property_error(wds::PropertyType type) const;
+  void add_property_error(const std::shared_ptr<wds::PropertyErrors>& errors);
   const PropertyErrorMap& property_errors() const;
 
   std::string ToString() const;
@@ -68,6 +68,6 @@ class Payload {
   std::vector<std::string> request_properties_;
 };
 
-} //namespace wfd
+} //namespace wds
 
 #endif // PAYLOAD_H_

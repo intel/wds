@@ -41,51 +41,51 @@ int DesktopMediaManager::GetLocalRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
 
-std::vector<wfd::SelectableH264VideoFormat>
+std::vector<wds::SelectableH264VideoFormat>
 DesktopMediaManager::GetSelectableH264VideoFormats() const {
-  static std::vector<wfd::SelectableH264VideoFormat> formats;
+  static std::vector<wds::SelectableH264VideoFormat> formats;
   if (formats.empty()) {
-    wfd::RateAndResolution i;
-    for (i = wfd::CEA640x480p60; i <= wfd::CEA1920x1080p24; i++)
-        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::CEARatesAndResolutions>(i)));
-    for (i = wfd::VESA800x600p30; i <= wfd::VESA1920x1200p30; i++)
-        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::VESARatesAndResolutions>(i)));
-    for (i = wfd::HH800x480p30; i <= wfd::HH848x480p60; i++)
-        formats.push_back(wfd::SelectableH264VideoFormat(wfd::CHP, wfd::k4_2, static_cast<wfd::HHRatesAndResolutions>(i)));
+    wds::RateAndResolution i;
+    for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; i++)
+        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::CEARatesAndResolutions>(i)));
+    for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; i++)
+        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::VESARatesAndResolutions>(i)));
+    for (i = wds::HH800x480p30; i <= wds::HH848x480p60; i++)
+        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::HHRatesAndResolutions>(i)));
   }
 
   return formats;
 }
 
 bool DesktopMediaManager::InitOptimalVideoFormat(
-    const wfd::NativeVideoFormat& sink_native_format,
-    const std::vector<wfd::SelectableH264VideoFormat>& sink_supported_formats) {
+    const wds::NativeVideoFormat& sink_native_format,
+    const std::vector<wds::SelectableH264VideoFormat>& sink_supported_formats) {
 
-  format_ = wfd::FindOptimalVideoFormat(sink_native_format,
+  format_ = wds::FindOptimalVideoFormat(sink_native_format,
                                         GetSelectableH264VideoFormats(),
                                         sink_supported_formats);
   return true;
 }
 
-wfd::SelectableH264VideoFormat DesktopMediaManager::GetOptimalVideoFormat() const {
+wds::SelectableH264VideoFormat DesktopMediaManager::GetOptimalVideoFormat() const {
   return format_;
 }
 
-bool DesktopMediaManager::InitOptimalAudioFormat(const std::vector<wfd::AudioCodec>& sink_codecs) {
+bool DesktopMediaManager::InitOptimalAudioFormat(const std::vector<wds::AudioCodec>& sink_codecs) {
   for (const auto& codec : sink_codecs) {
-     if (codec.format == wfd::AAC && codec.modes.test(wfd::AAC_48K_16B_2CH))
+     if (codec.format == wds::AAC && codec.modes.test(wds::AAC_48K_16B_2CH))
        return true;
   }
   return false;
 }
 
-wfd::AudioCodec DesktopMediaManager::GetOptimalAudioFormat() const {
-  wfd::AudioModes audio_modes;
-  audio_modes.set(wfd::AAC_48K_16B_2CH);
+wds::AudioCodec DesktopMediaManager::GetOptimalAudioFormat() const {
+  wds::AudioModes audio_modes;
+  audio_modes.set(wds::AAC_48K_16B_2CH);
 
-  return wfd::AudioCodec(wfd::AAC, audio_modes, 0);
+  return wds::AudioCodec(wds::AAC, audio_modes, 0);
 }
 
 void DesktopMediaManager::SendIDRPicture() {
-  WFD_WARNING("Unimplemented IDR picture request");
+  WDS_WARNING("Unimplemented IDR picture request");
 }

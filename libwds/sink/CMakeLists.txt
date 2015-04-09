@@ -5,5 +5,5 @@ include_directories ("${PROJECT_SOURCE_DIR}" )
 
 add_library(wdssink OBJECT
     sink.cpp cap_negotiation_state.cpp init_state.cpp
-    wfd_session_state.cpp streaming_state.cpp
+    session_state.cpp streaming_state.cpp
 )

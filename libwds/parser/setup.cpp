@@ -22,7 +22,7 @@
 
 #include "setup.h"
 
-namespace wfd {
+namespace wds {
 
 Setup::Setup(const std::string& request_uri)
  : Request(Request::MethodSetup, request_uri) {
@@ -38,4 +38,4 @@ std::string Setup::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wfd */
+} /* namespace wds */

@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace wfd {
+namespace wds {
 
 class ConnectorType: public Property {
  public:
@@ -40,6 +40,6 @@ class ConnectorType: public Property {
   unsigned short connector_type_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // CONNECTORTYPE_H_

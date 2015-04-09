@@ -25,7 +25,7 @@
 
 #include "property.h"
 
-namespace wfd {
+namespace wds {
 
 class CoupledSink: public Property {
  public:
@@ -42,6 +42,6 @@ class CoupledSink: public Property {
   unsigned long long int sink_address_;
 };
 
-}  // namespace wfd
+}  // namespace wds
 
 #endif  // COUPLEDSINK_H_

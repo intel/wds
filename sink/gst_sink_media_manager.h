@@ -27,7 +27,7 @@
 #include "libwds/public/media_manager.h"
 #include "mirac-gst-sink.hpp"
 
-class GstSinkMediaManager : public wfd::SinkMediaManager {
+class GstSinkMediaManager : public wds::SinkMediaManager {
  public:
   explicit GstSinkMediaManager(const std::string& hostname);
 
@@ -41,9 +41,9 @@ class GstSinkMediaManager : public wfd::SinkMediaManager {
   virtual void SetSession(const std::string& session) override;
   virtual std::string Session() const override;
 
-  virtual std::vector<wfd::SupportedH264VideoFormats> GetSupportedH264VideoFormats() const override;
-  virtual wfd::NativeVideoFormat SupportedNativeVideoFormat() const override;
-  virtual bool SetOptimalVideoFormat(const wfd::SelectableH264VideoFormat& optimal_format) override;
+  virtual std::vector<wds::SupportedH264VideoFormats> GetSupportedH264VideoFormats() const override;
+  virtual wds::NativeVideoFormat SupportedNativeVideoFormat() const override;
+  virtual bool SetOptimalVideoFormat(const wds::SelectableH264VideoFormat& optimal_format) override;
 
  private:
   std::string hostname_;

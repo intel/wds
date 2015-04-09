@@ -39,15 +39,15 @@ class Sink : public MiracBroker {
   void Teardown();
 
  protected:
-  virtual wfd::Peer* Peer() const override;
+  virtual wds::Peer* Peer() const override;
 
  private:
   virtual void got_message(const std::string& message) override;
   virtual void on_connected() override;
   void on_connection_failure(ConnectionFailure failure) override;
 
-  std::unique_ptr<wfd::SinkMediaManager> media_manager_;
-  std::unique_ptr<wfd::Sink> wfd_sink_;
+  std::unique_ptr<wds::SinkMediaManager> media_manager_;
+  std::unique_ptr<wds::Sink> wfd_sink_;
   std::string local_host_;
 };
 

@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-namespace wfd {
+namespace wds {
 
 PropertyErrors::PropertyErrors(PropertyType type, std::vector<unsigned short> error_codes) :
      type_(type),
@@ -63,4 +63,4 @@ std::string PropertyErrors::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

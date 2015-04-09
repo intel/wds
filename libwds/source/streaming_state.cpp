@@ -24,10 +24,10 @@
 #include "cap_negotiation_state.h"
 #include "libwds/common/rtsp_status_code.h"
 #include "libwds/public/media_manager.h"
-#include "wfd_session_state.h"
+#include "session_state.h"
 #include "libwds/parser/reply.h"
 
-namespace wfd {
+namespace wds {
 namespace source {
 
 class M9Handler final : public MessageReceiver<Request::M9> {
@@ -86,4 +86,4 @@ StreamingState::~StreamingState() {
 }
 
 }  // source
-}  // wfd
+}  // wds

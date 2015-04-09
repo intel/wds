@@ -22,7 +22,7 @@
 
 #include "clientrtpports.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 const char profile[] = "RTP/AVP/UDP;unicast";
@@ -48,4 +48,4 @@ std::string ClientRtpPorts::ToString() const {
   return ret;
 }
 
-}  // namespace wfd
+}  // namespace wds

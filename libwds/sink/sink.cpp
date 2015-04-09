@@ -25,16 +25,16 @@
 #include "init_state.h"
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
-#include "libwds/public/wfd_export.h"
+#include "libwds/public/wds_export.h"
 #include "libwds/parser/pause.h"
 #include "libwds/parser/play.h"
 #include "libwds/parser/teardown.h"
 #include "libwds/parser/triggermethod.h"
 #include "libwds/public/media_manager.h"
 #include "streaming_state.h"
-#include "wfd_session_state.h"
+#include "session_state.h"
 
-namespace wfd {
+namespace wds {
 
 namespace {
 
@@ -77,7 +77,7 @@ class SinkStateMachine : public MessageSequenceHandler {
      auto m16_handler = make_ptr(new sink::M16Handler(init_params, keep_alive_timer_));
      AddSequencedHandler(make_ptr(new sink::InitState(init_params)));
      AddSequencedHandler(make_ptr(new sink::CapNegotiationState(init_params)));
-     AddSequencedHandler(make_ptr(new sink::WfdSessionState(init_params, m6_handler, m16_handler)));
+     AddSequencedHandler(make_ptr(new sink::SessionState(init_params, m6_handler, m16_handler)));
      AddSequencedHandler(make_ptr(new sink::StreamingState(init_params, m16_handler)));
    }
 
@@ -160,24 +160,24 @@ bool SinkImpl::HandleCommand(std::unique_ptr<Message> command) {
 }
 
 bool SinkImpl::Teardown() {
-  return HandleCommand(CreateCommand<wfd::Teardown, Request::M8>());
+  return HandleCommand(CreateCommand<wds::Teardown, Request::M8>());
 }
 
 bool SinkImpl::Play() {
-  return HandleCommand(CreateCommand<wfd::Play, Request::M7>());
+  return HandleCommand(CreateCommand<wds::Play, Request::M7>());
 }
 
 bool SinkImpl::Pause() {
-  return HandleCommand(CreateCommand<wfd::Pause, Request::M9>());
+  return HandleCommand(CreateCommand<wds::Pause, Request::M9>());
 }
 
 void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get()))) {
-    WFD_ERROR("Cannot identify the received message");
+    WDS_ERROR("Cannot identify the received message");
     return;
   }
   if (!state_machine_->CanHandle(message.get())) {
-    WFD_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
+    WDS_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
     return;
   }
   state_machine_->Handle(std::move(message));
@@ -203,8 +203,8 @@ void SinkImpl::OnTimerEvent(uint timer_id) {
     state_machine_->Reset();
 }
 
-WFD_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
+WDS_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
   return new SinkImpl(delegate, mng);
 }
 
-}  // namespace wfd
+}  // namespace wds

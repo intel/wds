@@ -24,7 +24,7 @@
 
 #include <cassert>
 
-namespace wfd {
+namespace wds {
 
 namespace {
   const char kDefaultContentType[] = "text/parameters";
@@ -80,4 +80,4 @@ Request::~Request() {
 }
 
 
-} // namespace wfd
+} // namespace wds
