@@ -1,5 +1,5 @@
 /*
- * This file is part of wysiwidi
+ * This file is part of Wireless Display Software for Linux OS
  *
  * Copyright (C) 2014 Intel Corporation.
  *
@@ -28,7 +28,7 @@
 #include "mirac_broker_source.h"
 #include "mirac-glib-logging.hpp"
 
-#include "wfd/public/source.h"
+#include "libwds/public/source.h"
 
 static gboolean _sig_handler (gpointer data_ptr)
 {

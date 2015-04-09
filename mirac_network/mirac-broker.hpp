@@ -1,5 +1,5 @@
 /*
- * This file is part of wysiwidi
+ * This file is part of Wireless Display Software for Linux OS
  *
  * Copyright (C) 2014 Intel Corporation.
  *
@@ -28,7 +28,7 @@
 #include <map>
 #include <vector>
 
-#include "wfd/public/peer.h"
+#include "libwds/public/peer.h"
 #include "mirac-network.hpp"
 
 class MiracBroker : public wfd::Peer::Delegate

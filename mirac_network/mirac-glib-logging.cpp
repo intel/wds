@@ -1,5 +1,5 @@
 /*
- * This file is part of wysiwidi
+ * This file is part of Wireless Display Software for Linux OS
  *
  * Copyright (C) 2015 Intel Corporation.
  *

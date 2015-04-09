@@ -1,0 +1,1103 @@
+%skeleton "lalr1.cc"
+%require  "3.0"
+%debug 
+%verbose
+%defines
+%define api.namespace {wfd}
+%define parser_class_name {Parser}
+%start start
+
+%code requires {
+   #include <map>
+   #include <memory>
+   #include "audiocodecs.h"
+   #include "contentprotection.h"
+   #include "triggermethod.h"
+   #include "route.h"
+   #include "uibcsetting.h"
+   #include "uibccapability.h"
+   
+   namespace wfd {
+      class Driver;
+      class Scanner;
+      class Message;
+      class Header;
+      class TransportHeader;
+      class Property;
+      class PropertyErrors;
+      class Payload;
+      class VideoFormats;
+      struct H264Codec;
+      struct H264Codec3d;
+      struct AudioCodec;
+   }
+}
+
+%parse-param { Scanner& scanner  }
+%parse-param { std::unique_ptr<Message>& message  }
+
+%code {
+/*
+ * This file is part of Wireless Display Software for Linux OS
+ *
+ * Copyright (C) 2015 Intel Corporation.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ */
+
+
+
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <map>
+
+#include "driver.h"
+#include "message.h"
+#include "header.h" 
+#include "transportheader.h"
+#include "payload.h"
+#include "reply.h"
+#include "options.h"
+#include "getparameter.h"
+#include "setparameter.h"
+#include "play.h"
+#include "teardown.h"
+#include "pause.h"
+#include "setup.h"
+#include "audiocodecs.h"
+#include "videoformats.h"
+#include "formats3d.h"
+#include "contentprotection.h"
+#include "displayedid.h"
+#include "coupledsink.h"
+#include "triggermethod.h"
+#include "clientrtpports.h"
+#include "i2c.h"
+#include "avformatchangetiming.h"
+#include "standbyresumecapability.h"
+#include "standby.h"
+#include "idrrequest.h"
+#include "connectortype.h"
+#include "preferreddisplaymode.h"
+#include "presentationurl.h"
+#include "uibccapability.h"
+
+#undef yylex
+#define yylex scanner.yylex
+
+#define UNUSED_TOKEN(T) (void)T
+}
+
+%union {
+   /*semantic_type(){}
+   semantic_type(const semantic_type&){}
+   ~semantic_type(){}
+   semantic_type& operator=(const semantic_type&) {}
+   std::string test;*/
+   
+   std::string *sval;
+   unsigned long long int nval;
+   bool bool_val;
+   std::vector<std::string>* vsval;
+   Message* message;
+   Header* header;
+   Payload* mpayload;
+   AudioFormats audio_format;
+   Property* property;
+   std::vector<unsigned short>* error_list;
+   PropertyErrors* property_errors;
+   std::map<wfd::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
+   std::vector<H264Codec>* codecs;
+   H264Codec* codec;
+   std::vector<H264Codec3d>* codecs_3d;
+   H264Codec3d* codec_3d;
+   ContentProtection::HDCPSpec hdcp_spec;
+   TriggerMethod::Method trigger_method;
+   Route::Destination route_destination;
+   bool uibc_setting;
+   std::vector<UIBCCapability::InputCategory>* input_category_list;
+   std::vector<UIBCCapability::InputType>* generic_cap_list;
+   std::vector<UIBCCapability::DetailedCapability>* hidc_cap_list;
+   UIBCCapability::InputCategory input_category_list_value;
+   UIBCCapability::InputType generic_cap_list_value;
+   UIBCCapability::DetailedCapability* hidc_cap_list_value;
+   UIBCCapability::InputPath input_path;
+   Method method;
+   std::vector<Method>* methods;
+   PropertyType parameter;
+   std::vector<PropertyType>* parameters;
+   std::vector<AudioCodec>* audio_codecs;
+   AudioCodec* audio_codec;
+   std::pair<std::string, unsigned int>* session_info;
+   TransportHeader* transport;
+}
+
+%token END 0
+%token WFD_SP
+%token <nval> WFD_NUM
+%token WFD_OPTIONS
+%token WFD_SET_PARAMETER
+%token WFD_GET_PARAMETER
+%token WFD_SETUP
+%token WFD_PLAY
+%token WFD_TEARDOWN
+%token WFD_PAUSE
+%token WFD_END
+%token WFD_RESPONSE
+%token <nval> WFD_RESPONSE_CODE
+%token <sval> WFD_STRING
+%token <sval> WFD_GENERIC_PROPERTY
+%token <sval> WFD_HEADER
+%token WFD_CSEQ
+%token WFD_RESPONSE_METHODS
+%token WFD_TAG
+%token WFD_SUPPORT_CHECK
+%token <sval> WFD_REQUEST_URI
+%token WFD_CONTENT_TYPE
+%token <sval> WFD_MIME
+%token WFD_CONTENT_LENGTH
+%token WFD_AUDIO_CODECS
+%token WFD_VIDEO_FORMATS
+%token WFD_3D_FORMATS
+%token WFD_CONTENT_PROTECTION
+%token WFD_DISPLAY_EDID
+%token WFD_COUPLED_SINK
+%token WFD_TRIGGER_METHOD
+%token WFD_PRESENTATION_URL
+%token WFD_CLIENT_RTP_PORTS
+%token WFD_ROUTE
+%token WFD_I2C
+%token WFD_AV_FORMAT_CHANGE_TIMING
+%token WFD_PREFERRED_DISPLAY_MODE
+%token WFD_UIBC_CAPABILITY
+%token WFD_UIBC_SETTING
+%token WFD_STANDBY_RESUME_CAPABILITY
+%token WFD_STANDBY_IN_REQUEST
+%token WFD_STANDBY_IN_RESPONSE
+%token WFD_CONNECTOR_TYPE
+%token WFD_IDR_REQUEST
+%token WFD_AUDIO_CODECS_ERROR
+%token WFD_VIDEO_FORMATS_ERROR
+%token WFD_3D_FORMATS_ERROR
+%token WFD_CONTENT_PROTECTION_ERROR
+%token WFD_DISPLAY_EDID_ERROR
+%token WFD_COUPLED_SINK_ERROR
+%token WFD_TRIGGER_METHOD_ERROR
+%token WFD_PRESENTATION_URL_ERROR
+%token WFD_CLIENT_RTP_PORTS_ERROR
+%token WFD_ROUTE_ERROR
+%token WFD_I2C_ERROR
+%token WFD_AV_FORMAT_CHANGE_TIMING_ERROR
+%token WFD_PREFERRED_DISPLAY_MODE_ERROR
+%token WFD_UIBC_CAPABILITY_ERROR
+%token WFD_UIBC_SETTING_ERROR
+%token WFD_STANDBY_RESUME_CAPABILITY_ERROR
+%token WFD_STANDBY_ERROR
+%token WFD_CONNECTOR_TYPE_ERROR
+%token WFD_IDR_REQUEST_ERROR
+%token <sval> WFD_GENERIC_PROPERTY_ERROR
+%token WFD_NONE
+%token WFD_AUDIO_CODEC_LPCM
+%token WFD_AUDIO_CODEC_AAC
+%token WFD_AUDIO_CODEC_AC3
+%token WFD_HDCP_SPEC_2_0
+%token WFD_HDCP_SPEC_2_1
+%token <nval> WFD_IP_PORT
+%token <sval> WFD_PRESENTATION_URL_0
+%token <sval> WFD_PRESENTATION_URL_1
+%token WFD_STREAM_PROFILE
+%token WFD_MODE_PLAY
+%token WFD_ROUTE_PRIMARY
+%token WFD_ROUTE_SECONDARY
+%token WFD_INPUT_CATEGORY_LIST
+%token WFD_INPUT_CATEGORY_GENERIC
+%token WFD_INPUT_CATEGORY_HIDC
+%token WFD_GENERIC_CAP_LIST
+%token WFD_INPUT_TYPE_KEYBOARD
+%token WFD_INPUT_TYPE_MOUSE
+%token WFD_INPUT_TYPE_SINGLE_TOUCH
+%token WFD_INPUT_TYPE_MULTI_TOUCH
+%token WFD_INPUT_TYPE_JOYSTICK
+%token WFD_INPUT_TYPE_CAMERA
+%token WFD_INPUT_TYPE_GESTURE
+%token WFD_INPUT_TYPE_REMOTE_CONTROL
+%token WFD_HIDC_CAP_LIST
+%token WFD_INPUT_PATH_INFRARED
+%token WFD_INPUT_PATH_USB
+%token WFD_INPUT_PATH_BT
+%token WFD_INPUT_PATH_WIFI
+%token WFD_INPUT_PATH_ZIGBEE
+%token WFD_INPUT_PATH_NOSP
+%token WFD_UIBC_SETTING_ENABLE
+%token WFD_UIBC_SETTING_DISABLE
+%token WFD_SUPPORTED
+%token WFD_SESSION
+%token <sval> WFD_SESSION_ID
+%token WFD_TIMEOUT
+%token WFD_TRANSPORT
+%token WFD_SERVER_PORT
+
+%type <message> options set_parameter get_parameter setup play teardown pause
+%type <message> wfd_reply command
+%type <header> headers
+
+%type <sval> wfd_content_type
+%type <session_info> wfd_session
+%type <method> wfd_method
+%type <methods> wfd_methods wfd_supported_methods
+%type <nval> wfd_content_length
+%type <nval> wfd_cseq
+%type <audio_format> wfd_audio_codec_type
+%type <property> wfd_property wfd_property_audio_codecs
+%type <property> wfd_property_video_formats 
+%type <property> wfd_property_3d_formats
+%type <property> wfd_content_protection
+%type <property> wfd_display_edid
+%type <property> wfd_coupled_sink
+%type <property> wfd_trigger_method
+%type <property> wfd_presentation_url
+%type <property> wfd_client_rtp_ports
+%type <property> wfd_route
+%type <property> wfd_I2C
+%type <property> wfd_av_format_change_timing
+%type <property> wfd_preferred_display_mode
+%type <property> wfd_uibc_capability
+%type <property> wfd_uibc_setting
+%type <property> wfd_standby_resume_capability
+%type <property> wfd_connector_type
+%type <mpayload> wdf_property_map
+%type <mpayload> wfd_property_error_map
+%type <property_errors> wfd_property_errors
+%type <error_list> wfd_error_list
+%type <mpayload> payload
+%type <codecs> wfd_h264_codecs
+%type <codec> wfd_h264_codec
+%type <nval> wfd_max_hres
+%type <nval> wfd_max_vres
+%type <codecs_3d> wfd_h264_codecs_3d
+%type <codec_3d> wfd_h264_codec_3d
+%type <hdcp_spec> hdcp2_spec
+%type <sval> wfd_edid_payload
+%type <nval> wfd_sink_address
+%type <trigger_method> wfd_supported_trigger_methods
+%type <route_destination> wfd_route_destination
+%type <nval> wfd_port
+%type <uibc_setting> wfd_uibc_setting_value
+%type <bool_val> wfd_standby_resume_capability_value
+%type <sval> wfd_presentation_url0 wfd_presentation_url1
+%type <input_category_list> wfd_input_category_list wfd_input_category_list_values
+%type <generic_cap_list> wfd_generic_cap_list wfd_generic_cap_list_values
+%type <hidc_cap_list> wfd_hidc_cap_list wfd_hidc_cap_list_values
+%type <input_category_list_value> wfd_input_category_list_value
+%type <generic_cap_list_value> wfd_generic_cap_list_value
+%type <hidc_cap_list_value> wfd_hidc_cap_list_value
+%type <input_path> wfd_input_path
+%type <parameter> wfd_parameter
+%type <mpayload> wfd_parameter_list
+%type <audio_codecs> wfd_audio_codec_list
+%type <audio_codec> wfd_audio_codec
+%type <transport> wfd_transport
+
+%destructor { if($$) delete $$; $$ = 0; } WFD_STRING WFD_REQUEST_URI WFD_MIME WFD_GENERIC_PROPERTY
+%destructor { if($$) delete $$; $$ = 0; } wfd_methods wfd_supported_methods
+%destructor { if($$) delete $$; $$ = 0; } wfd_h264_codec wfd_h264_codecs
+%destructor { if($$) delete $$; $$ = 0; } wfd_h264_codec_3d wfd_h264_codecs_3d
+%destructor { if($$) delete $$; $$ = 0; } wfd_edid_payload
+%destructor { if($$) delete $$; $$ = 0; } wfd_hidc_cap_list_value
+%destructor { if($$) delete $$; $$ = 0; } wfd_parameter_list
+%destructor { if($$) delete $$; $$ = 0; } wfd_audio_codec wfd_audio_codec_list
+
+ /* check where we need destructors for discarded symbols
+    http://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
+  %destructor { if($$) delete $$; $$ = 0; } options set_parameter get_parameter setup play
+  %destructor { if($$) delete $$; $$ = 0; } teardown pause wfd_reply command headers */
+  
+%%
+
+start: message
+  ;
+
+message:
+    command headers {
+      message.reset($1);
+      $1->set_header(std::unique_ptr<Header>($2));
+    }
+  | payload {
+      message->set_payload(std::unique_ptr<Payload>($1));
+    }
+  | error {
+      std::cerr << "Unknown message" << std::endl;
+    }
+  ;
+
+command:
+    options
+  | set_parameter
+  | get_parameter
+  | setup
+  | play
+  | teardown
+  | pause
+  | wfd_reply
+  ;
+
+options:
+    WFD_OPTIONS WFD_SP '*' WFD_SP WFD_END {
+      $$ = new Options("*");
+    }
+  | WFD_OPTIONS WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new Options(*$3);
+    }
+  ;
+
+set_parameter:
+    WFD_SET_PARAMETER WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new SetParameter(*$3);
+    }
+  ;
+
+get_parameter:
+    WFD_GET_PARAMETER WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new GetParameter(*$3);
+    }
+  ;
+
+setup:
+    WFD_SETUP WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new Setup(*$3);
+    }
+  ;
+
+play:
+    WFD_PLAY WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new Play(*$3);
+    }
+  ;
+
+teardown:
+    WFD_TEARDOWN WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new Teardown(*$3);
+    }
+  ;
+
+pause:
+    WFD_PAUSE WFD_SP WFD_REQUEST_URI WFD_SP WFD_END {
+      $$ = new Pause(*$3);
+    }
+  ;
+
+wfd_reply:
+    WFD_RESPONSE WFD_RESPONSE_CODE WFD_STRING {
+      UNUSED_TOKEN($3);
+      $$ = new Reply($2);
+    }
+  ;
+
+headers:
+    {
+      $$ = new Header();
+    }
+  | headers wfd_cseq { $1->set_cseq($2); }
+  | headers WFD_SUPPORT_CHECK { $1->set_require_wfd_support(true); }
+  | headers wfd_content_type { $1->set_content_type(*$2); }
+  | headers wfd_content_length { $1->set_content_length($2); }
+  | headers wfd_supported_methods { $1->set_supported_methods(*$2); }
+  | headers wfd_session {
+      $1->set_session((*$2).first);
+      $1->set_timeout((*$2).second);
+    }
+  | headers wfd_transport { $1->set_transport ($2); }
+  | headers WFD_HEADER wfd_ows WFD_STRING { $1->add_generic_header(*$2, *$4); }
+  ;
+  
+wfd_cseq: 
+    WFD_CSEQ wfd_ows WFD_NUM {
+      $$ = $3;
+    }
+  ;
+
+wfd_content_type:
+    WFD_CONTENT_TYPE wfd_ows WFD_MIME {
+      $$ = $3;
+    }
+  ;
+  
+wfd_content_length:
+    WFD_CONTENT_LENGTH wfd_ows WFD_NUM {
+      $$ = $3;
+    }
+  ;
+
+wfd_session:
+    WFD_SESSION WFD_SP WFD_SESSION_ID {
+      $$ = new std::pair<std::string, unsigned int>(*$3, 0);
+    }
+  | WFD_SESSION WFD_SP WFD_SESSION_ID WFD_TIMEOUT WFD_NUM {
+      $$ = new std::pair<std::string, unsigned int>(*$3, $5);
+    }
+  ;
+
+wfd_transport:
+    WFD_TRANSPORT WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+    }
+  | WFD_TRANSPORT WFD_NUM '-' WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+      $$->set_client_supports_rtcp (true);
+    }
+  | WFD_TRANSPORT WFD_NUM WFD_SERVER_PORT WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+      $$->set_server_port ($4);
+    }
+  | WFD_TRANSPORT WFD_NUM '-' WFD_NUM WFD_SERVER_PORT WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+      $$->set_client_supports_rtcp (true);
+      $$->set_server_port ($6);
+    }
+  | WFD_TRANSPORT WFD_NUM WFD_SERVER_PORT WFD_NUM '-' WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+      $$->set_server_port ($4);
+      $$->set_server_supports_rtcp (true);
+    }
+  | WFD_TRANSPORT WFD_NUM '-' WFD_NUM WFD_SERVER_PORT WFD_NUM '-' WFD_NUM {
+      $$ = new TransportHeader();
+      $$->set_client_port ($2);
+      $$->set_client_supports_rtcp (true);
+      $$->set_server_port ($6);
+      $$->set_server_supports_rtcp (true);
+    }
+  ;
+
+wfd_supported_methods:
+    WFD_RESPONSE_METHODS wfd_ows wfd_methods {
+     $$ = $3;
+    }
+  ;
+
+wfd_methods:
+    wfd_method {
+      $$ = new std::vector<Method>();
+      $$->push_back($1);
+    }
+  | wfd_methods wfd_ows ',' wfd_ows wfd_method {
+      UNUSED_TOKEN($$);
+      $1->push_back($5);
+    }
+  ;
+
+wfd_method: 
+    WFD_OPTIONS { $$ = wfd::OPTIONS; }
+  | WFD_SET_PARAMETER { $$ = wfd::SET_PARAMETER; }
+  | WFD_GET_PARAMETER { $$ = wfd::GET_PARAMETER; }
+  | WFD_SETUP { $$ = wfd::SETUP; }
+  | WFD_PLAY { $$ = wfd::PLAY; }
+  | WFD_TEARDOWN { $$ = wfd::TEARDOWN; }
+  | WFD_PAUSE { $$ = wfd::PAUSE; }
+  | WFD_TAG { $$ = wfd::ORG_WFA_WFD_1_0; }
+  ;
+  
+wfd_ows: 
+    /*blank*/
+  | WFD_SP
+  ;
+  
+payload: {
+    $$ = 0;
+    }
+  | wfd_parameter_list
+  | wdf_property_map
+  | wfd_property_error_map
+  ;
+
+  /* used for GET_PARAMETER method */
+wfd_parameter_list:
+    wfd_parameter_list wfd_parameter {
+      UNUSED_TOKEN($$);
+      $1->add_get_parameter_property($2);
+    }
+  | wfd_parameter {
+      $$ = new Payload();
+      $$->add_get_parameter_property($1);
+    }
+  | wfd_parameter_list WFD_GENERIC_PROPERTY {
+      UNUSED_TOKEN($$);
+      $1->add_get_parameter_property(*$2);
+    }
+  | WFD_GENERIC_PROPERTY {
+      $$ = new Payload();
+      $$->add_get_parameter_property(*$1);
+    }
+  ;
+
+wfd_parameter:
+    WFD_AUDIO_CODECS { $$ = WFD_AUDIO_CODECS; }
+  | WFD_VIDEO_FORMATS { $$ = WFD_VIDEO_FORMATS; }
+  | WFD_3D_FORMATS { $$ = WFD_3D_FORMATS; }
+  | WFD_CONTENT_PROTECTION { $$ = WFD_CONTENT_PROTECTION; }
+  | WFD_DISPLAY_EDID { $$ = WFD_DISPLAY_EDID; }
+  | WFD_COUPLED_SINK { $$ = WFD_COUPLED_SINK; }
+  | WFD_TRIGGER_METHOD { $$ = WFD_TRIGGER_METHOD; }
+  | WFD_PRESENTATION_URL { $$ = WFD_PRESENTATION_URL; }
+  | WFD_CLIENT_RTP_PORTS { $$ = WFD_CLIENT_RTP_PORTS; }
+  | WFD_ROUTE { $$ = WFD_ROUTE; }
+  | WFD_I2C { $$ = WFD_I2C; }
+  | WFD_AV_FORMAT_CHANGE_TIMING { $$ = WFD_AV_FORMAT_CHANGE_TIMING; }
+  | WFD_PREFERRED_DISPLAY_MODE { $$ = WFD_PREFERRED_DISPLAY_MODE; }
+  | WFD_UIBC_CAPABILITY { $$ = WFD_UIBC_CAPABILITY; }
+  | WFD_UIBC_SETTING { $$ = WFD_UIBC_SETTING; }
+  | WFD_STANDBY_RESUME_CAPABILITY { $$ = WFD_STANDBY_RESUME_CAPABILITY; }
+  | WFD_STANDBY_IN_REQUEST { $$ = WFD_STANDBY; }
+  | WFD_CONNECTOR_TYPE { $$ = WFD_CONNECTOR_TYPE; }
+  ;
+
+wfd_error_list:
+    WFD_NUM {
+      $$ = new std::vector<unsigned short>();
+      $$->push_back($1);
+    }
+  | wfd_error_list ',' WFD_SP WFD_NUM {
+      $1->push_back($4);
+    }
+
+wfd_property_errors:
+    WFD_AUDIO_CODECS_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_AUDIO_CODECS, *$4);
+    }
+  | WFD_VIDEO_FORMATS_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_VIDEO_FORMATS, *$4);
+    }
+  | WFD_3D_FORMATS_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_3D_FORMATS, *$4);
+    }
+  | WFD_CONTENT_PROTECTION_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_CONTENT_PROTECTION, *$4);
+    }
+  | WFD_DISPLAY_EDID_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_DISPLAY_EDID, *$4);
+    }
+  | WFD_COUPLED_SINK_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_COUPLED_SINK, *$4);
+    }
+  | WFD_TRIGGER_METHOD_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_TRIGGER_METHOD, *$4);
+    }
+  | WFD_PRESENTATION_URL_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_PRESENTATION_URL, *$4);
+    }
+  | WFD_CLIENT_RTP_PORTS_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_CLIENT_RTP_PORTS, *$4);
+    }
+  | WFD_ROUTE_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_ROUTE, *$4);
+    }
+  | WFD_I2C_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_I2C, *$4);
+    }
+  | WFD_AV_FORMAT_CHANGE_TIMING_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_AV_FORMAT_CHANGE_TIMING, *$4);
+    }
+  | WFD_PREFERRED_DISPLAY_MODE_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_PREFERRED_DISPLAY_MODE, *$4);
+    }
+  | WFD_UIBC_CAPABILITY_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_UIBC_CAPABILITY, *$4);
+    }
+  | WFD_UIBC_SETTING_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_UIBC_SETTING, *$4);
+    }
+  | WFD_STANDBY_RESUME_CAPABILITY_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_STANDBY_RESUME_CAPABILITY, *$4);
+    }
+  | WFD_CONNECTOR_TYPE_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_CONNECTOR_TYPE, *$4);
+    }
+  | WFD_IDR_REQUEST_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(WFD_IDR_REQUEST, *$4);
+    }
+  | WFD_GENERIC_PROPERTY_ERROR ':' WFD_SP wfd_error_list {
+      $$ = new PropertyErrors(*$1, *$4);
+    }
+  ;
+
+wfd_property_error_map:
+    wfd_property_errors {
+      $$ = new Payload();
+      $$->add_property_error(std::shared_ptr<PropertyErrors>($1));
+    }
+  | wfd_property_error_map wfd_property_errors {
+      $1->add_property_error(std::shared_ptr<PropertyErrors>($2));
+    }
+  ;
+
+wdf_property_map:
+    wfd_property {
+      $$ = new Payload();
+      $$->add_property(std::shared_ptr<Property>($1));
+    }
+  | wdf_property_map wfd_property {
+      $1->add_property(std::shared_ptr<Property>($2));
+    } 
+  ;
+
+wfd_property:
+    wfd_property_audio_codecs
+  | wfd_property_video_formats 
+  | wfd_property_3d_formats
+  | wfd_content_protection
+  | wfd_display_edid
+  | wfd_coupled_sink
+  | wfd_trigger_method
+  | wfd_presentation_url
+  | wfd_client_rtp_ports
+  | wfd_route
+  | wfd_I2C
+  | wfd_av_format_change_timing
+  | wfd_preferred_display_mode
+  | wfd_uibc_capability
+  | wfd_uibc_setting
+  | wfd_standby_resume_capability
+  | wfd_connector_type
+  | WFD_STANDBY_IN_RESPONSE {
+      $$ = new Standby();
+    }
+  | WFD_IDR_REQUEST {
+      $$ = new IDRRequest();
+    }
+  | WFD_GENERIC_PROPERTY WFD_STRING {
+      $$ = new GenericProperty(*$1, *$2);
+    }
+  ;
+
+wfd_property_audio_codecs:
+    WFD_AUDIO_CODECS ':' WFD_SP wfd_audio_codec_list  {
+      $$ = new AudioCodecs(*$4);
+    }
+  | WFD_AUDIO_CODECS ':' WFD_SP WFD_NONE {
+      $$ = new AudioCodecs();
+    }
+  ;
+
+wfd_audio_codec_list:
+    wfd_audio_codec {
+      $$ = new std::vector<AudioCodec>();
+      $$->push_back(*$1);
+    }
+  | wfd_audio_codec_list ',' WFD_SP wfd_audio_codec {
+      UNUSED_TOKEN($$);
+      $1->push_back(*$4);
+    }
+  ;
+
+wfd_audio_codec:
+  wfd_audio_codec_type WFD_SP WFD_NUM WFD_SP WFD_NUM {
+    $$ = new AudioCodec($1, $3, $5);
+  }
+  ;
+
+wfd_audio_codec_type:
+    WFD_AUDIO_CODEC_LPCM { $$ = LPCM; }
+  | WFD_AUDIO_CODEC_AAC { $$ = AAC; }
+  | WFD_AUDIO_CODEC_AC3 { $$ = AC3; }
+  ;
+
+wfd_property_video_formats:
+    WFD_VIDEO_FORMATS ':' wfd_ows WFD_NONE {
+      $$ = new VideoFormats();
+    }
+    /* native, preferred-display-mode-supported, H.264-codecs */
+  | WFD_VIDEO_FORMATS ':' wfd_ows WFD_NUM WFD_SP WFD_NUM WFD_SP wfd_h264_codecs {
+      $$ = new VideoFormats($4, $6, *$8);
+    }
+  ;
+
+wfd_h264_codecs:
+    wfd_h264_codec {
+      $$ = new H264Codecs();
+      $$->push_back(*$1);
+    }
+  | wfd_h264_codecs wfd_ows ',' wfd_ows wfd_h264_codec {
+      UNUSED_TOKEN($$);
+      $1->push_back(*$5);
+    }
+  ;
+
+wfd_h264_codec:
+    /* profile, level, misc-params , max-hres, max-vres */
+    WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP wfd_max_hres WFD_SP wfd_max_vres {
+      $$ = new H264Codec($1, $3, $5, $7, $9, $11, $13, $15, $17, $19, $21);
+    }
+
+
+wfd_h264_codecs_3d:
+    wfd_h264_codec_3d {
+      $$ = new H264Codecs3d();
+      $$->push_back(*$1);
+    }
+  | wfd_h264_codecs_3d wfd_ows ',' wfd_ows wfd_h264_codec_3d {
+      UNUSED_TOKEN($$);
+      $1->push_back(*$5);
+    }
+  ;
+
+wfd_h264_codec_3d:
+    WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP  wfd_max_hres WFD_SP wfd_max_vres {
+      $$ = new H264Codec3d($1, $3, $5, $7, $9, $11, $13, $15, $17);
+    }
+  ;
+
+wfd_max_hres:
+    WFD_NONE {
+      $$ = 0;
+    }
+  | WFD_NUM
+  ;
+  
+wfd_max_vres:
+    WFD_NONE {
+      $$ = 0;
+    }
+  | WFD_NUM
+  ;
+
+wfd_property_3d_formats:
+    /* native, preferred-display-mode-supported, H.264-codecs */
+    WFD_3D_FORMATS ':' WFD_SP  WFD_NUM WFD_SP WFD_NUM WFD_SP wfd_h264_codecs_3d {
+      $$ = new Formats3d($4, $6, *$8);
+    }
+  | WFD_3D_FORMATS ':' WFD_SP WFD_NONE {
+      $$ = new Formats3d();
+    }
+  ;
+
+wfd_content_protection:
+    WFD_CONTENT_PROTECTION ':' WFD_SP WFD_NONE {
+      $$ = new ContentProtection();
+    }
+  | WFD_CONTENT_PROTECTION ':' WFD_SP hdcp2_spec WFD_SP WFD_IP_PORT WFD_NUM {
+      $$ = new ContentProtection($4, $7);
+    }
+  ;
+
+hdcp2_spec:
+    WFD_HDCP_SPEC_2_0 {
+      $$ = ContentProtection::HDCP_SPEC_2_0;
+    }
+  | WFD_HDCP_SPEC_2_1 {
+      $$ = ContentProtection::HDCP_SPEC_2_1;
+    }
+  ;
+
+wfd_display_edid:
+    WFD_DISPLAY_EDID ':' WFD_SP WFD_NONE {
+      $$ = new DisplayEdid();
+    }
+  | WFD_DISPLAY_EDID ':' WFD_SP WFD_NUM WFD_SP wfd_edid_payload {
+      $$ = new DisplayEdid($4, $6 ? *$6 : "");
+    }
+  ;
+
+wfd_edid_payload:
+    WFD_NONE {
+      $$ = 0;
+    }
+  | WFD_STRING
+  ;
+  
+wfd_coupled_sink:
+    WFD_COUPLED_SINK ':' WFD_SP WFD_NONE {
+      $$ = new CoupledSink();
+    }
+  | WFD_COUPLED_SINK ':' WFD_SP WFD_NUM WFD_SP wfd_sink_address {
+      $$ = new CoupledSink($4, $6);
+    }
+  ;
+
+wfd_sink_address:
+    WFD_NONE {
+     $$ = -1;
+    }
+  | WFD_NUM
+  ; 
+
+wfd_trigger_method:
+    WFD_TRIGGER_METHOD ':' WFD_SP wfd_supported_trigger_methods {
+      $$ = new TriggerMethod($4);
+    }
+  ;
+
+wfd_supported_trigger_methods:
+    WFD_SETUP {
+      $$ = TriggerMethod::SETUP;
+    }
+  | WFD_PAUSE{
+      $$ = TriggerMethod::PAUSE;
+    }
+  | WFD_TEARDOWN {
+      $$ = TriggerMethod::TEARDOWN;
+    }
+  | WFD_PLAY {
+      $$ = TriggerMethod::PLAY;
+    }
+  ;
+
+wfd_presentation_url:
+    WFD_PRESENTATION_URL ':' WFD_SP wfd_presentation_url0 WFD_SP wfd_presentation_url1 {
+      $$ = new PresentationUrl($4 ? *$4 : "", $6 ? *$6 : "");
+    }
+  ;
+ 
+wfd_presentation_url0:
+    WFD_NONE {
+      $$ = 0;
+    }
+  | WFD_PRESENTATION_URL_0
+  ;
+
+wfd_presentation_url1:
+    WFD_NONE {
+      $$ = 0;
+    }
+  | WFD_PRESENTATION_URL_1
+  ;
+
+wfd_client_rtp_ports:
+    WFD_CLIENT_RTP_PORTS ':' WFD_SP WFD_STREAM_PROFILE WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_MODE_PLAY {
+      $$ = new ClientRtpPorts($6, $8);
+  }
+
+wfd_route:
+    WFD_ROUTE ':' WFD_SP wfd_route_destination {
+      $$ = new Route($4);
+    }
+  ;
+
+wfd_route_destination:
+    WFD_ROUTE_PRIMARY {
+      $$ = Route::PRIMARY;
+    }
+  | WFD_ROUTE_SECONDARY {
+      $$ = Route::SECONDARY;
+    }
+  ;
+
+wfd_I2C:
+    WFD_I2C ':' WFD_SP wfd_port {
+      $$ = new I2C($4);
+    }
+  ;
+
+wfd_port:
+    WFD_NONE {
+      $$ = -1;
+    }
+  | WFD_NUM
+  ;
+
+wfd_av_format_change_timing:
+    WFD_AV_FORMAT_CHANGE_TIMING ':' WFD_SP WFD_NUM WFD_SP WFD_NUM {
+      $$ = new AVFormatChangeTiming($4, $6);
+    }
+  ;
+
+wfd_preferred_display_mode:
+    /* p-clock SP H SP HB SP HSPOL-HSOFF SP HSW SP V SP VB SP VSPOL-VSOFF SP VSW SP VBS3D SP 2d-s3d-modes SP p-depth SP H.264-codec */
+    WFD_PREFERRED_DISPLAY_MODE ':' WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP WFD_NUM WFD_SP wfd_h264_codec {
+      $$ = new PreferredDisplayMode($4, $6, $8, $10, $12, $14, $16, $18, $20, $22, $24, $26, *$28);
+    }
+  ;
+
+wfd_uibc_capability:
+    WFD_UIBC_CAPABILITY ':' WFD_SP WFD_NONE {
+      $$ = new UIBCCapability();
+    }
+  | WFD_UIBC_CAPABILITY ':' WFD_SP wfd_input_category_list ';' wfd_generic_cap_list ';' wfd_hidc_cap_list ';' WFD_IP_PORT wfd_port {
+      $$ = new UIBCCapability(*$4, *$6, *$8, $11);
+    }
+  ;
+
+wfd_input_category_list:
+    WFD_INPUT_CATEGORY_LIST wfd_input_category_list_values {
+      $$ = $2;
+    }
+  ;
+
+wfd_input_category_list_values:
+    WFD_NONE {
+      $$ = new std::vector<UIBCCapability::InputCategory>();
+    }
+  | wfd_input_category_list_value {
+      $$ = new std::vector<UIBCCapability::InputCategory>();
+      $$->push_back($1);
+    }
+  | wfd_input_category_list_values ',' WFD_SP wfd_input_category_list_value {
+      $1->push_back($4);
+    }
+  ; 
+
+wfd_input_category_list_value:
+    WFD_INPUT_CATEGORY_GENERIC {
+      $$ = UIBCCapability::GENERIC;
+    }
+  | WFD_INPUT_CATEGORY_HIDC {
+      $$ = UIBCCapability::HIDC;
+    }
+  ;
+
+wfd_generic_cap_list:
+    WFD_GENERIC_CAP_LIST wfd_generic_cap_list_values {
+      $$ = $2;
+    }
+  ;
+  
+wfd_generic_cap_list_values:
+    WFD_NONE {
+      $$ = new std::vector<UIBCCapability::InputType>();
+    }
+  | wfd_generic_cap_list_value {
+      $$ = new std::vector<UIBCCapability::InputType>();
+      $$->push_back($1);
+    }
+  | wfd_generic_cap_list_values ',' WFD_SP wfd_generic_cap_list_value {
+      $1->push_back($4);
+    }
+  ;
+
+wfd_generic_cap_list_value:
+    WFD_INPUT_TYPE_KEYBOARD {
+      $$ = UIBCCapability::KEYBOARD;
+    }
+  | WFD_INPUT_TYPE_MOUSE {
+      $$ = UIBCCapability::MOUSE;
+    }
+  | WFD_INPUT_TYPE_SINGLE_TOUCH {
+      $$ = UIBCCapability::SINGLE_TOUCH;
+    }
+  | WFD_INPUT_TYPE_MULTI_TOUCH {
+      $$ = UIBCCapability::MULTI_TOUCH;
+    }
+  | WFD_INPUT_TYPE_JOYSTICK {
+      $$ = UIBCCapability::JOYSTICK;
+    }
+  | WFD_INPUT_TYPE_CAMERA {
+      $$ = UIBCCapability::CAMERA;
+    }
+  | WFD_INPUT_TYPE_GESTURE {
+      $$ = UIBCCapability::GESTURE;
+    }
+  | WFD_INPUT_TYPE_REMOTE_CONTROL {
+      $$ = UIBCCapability::REMOTE_CONTROL;
+    }
+  ;
+
+wfd_hidc_cap_list:
+    WFD_HIDC_CAP_LIST wfd_hidc_cap_list_values {
+      $$ = $2;
+    }
+  ;
+  
+wfd_hidc_cap_list_values:
+    WFD_NONE {
+      $$ = new std::vector<UIBCCapability::DetailedCapability>();
+    }
+  | wfd_hidc_cap_list_value {
+      $$ = new std::vector<UIBCCapability::DetailedCapability>();
+      $$->push_back(*$1);
+    }
+  | wfd_hidc_cap_list_values ',' WFD_SP wfd_hidc_cap_list_value {
+      $1->push_back(*$4);
+    }
+  ;
+
+wfd_hidc_cap_list_value:
+    wfd_generic_cap_list_value '/' wfd_input_path {
+      $$ = new UIBCCapability::DetailedCapability($1, $3);
+    }
+  ;
+
+
+wfd_input_path:
+    WFD_INPUT_PATH_INFRARED {
+      $$ = UIBCCapability::INFRARED;
+    }
+  | WFD_INPUT_PATH_USB {
+      $$ = UIBCCapability::USB;
+    }
+  | WFD_INPUT_PATH_BT {
+      $$ = UIBCCapability::BT;
+    }
+  | WFD_INPUT_PATH_ZIGBEE {
+      $$ = UIBCCapability::ZIGBEE;
+    }
+  | WFD_INPUT_PATH_WIFI {
+      $$ = UIBCCapability::WI_FI;
+    }
+  | WFD_INPUT_PATH_NOSP {
+      $$ = UIBCCapability::NO_SP;
+    }
+  ;
+  
+wfd_uibc_setting:
+    WFD_UIBC_SETTING ':' WFD_SP wfd_uibc_setting_value {
+      $$ = new UIBCSetting($4);
+    }
+  ;
+
+wfd_uibc_setting_value:
+    WFD_UIBC_SETTING_ENABLE {
+      $$ = true;
+    }
+  | WFD_UIBC_SETTING_DISABLE {
+      $$ = false;
+    }
+  ;
+
+wfd_standby_resume_capability:
+    WFD_STANDBY_RESUME_CAPABILITY ':' WFD_SP wfd_standby_resume_capability_value {
+      $$ = new StandbyResumeCapability($4);
+    }
+  ;
+  
+wfd_standby_resume_capability_value:
+    WFD_NONE {
+      $$ = false;
+    }
+  | WFD_SUPPORTED {
+      $$ = true;
+    }
+  ;
+  
+wfd_connector_type:
+    WFD_CONNECTOR_TYPE ':' WFD_SP WFD_NUM {
+      $$ = new ConnectorType($4);
+    }
+  | WFD_CONNECTOR_TYPE ':' WFD_SP WFD_NONE {
+      $$ = new ConnectorType();
+    }
+  ;
+
+%%
+
+void wfd::Parser::error(const std::string &err_message)
+{
+  message = nullptr;
+}

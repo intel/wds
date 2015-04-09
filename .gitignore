@@ -10,17 +10,17 @@ install_manifest.txt
 Testing/
 
 # generated source
-wfd/parser/errorscanner.cpp
-wfd/parser/headerscanner.cpp
-wfd/parser/messagescanner.cpp
-wfd/parser/parser.output
-wfd/parser/parser.tab.cpp
-wfd/parser/parser.tab.hpp
-wfd/parser/stack.hh
+libwds/parser/errorscanner.cpp
+libwds/parser/headerscanner.cpp
+libwds/parser/messagescanner.cpp
+libwds/parser/parser.output
+libwds/parser/parser.tab.cpp
+libwds/parser/parser.tab.hpp
+libwds/parser/stack.hh
 
 # generated binaries
-wfd/parser/wfd
-wfd/parser/test-wfd
+libwds/parser/wds
+libwds/parser/test-wds
 sink/sink-test
 p2p/test-ie
 p2p/register-peer-service

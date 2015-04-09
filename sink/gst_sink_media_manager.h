@@ -1,5 +1,5 @@
 /*
- * This file is part of wysiwidi
+ * This file is part of Wireless Display Software for Linux OS
  *
  * Copyright (C) 2014 Intel Corporation.
  *
@@ -24,7 +24,7 @@
 
 #include <memory>
 
-#include "wfd/public/media_manager.h"
+#include "libwds/public/media_manager.h"
 #include "mirac-gst-sink.hpp"
 
 class GstSinkMediaManager : public wfd::SinkMediaManager {

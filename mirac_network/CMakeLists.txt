@@ -4,8 +4,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -std=c++11")
 
 include_directories ("${PROJECT_SOURCE_DIR}" )
 include_directories ("${PROJECT_SOURCE_DIR}/include" )
-include_directories ("${PROJECT_SOURCE_DIR}/wfd/parser" )
-include_directories ("${PROJECT_SOURCE_DIR}/wfd/public" )
+include_directories ("${PROJECT_SOURCE_DIR}/libwds/parser" )
+include_directories ("${PROJECT_SOURCE_DIR}/libwds/public" )
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules (GLIB2 REQUIRED glib-2.0)
