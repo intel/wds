@@ -1,0 +1,131 @@
+/*
+ * This file is part of Wireless Display Software for Linux OS
+ *
+ * Copyright (C) 2014 Intel Corporation.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ */
+
+#include "session_state.h"
+
+#include "libwds/public/media_manager.h"
+
+#include "cap_negotiation_state.h"
+#include "libwds/common/rtsp_status_code.h"
+#include "libwds/parser/reply.h"
+#include "libwds/parser/setparameter.h"
+#include "libwds/parser/triggermethod.h"
+
+namespace wds {
+namespace source {
+
+class M5Handler final : public SequencedMessageSender {
+ public:
+  using SequencedMessageSender::SequencedMessageSender;
+
+ private:
+  std::unique_ptr<Message> CreateMessage() override {
+    SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
+    set_param->header().set_cseq(send_cseq_++);
+    set_param->payload().add_property(
+        std::shared_ptr<wds::Property>(new TriggerMethod(TriggerMethod::SETUP)));
+    return std::unique_ptr<Message>(set_param);
+  }
+
+  bool HandleReply(Reply* reply) override {
+    return (reply->response_code() == RTSP_OK);
+  }
+
+};
+
+class M6Handler final : public MessageReceiver<Request::M6> {
+ public:
+  M6Handler(const InitParams& init_params, uint& timer_id)
+    : MessageReceiver<Request::M6>(init_params),
+      keep_alive_timer_(timer_id) {
+  }
+
+  std::unique_ptr<Reply> HandleMessage(
+      Message* message) override {
+    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
+    // todo: generate unique session id
+    reply->header().set_session("abcdefg123456");
+    reply->header().set_timeout(kDefaultKeepAliveTimeout);
+
+    auto transport = new TransportHeader();
+    // we assume here that there is no coupled secondary sink
+    transport->set_client_port(ToSourceMediaManager(manager_)->GetSinkRtpPorts().first);
+    transport->set_server_port(ToSourceMediaManager(manager_)->GetLocalRtpPort());
+    reply->header().set_transport(transport);
+
+    return std::move(reply);
+  }
+
+  void Handle(std::unique_ptr<Message> message) override {
+    MessageReceiver<Request::M6>::Handle(std::move(message));
+    keep_alive_timer_ =
+        sender_->CreateTimer(kDefaultTimeoutValue);
+  }
+
+  uint& keep_alive_timer_;
+};
+
+M7Handler::M7Handler(const InitParams& init_params)
+  : MessageReceiver<Request::M7>(init_params) {
+}
+
+std::unique_ptr<Reply> M7Handler::HandleMessage(
+    Message* message) {
+  if (!manager_->IsPaused())
+    return nullptr; // FIXME : Shouldn't we just send error code?
+  manager_->Play();
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+}
+
+M8Handler::M8Handler(const InitParams& init_params)
+  : MessageReceiver<Request::M8>(init_params) {
+}
+
+std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
+  manager_->Teardown(); // FIXME : make proper reset.
+  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+}
+
+
+M16Sender::M16Sender(const InitParams& init_params)
+  : OptionalMessageSender<Request::M16>(init_params) {
+}
+
+bool M16Sender::HandleReply(Reply* reply) {
+  return (reply->response_code() == RTSP_OK);
+}
+
+SessionState::SessionState(const InitParams& init_params, uint& timer_id,
+    MessageHandlerPtr& m16_sender)
+  : MessageSequenceWithOptionalSetHandler(init_params) {
+  AddSequencedHandler(make_ptr(new M5Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M6Handler(init_params, timer_id)));
+  AddSequencedHandler(make_ptr(new M7Handler(init_params)));
+
+  AddOptionalHandler(make_ptr(new M8Handler(init_params)));
+  AddOptionalHandler(m16_sender);
+}
+
+SessionState::~SessionState() {
+}
+
+}  // source
+}  // wds
