@@ -25,6 +25,8 @@
 #include <gio/gio.h>
 
 #include "mirac-gst-test-source.hpp"
+#include "mirac-gst-bus-handler.hpp"
+#include "libwds/public/logging.h"
 
 MiracGstTestSource::MiracGstTestSource (wfd_test_stream_t wfd_stream_type, std::string hostname, int port)
 {
@@ -43,7 +45,17 @@ MiracGstTestSource::MiracGstTestSource (wfd_test_stream_t wfd_stream_type, std::
         gst_pipeline = "ximagesrc ! videoconvert ! video/x-raw,format=I420 ! x264enc tune=zerolatency ! mpegtsmux ! rtpmp2tpay ! udpsink name=sink " + hostname_port;
     }
 
-    gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
+    GError *err = NULL;
+    gst_elem = gst_parse_launch(gst_pipeline.c_str(), &err);
+    if (err != NULL) {
+        WDS_ERROR("Cannot initialize gstreamer pipeline: [%s] %s", g_quark_to_string(err->domain), err->message);
+    }
+
+    if (gst_elem) {
+        GstBus* bus = gst_pipeline_get_bus (GST_PIPELINE (gst_elem));
+        bus_watch_id = gst_bus_add_watch (bus, mirac_gstbus_callback, this);
+        gst_object_unref (bus);
+    }
 }
 
 void MiracGstTestSource::SetState(GstState state)
@@ -87,6 +99,7 @@ MiracGstTestSource::~MiracGstTestSource ()
 {
     if (gst_elem) {
         gst_element_set_state (gst_elem, GST_STATE_NULL);
+        g_source_remove (bus_watch_id);
         gst_object_unref (GST_OBJECT (gst_elem));
     }
 }

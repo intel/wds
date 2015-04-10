@@ -20,6 +20,8 @@
  */
 
 #include "mirac-gst-sink.hpp"
+#include "mirac-gst-bus-handler.hpp"
+#include "libwds/public/logging.h"
 
 #include <cassert>
 
@@ -43,12 +45,18 @@ MiracGstSink::MiracGstSink (std::string hostname, int port) {
   std::string url =  "udp://" + (!hostname.empty() ? hostname  : "::") + (port > 0 ? ":" + std::to_string(port) : ":");
   gst_pipeline = "playbin uri=" + url;
 
-  // todo (shalamov): GError is not checked
-  gst_elem = gst_parse_launch(gst_pipeline.c_str(), NULL);
+  GError *err = NULL;
+  gst_elem = gst_parse_launch(gst_pipeline.c_str(), &err);
+  if (err != NULL) {
+      WDS_ERROR("Cannot initialize gstreamer pipeline: [%s] %s", g_quark_to_string(err->domain), err->message);
+  }
+
   if (gst_elem) {
-      // todo (shalamov): add check whether handler id is > 0
+      GstBus* bus = gst_pipeline_get_bus (GST_PIPELINE (gst_elem));
+      bus_watch_id = gst_bus_add_watch (bus, mirac_gstbus_callback, this);
+      gst_object_unref (bus);
+
       g_signal_connect(gst_elem, "source-setup", G_CALLBACK(_set_udp_caps), NULL);
-      // todo (shalamov): add check for return value
       gst_element_set_state (gst_elem, GST_STATE_PLAYING);
   }
 }
@@ -106,6 +114,7 @@ bool MiracGstSink::IsInState(GstState state) const {
 MiracGstSink::~MiracGstSink () {
   if (gst_elem) {
     gst_element_set_state (gst_elem, GST_STATE_NULL);
+    g_source_remove (bus_watch_id);
     gst_object_unref (GST_OBJECT (gst_elem));
   }
 }

@@ -41,6 +41,7 @@ public:
 private:
     bool IsInState(GstState state) const;
     GstElement* gst_elem;
+    guint bus_watch_id;
 };
 
 #endif
