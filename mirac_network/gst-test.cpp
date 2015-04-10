@@ -30,6 +30,7 @@
 
 #include "mirac-gst-test-source.hpp"
 #include "mirac-gst-sink.hpp"
+#include "mirac-glib-logging.hpp"
 
 static gboolean _sig_handler (gpointer data_ptr)
 {
@@ -43,6 +44,8 @@ static gboolean _sig_handler (gpointer data_ptr)
 
 int main (int argc, char *argv[])
 {
+    InitGlibLogging();
+
     GError *error = NULL;
     GOptionContext *context;
     GMainLoop* ml = NULL;
@@ -65,7 +68,7 @@ int main (int argc, char *argv[])
     g_option_context_add_main_entries (context, main_entries, NULL);
     
    if (!g_option_context_parse (context, &argc, &argv, &error)) {
-        g_print ("option parsing failed: %s\n", error->message);
+        WDS_ERROR ("option parsing failed: %s", error->message);
         g_option_context_free(context);
         exit (1);
     }
@@ -96,10 +99,10 @@ int main (int argc, char *argv[])
     if (g_strcmp0(wfd_device_option, "testsource") == 0) {
         source_pipeline.reset(new MiracGstTestSource(wfd_stream, hostname, port));
         source_pipeline->SetState(GST_STATE_PLAYING);
-        g_print("Source UDP port: %d\n", source_pipeline->UdpSourcePort());
+        WDS_LOG("Source UDP port: %d", source_pipeline->UdpSourcePort());
     } else if (g_strcmp0(wfd_device_option, "sink") == 0) {
         sink_pipeline.reset(new MiracGstSink(hostname, port));
-        g_print("Listening on port %d\n", sink_pipeline->sink_udp_port());
+        WDS_LOG("Listening on port %d", sink_pipeline->sink_udp_port());
     }
 
     g_free(wfd_device_option);

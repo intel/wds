@@ -102,7 +102,7 @@ int main (int argc, char *argv[])
 
     GError* error = NULL;
     if (!g_option_context_parse (context, &argc, &argv, &error)) {
-        g_print ("option parsing failed: %s\n", error->message);
+        WDS_ERROR ("option parsing failed: %s", error->message);
         g_option_context_free(context);
         exit (1);
     }
