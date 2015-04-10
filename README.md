@@ -12,7 +12,7 @@ The source code includes example implementations:
  * _sink:_ Miracast sink that depends on Gstreamer, Connman and GLib mainloop
  * _desktop_source:_ Miracast source that depends on Gstreamer, Connman and GLib mainloop
 
-More information can be found on the [mailing list](https://lists.01.org/mailman/listinfo/wds-dev) and the [wiki](https://github.com/01org/wds/wiki).
+More information can be found on the [mailing list](https://lists.01.org/mailman/listinfo/wysiwidi-dev) and the [wiki](https://github.com/01org/wds/wiki).
 
 ### Requirements:
 
