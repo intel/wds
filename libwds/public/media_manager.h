@@ -33,8 +33,13 @@ namespace wds {
 /**
  * MediaManager interface.
  *
- * Source or sink applications should implement that interface. MediaManager
- * instance is used by state machine to control media stream.
+ * MediaManager instance is used by the state machine to control media stream
+ * during WFD session.
+ *
+ * MediaManager contains the common methods for both WFD sink and WFD source.
+ * The client applications are not supposed to implement it directly, they should
+ * rather implement either @c SinkMediaManager or @c SourceMediaManager.
+ * @see SinkMediaManager, SourceMediaManager
  */
 class MediaManager {
  public:
@@ -42,19 +47,16 @@ class MediaManager {
 
   /**
    * Triggers playback of the media stream.
-   * Should be called only by the state machine.
    */
   virtual void Play() = 0;
 
   /**
    * Pauses playback of the media stream.
-   * Should be called only by the state machine.
    */
   virtual void Pause() = 0;
 
   /**
    * Destroys media stream.
-   * Should be called only by the state machine.
    */
   virtual void Teardown() = 0;
 
@@ -65,42 +67,58 @@ class MediaManager {
   virtual bool IsPaused() const = 0;
 };
 
+/**
+ * SinkMediaManager interface.
+ *
+ * Extends the common @c MediaManager interface with WFD sink specific methods.
+ * @see MediaManager
+ */
 class SinkMediaManager : public MediaManager {
  public:
+   ~SinkMediaManager() override { }
+
   /**
-   * Returns RTP ports that are used to transmit media streams.
-   * @see SetRtpPorts
+   * Returns RTP listening ports that are used by WFD sink to receive media streams.
+   *
+   * In case of coupled sink configuration video and audio data could be sent
+   * to different RTP ports.
+   *
    * @return pair of RTP ports, port0 and port1
    */
-  virtual std::pair<int,int> ListeningRtpPorts() const = 0;
+  virtual std::pair<int,int> GetLocalRtpPorts() const = 0;
 
   /**
    * Sets presentation URL for media stream.
    * Presentation URL can be referred in order to control media stream resource
-   * within wds session.
+   * within WFD session.
    *
-   * @param presentation url that represents video / audio stream
+   * The implementation must store the given value and return it at GetPresentationUrl.
+   *
+   * @param presentation URL that represents video / audio stream
    */
   virtual void SetPresentationUrl(const std::string& url) = 0;
 
   /**
    * Returns presentation URL for managed media resource.
    * @see SetPresentationUrl
-   * @return presentation url
+   * @return presentation URL
    */
-  virtual std::string PresentationUrl() const = 0;
+  virtual std::string GetPresentationUrl() const = 0;
 
   /**
-   * Sets unique ID for wds session.
-   * @param string that uniquely identifies wds session
+   * Sets unique ID for WFD session.
+   *
+   * The implementation must store the given value and return it at GetSessionId.
+   *
+   * @param string that uniquely identifies WFD session
    */
-  virtual void SetSession(const std::string& session) = 0;
+  virtual void SetSessionId(const std::string& session) = 0;
 
   /**
-   * Returns unique wds session id.
-   * @return unique id for wds session
+   * Returns unique WFD session id.
+   * @return unique id for WFD session
    */
-  virtual std::string Session() const = 0;
+  virtual std::string GetSessionId() const = 0;
 
   /**
    * Returns list of supported H264 video formats
@@ -112,27 +130,36 @@ class SinkMediaManager : public MediaManager {
    * Returns native video format of a device
    * @return native video format
    */
-  virtual NativeVideoFormat SupportedNativeVideoFormat() const = 0;
+  virtual NativeVideoFormat GetSupportedNativeVideoFormat() const = 0;
 
   /**
    * Sets optimal H264 format that would be used to send / receive video stream
    *
    * @param optimal H264 format
-   * @return true if format can be used by media manager
+   * @return true if format can be used by media manager, false otherwise
    */
   virtual bool SetOptimalVideoFormat(const SelectableH264VideoFormat& optimal_format) = 0;
 };
 
+/**
+ * SourceMediaManager interface.
+ *
+ * Extends the common @c MediaManager interface with WFD source specific methods.
+ * @see MediaManager
+ */
 class SourceMediaManager : public MediaManager {
  public:
+   ~SourceMediaManager() override { }
+
   /**
-   * Sets RTP ports for media stream.
+   * Sets RTP ports used by WFD sink to receive media streams.
+   *
    * In case of coupled sink configuration video and audio data could be sent
    * to different RTP ports.
    *
-   * When MediaManager is responsible for receiving media stream, SetRtpPorts
-   * must set listening RTP ports for UDP connection. MediaManager that is
-   * sending media stream, must use RTP ports for outgoing UDP connection.
+   * WFD source must use these RTP ports for outgoing UDP connection.
+   *
+   * The implementation must store the given values and return them at GetSinkRtpPorts.
    *
    * @param port0 RTP port for video / audio stream
    * @param port1 RTP port that could be used to send audio stream
@@ -140,14 +167,14 @@ class SourceMediaManager : public MediaManager {
   virtual void SetSinkRtpPorts(int port1, int port2) = 0;
 
   /**
-   * Returns RTP ports that are used to transmit media streams.
+   * Returns RTP ports that are used by WFD sink to receive media streams.
    * @see SetRtpPorts
    * @return pair of RTP ports, port0 and port1
    */
-  virtual std::pair<int,int> SinkRtpPorts() const = 0;
+  virtual std::pair<int,int> GetSinkRtpPorts() const = 0;
 
   /**
-   * Returns the source RTP port
+   * Returns the local WFD source RTP port transmitting the media stream.
    * @return RTP port
    */
   virtual int GetLocalRtpPort() const = 0;
@@ -209,8 +236,8 @@ inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng) {
 }
 
 /**
- * An aux function to find the optimal format for streaming.
- * The quality selection algorithm will pick codec with higher bandwidth
+ * An auxiliary function to find the optimal format for streaming.
+ * The quality selection algorithm will pick codec with higher bandwidth.
  *
  * @param native format of a remote device
  * @param local_formats of H264 formats that are supported by local device

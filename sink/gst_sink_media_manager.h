@@ -31,19 +31,19 @@ class GstSinkMediaManager : public wds::SinkMediaManager {
  public:
   explicit GstSinkMediaManager(const std::string& hostname);
 
-  virtual void Play() override;
-  virtual void Pause() override;
-  virtual void Teardown() override;
-  virtual bool IsPaused() const override;
-  virtual std::pair<int,int> ListeningRtpPorts() const override;
-  virtual void SetPresentationUrl(const std::string& url) override;
-  virtual std::string PresentationUrl() const override;
-  virtual void SetSession(const std::string& session) override;
-  virtual std::string Session() const override;
+  void Play() override;
+  void Pause() override;
+  void Teardown() override;
+  bool IsPaused() const override;
+  std::pair<int,int> GetLocalRtpPorts() const override;
+  void SetPresentationUrl(const std::string& url) override;
+  std::string GetPresentationUrl() const override;
+  void SetSessionId(const std::string& session) override;
+  std::string GetSessionId() const override;
 
-  virtual std::vector<wds::SupportedH264VideoFormats> GetSupportedH264VideoFormats() const override;
-  virtual wds::NativeVideoFormat SupportedNativeVideoFormat() const override;
-  virtual bool SetOptimalVideoFormat(const wds::SelectableH264VideoFormat& optimal_format) override;
+  std::vector<wds::SupportedH264VideoFormats> GetSupportedH264VideoFormats() const override;
+  wds::NativeVideoFormat GetSupportedNativeVideoFormat() const override;
+  bool SetOptimalVideoFormat(const wds::SelectableH264VideoFormat& optimal_format) override;
 
  private:
   std::string hostname_;

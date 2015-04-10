@@ -63,14 +63,14 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           auto codec_lpcm = AudioCodec(LPCM, AudioModes(3), 0);
           auto codec_aac = AudioCodec(AAC, AudioModes(15), 0);
           auto codec_ac3 = AudioCodec(AC3, AudioModes(7), 0);
-          auto codec_list = std::vector<AudioCodec>();
+          std::vector<AudioCodec> codec_list;
           codec_list.push_back(codec_lpcm);
           codec_list.push_back(codec_aac);
           codec_list.push_back(codec_ac3);
           new_prop.reset(new AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_VIDEO_FORMATS]){
-          new_prop.reset(new VideoFormats(ToSinkMediaManager(manager_)->SupportedNativeVideoFormat(),
+          new_prop.reset(new VideoFormats(ToSinkMediaManager(manager_)->GetSupportedNativeVideoFormat(),
               false,
               ToSinkMediaManager(manager_)->GetSupportedH264VideoFormats()));
           reply->payload().add_property(new_prop);
@@ -87,8 +87,8 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new CoupledSink());
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_CLIENT_RTP_PORTS]){
-          new_prop.reset(new ClientRtpPorts(ToSinkMediaManager(manager_)->ListeningRtpPorts().first,
-                                                 ToSinkMediaManager(manager_)->ListeningRtpPorts().second));
+          new_prop.reset(new ClientRtpPorts(ToSinkMediaManager(manager_)->GetLocalRtpPorts().first,
+                                            ToSinkMediaManager(manager_)->GetLocalRtpPorts().second));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_I2C]){
           new_prop.reset(new I2C(0));
@@ -103,7 +103,8 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new StandbyResumeCapability(false));
           reply->payload().add_property(new_prop);
       } else {
-          std::cout << "** GET_PARAMETER: Property not supported" << std::endl;
+          WDS_ERROR("** GET_PARAMETER: Property not supported");
+          return std::unique_ptr<Reply>(new Reply(RTSP_NotImplemented));
       }
   }
 
@@ -119,7 +120,7 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto presentation_url =
       static_cast<PresentationUrl*>(message->payload().get_property(WFD_PRESENTATION_URL).get());
   assert(presentation_url);
-  SinkMediaManager* sink_media_manager= ToSinkMediaManager(manager_);
+  SinkMediaManager* sink_media_manager = ToSinkMediaManager(manager_);
   sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
 
   auto video_formats =

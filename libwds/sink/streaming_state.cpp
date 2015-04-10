@@ -61,8 +61,8 @@ class M7Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Play* play = new Play(ToSinkMediaManager(manager_)->PresentationUrl());
-    play->header().set_session(ToSinkMediaManager(manager_)->Session());
+    Play* play = new Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    play->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
     play->header().set_cseq (send_cseq_++);
     return std::unique_ptr<Message>(play);
   }
@@ -90,14 +90,15 @@ class M8Sender final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Teardown* teardown = new Teardown(ToSinkMediaManager(manager_)->PresentationUrl());
-    teardown->header().set_session(ToSinkMediaManager(manager_)->Session());
-    teardown->header().set_cseq (send_cseq_++);
+    Teardown* teardown = new Teardown(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    teardown->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
+    teardown->header().set_cseq(send_cseq_++);
     return std::unique_ptr<Message>(teardown);
   }
 
   bool HandleReply(Reply* reply) override {
-    if (!ToSinkMediaManager(manager_)->Session().empty() && (reply->response_code() == RTSP_OK)) {
+    if (!ToSinkMediaManager(manager_)->GetSessionId().empty() &&
+        (reply->response_code() == RTSP_OK)) {
       manager_->Teardown();
       return true;
     }
@@ -107,7 +108,7 @@ class M8Sender final : public SequencedMessageSender {
 
 TeardownHandler::TeardownHandler(const InitParams& init_params)
   : MessageSequenceHandler(init_params) {
-  AddSequencedHandler(make_ptr(new M5Handler<wds::TriggerMethod::TEARDOWN>(init_params)));
+  AddSequencedHandler(make_ptr(new M5Handler<TriggerMethod::TEARDOWN>(init_params)));
   AddSequencedHandler(make_ptr(new M8Sender(init_params)));
 }
 
@@ -116,9 +117,9 @@ class M9Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Pause* pause = new Pause(ToSinkMediaManager(manager_)->PresentationUrl());
-    pause->header().set_session(ToSinkMediaManager(manager_)->Session());
-    pause->header().set_cseq (send_cseq_++);
+    Pause* pause = new Pause(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    pause->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
+    pause->header().set_cseq(send_cseq_++);
     return std::unique_ptr<Message>(pause);
   }
 

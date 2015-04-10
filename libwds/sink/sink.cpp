@@ -141,16 +141,16 @@ void SinkImpl::RTSPDataReceived(const std::string& message) {
 
 template <class WfdMessage, Request::ID id>
 std::unique_ptr<Message> SinkImpl::CreateCommand() {
-  auto message = new WfdMessage(manager_->PresentationUrl());
-  message->header().set_session(manager_->Session());
+  auto message = new WfdMessage(manager_->GetPresentationUrl());
+  message->header().set_session(manager_->GetSessionId());
   message->header().set_cseq(state_machine_->GetNextCSeq());
   message->set_id(id);
   return std::unique_ptr<Message>(message);
 }
 
 bool SinkImpl::HandleCommand(std::unique_ptr<Message> command) {
-  if (manager_->Session().empty() ||
-      manager_->PresentationUrl().empty())
+  if (manager_->GetSessionId().empty() ||
+      manager_->GetPresentationUrl().empty())
     return false;
 
   if (!state_machine_->CanSend(command.get()))

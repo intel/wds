@@ -111,13 +111,13 @@ bool M3Handler::HandleReply(Reply* reply) {
 std::unique_ptr<Message> M4Handler::CreateMessage() {
   SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
   set_param->header().set_cseq(send_cseq_++);
+  SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
+  const auto& ports = source_manager->GetSinkRtpPorts();
   set_param->payload().add_property(
-      std::shared_ptr<Property>(new ClientRtpPorts(ToSourceMediaManager(manager_)->SinkRtpPorts().first,
-                                                   ToSourceMediaManager(manager_)->SinkRtpPorts().second)));
+      std::shared_ptr<Property>(new ClientRtpPorts(ports.first, ports.second)));
   std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
   set_param->payload().add_property(
       std::shared_ptr<Property>(new PresentationUrl(presentation_Url_1, "")));
-  SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   set_param->payload().add_property(
       std::shared_ptr<VideoFormats>(new VideoFormats(
           NativeVideoFormat(),  // Should be all zeros.
