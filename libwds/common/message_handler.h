@@ -28,8 +28,8 @@
 #include <memory>
 #include <utility>
 
-#include "libwds/parser/message.h"
-#include "libwds/parser/reply.h"
+#include "libwds/rtsp/message.h"
+#include "libwds/rtsp/reply.h"
 #include "libwds/public/logging.h"
 #include "libwds/public/peer.h"
 

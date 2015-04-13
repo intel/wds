@@ -24,9 +24,9 @@
 #include "libwds/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/setparameter.h"
-#include "libwds/parser/triggermethod.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/setparameter.h"
+#include "libwds/rtsp/triggermethod.h"
 
 namespace wds {
 

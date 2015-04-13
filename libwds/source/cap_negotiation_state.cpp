@@ -21,14 +21,14 @@
 
 #include "cap_negotiation_state.h"
 
-#include "libwds/parser/audiocodecs.h"
-#include "libwds/parser/clientrtpports.h"
-#include "libwds/parser/getparameter.h"
-#include "libwds/parser/payload.h"
-#include "libwds/parser/presentationurl.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/setparameter.h"
-#include "libwds/parser/videoformats.h"
+#include "libwds/rtsp/audiocodecs.h"
+#include "libwds/rtsp/clientrtpports.h"
+#include "libwds/rtsp/getparameter.h"
+#include "libwds/rtsp/payload.h"
+#include "libwds/rtsp/presentationurl.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/setparameter.h"
+#include "libwds/rtsp/videoformats.h"
 #include "libwds/public/media_manager.h"
 
 namespace wds {

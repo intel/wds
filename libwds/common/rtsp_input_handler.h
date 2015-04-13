@@ -23,7 +23,7 @@
 #define RTSP_INPUT_HANDLER_H_
 
 #include <string>
-#include "libwds/parser/driver.h"
+#include "libwds/rtsp/driver.h"
 
 namespace wds {
 

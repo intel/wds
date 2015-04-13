@@ -21,8 +21,8 @@
 
 #include "init_state.h"
 
-#include "libwds/parser/options.h"
-#include "libwds/parser/reply.h"
+#include "libwds/rtsp/options.h"
+#include "libwds/rtsp/reply.h"
 
 namespace wds {
 

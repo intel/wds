@@ -25,10 +25,10 @@
 
 #include "cap_negotiation_state.h"
 #include "streaming_state.h"
-#include "libwds/parser/play.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/setup.h"
-#include "libwds/parser/transportheader.h"
+#include "libwds/rtsp/play.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/setup.h"
+#include "libwds/rtsp/transportheader.h"
 
 namespace wds {
 using rtsp::Message;

@@ -29,8 +29,8 @@
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
 #include "libwds/public/wds_export.h"
-#include "libwds/parser/getparameter.h"
-#include "libwds/parser/setparameter.h"
+#include "libwds/rtsp/getparameter.h"
+#include "libwds/rtsp/setparameter.h"
 #include "libwds/public/media_manager.h"
 
 namespace wds {

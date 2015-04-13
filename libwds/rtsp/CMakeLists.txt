@@ -16,7 +16,7 @@ ADD_FLEX_BISON_DEPENDENCY(HeaderLexer Parser)
 FLEX_TARGET(ErrorLexer errorlexer.l  ${CMAKE_CURRENT_BINARY_DIR}/errorscanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(ErrorLexer Parser)
 
-add_library(wdsparser OBJECT
+add_library(wdsrtsp OBJECT
     ${BISON_Parser_OUTPUTS}
     ${FLEX_MessageLexer_OUTPUTS}
     ${FLEX_ErrorLexer_OUTPUTS}
@@ -32,7 +32,7 @@ add_library(wdsparser OBJECT
     preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp scanner.cpp
 )
 
-add_executable(test-wds tests.cpp $<TARGET_OBJECTS:wdsparser>)
+add_executable(test-wds tests.cpp $<TARGET_OBJECTS:wdsrtsp>)
 set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
 target_link_libraries (test-wds)
 

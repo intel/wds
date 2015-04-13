@@ -24,7 +24,7 @@
 #include "cap_negotiation_state.h"
 #include "libwds/public/media_manager.h"
 #include "session_state.h"
-#include "libwds/parser/reply.h"
+#include "libwds/rtsp/reply.h"
 
 namespace wds {
 

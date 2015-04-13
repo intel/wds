@@ -24,11 +24,11 @@
 #include "libwds/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "libwds/parser/pause.h"
-#include "libwds/parser/play.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/teardown.h"
-#include "libwds/parser/triggermethod.h"
+#include "libwds/rtsp/pause.h"
+#include "libwds/rtsp/play.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/teardown.h"
+#include "libwds/rtsp/triggermethod.h"
 #include "session_state.h"
 
 namespace wds {
