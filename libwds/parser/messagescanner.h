@@ -30,19 +30,21 @@
 #include "parser.tab.hpp"
 
 namespace wds {
+namespace rtsp {
 
 class MessageScanner : public yyFlexLexer, public BaseLexer {
  public:
   MessageScanner(std::istream *in, bool is_reply_message = false)
  : yyFlexLexer(in),
    BaseLexer(),
-   is_reply_message_(is_reply_message) {};
+   is_reply_message_(is_reply_message) { }
 
  private:
   bool is_reply_message_;
   int yylex() override;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif // MESSAGESCANNER_H

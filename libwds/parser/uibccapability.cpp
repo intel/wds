@@ -23,6 +23,7 @@
 #include "uibccapability.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 
@@ -96,14 +97,14 @@ std::string UIBCCapability::ToString() const {
   + std::string(SPACE);
 
   if (is_none())
-    return ret + wds::NONE;
+    return ret + NONE;
 
   ret += kInputCategoryList;
   auto inp_cat_i = input_categories_.begin();
   auto inp_cat_end = input_categories_.end();
 
   if (input_categories_.empty())
-    ret += wds::NONE;
+    ret += NONE;
 
   while (inp_cat_i != inp_cat_end) {
     ret += kInputCategories[*inp_cat_i];
@@ -121,7 +122,7 @@ std::string UIBCCapability::ToString() const {
   auto gen_cap_end = generic_capabilities_.end();
 
   if (generic_capabilities_.empty())
-    ret += wds::NONE;
+    ret += NONE;
 
   while (gen_cap_i != gen_cap_end) {
     ret += kInputTypes[*gen_cap_i];
@@ -139,7 +140,7 @@ std::string UIBCCapability::ToString() const {
   auto hidc_cap_end = hidc_capabilities_.end();
 
   if (hidc_capabilities_.empty())
-    ret += wds::NONE;
+    ret += NONE;
 
   while (hidc_cap_i != hidc_cap_end) {
     ret += kInputTypes[(*hidc_cap_i).first]
@@ -154,9 +155,10 @@ std::string UIBCCapability::ToString() const {
   }
 
   ret += tcp_port_ > 0 ? std::string("port=") + std::to_string(tcp_port_)
-                       : wds::NONE;
+                       : NONE;
 
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

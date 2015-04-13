@@ -21,12 +21,14 @@
 
 #include "init_state.h"
 
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/parser/options.h"
 #include "libwds/parser/reply.h"
 
 namespace wds {
 namespace sink {
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
 
 class M1Handler final : public MessageReceiver<Request::M1> {
  public:
@@ -34,11 +36,11 @@ class M1Handler final : public MessageReceiver<Request::M1> {
     : MessageReceiver<Request::M1>(init_params) {
   }
   virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
-    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
-    std::vector<Method> supported_methods;
-    supported_methods.push_back(ORG_WFA_WFD_1_0);
-    supported_methods.push_back(GET_PARAMETER);
-    supported_methods.push_back(SET_PARAMETER);
+    auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
+    std::vector<rtsp::Method> supported_methods;
+    supported_methods.push_back(rtsp::ORG_WFA_WFD_1_0);
+    supported_methods.push_back(rtsp::GET_PARAMETER);
+    supported_methods.push_back(rtsp::SET_PARAMETER);
     reply->header().set_supported_methods(supported_methods);
     return std::move(reply);
   }
@@ -49,23 +51,23 @@ class M2Handler final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<Message> CreateMessage() override {
-    auto options = new Options("*");
+    auto options = new rtsp::Options("*");
     options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
     return std::unique_ptr<Message>(options);
   }
 
   virtual bool HandleReply(Reply* reply) override {
-    const Header& header = reply->header();
+    const rtsp::Header& header = reply->header();
 
-    if (reply->response_code() == RTSP_OK
-        && header.has_method(Method::ORG_WFA_WFD_1_0)
-        && header.has_method(Method::GET_PARAMETER)
-        && header.has_method(Method::SET_PARAMETER)
-        && header.has_method(Method::SETUP)
-        && header.has_method(Method::PLAY)
-        && header.has_method(Method::TEARDOWN)
-        && header.has_method(Method::PAUSE)) {
+    if (reply->response_code() == rtsp::STATUS_OK
+        && header.has_method(rtsp::Method::ORG_WFA_WFD_1_0)
+        && header.has_method(rtsp::Method::GET_PARAMETER)
+        && header.has_method(rtsp::Method::SET_PARAMETER)
+        && header.has_method(rtsp::Method::SETUP)
+        && header.has_method(rtsp::Method::PLAY)
+        && header.has_method(rtsp::Method::TEARDOWN)
+        && header.has_method(rtsp::Method::PAUSE)) {
       return true;
     }
 

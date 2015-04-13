@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class GenericProperty: public Property {
   public:
@@ -43,6 +44,7 @@ class GenericProperty: public Property {
     std::string value_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // GENERIC_PROPERTY_H_

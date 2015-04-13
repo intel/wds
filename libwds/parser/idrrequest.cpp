@@ -23,6 +23,7 @@
 #include "idrrequest.h"
 
 namespace wds {
+namespace rtsp {
 
 IDRRequest::IDRRequest() : Property(WFD_IDR_REQUEST) {
 }
@@ -34,4 +35,5 @@ std::string IDRRequest::ToString() const {
   return std::string("wfd_idr_request");
 }
 
+}  // namespace rtsp
 }  // namespace wds

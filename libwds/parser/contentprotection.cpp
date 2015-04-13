@@ -25,6 +25,7 @@
 #include <assert.h>
 
 namespace wds {
+namespace rtsp {
 
 namespace {
   const char* name[] = {"HDCP2.0", "HDCP2.1"};
@@ -55,11 +56,12 @@ std::string ContentProtection::ToString() const {
     + std::string(SEMICOLON) + std::string(SPACE);
 
   if (is_none())
-    ret += wds::NONE;
+    ret += NONE;
   else
     ret += name[hdcp_spec()] + std::string(SPACE)
         + port_prefix + std::to_string(port_);
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

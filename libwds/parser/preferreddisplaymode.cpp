@@ -25,6 +25,7 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 PreferredDisplayMode::PreferredDisplayMode(
     unsigned int p_clock,unsigned short h,
@@ -83,4 +84,5 @@ std::string PreferredDisplayMode::ToString() const {
 PreferredDisplayMode::~PreferredDisplayMode() {
 }
 
+}  // namespace rtsp
 }  // namespace wds

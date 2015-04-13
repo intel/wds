@@ -23,6 +23,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 Property::Property(PropertyType type)
     : type_(type),
@@ -42,4 +43,5 @@ std::string Property::ToString() const {
   return std::string();
 }
 
+}  // namespace rtsp
 }  // namespace wds

@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class I2C: public Property {
  public:
@@ -40,6 +41,7 @@ class I2C: public Property {
   int port_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // I2C_H_

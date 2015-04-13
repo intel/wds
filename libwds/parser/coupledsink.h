@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class CoupledSink: public Property {
  public:
@@ -42,6 +43,7 @@ class CoupledSink: public Property {
   unsigned long long int sink_address_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // COUPLEDSINK_H_

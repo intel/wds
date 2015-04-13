@@ -26,11 +26,12 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class DisplayEdid: public Property {
  public:
   DisplayEdid();
-  DisplayEdid(unsigned short edid_block_count, std::string edid_payload);
+  DisplayEdid(unsigned short edid_block_count, const std::string& edid_payload);
   ~DisplayEdid() override;
 
   unsigned short block_count() const { return edid_block_count_; }
@@ -42,6 +43,7 @@ class DisplayEdid: public Property {
   std::string edid_payload_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // DISPLAYEDID_H_

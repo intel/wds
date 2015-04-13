@@ -28,6 +28,7 @@
 #include "videoformats.h"
 
 namespace wds {
+namespace rtsp {
 
 class PreferredDisplayMode: public Property {
  public:
@@ -71,6 +72,7 @@ class PreferredDisplayMode: public Property {
   H264Codec h264_codec_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // PREFERREDDISPLAYMODE_H_

@@ -26,6 +26,7 @@
 #include "message.h"
 
 namespace wds {
+namespace rtsp {
 
 class Pause : public Request {
  public:
@@ -34,6 +35,7 @@ class Pause : public Request {
     std::string ToString() const override;
 };
 
-} // namespace wds
+}  // namespace rtsp
+}  // namespace wds
 
 #endif // PAUSE_H_

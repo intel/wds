@@ -25,15 +25,16 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 DisplayEdid::DisplayEdid(): Property(WFD_DISPLAY_EDID, true) {
 }
 
 DisplayEdid::DisplayEdid(unsigned short edid_block_count,
-    std::string edid_payload)
+    const std::string& edid_payload)
   : Property(WFD_DISPLAY_EDID),
     edid_block_count_(edid_block_count),
-    edid_payload_(edid_payload.length() ? edid_payload : wds::NONE) {
+    edid_payload_(edid_payload.length() ? edid_payload : NONE) {
 }
 
 DisplayEdid::~DisplayEdid() {
@@ -46,7 +47,7 @@ std::string DisplayEdid::ToString() const {
     + std::string(SPACE);
 
   if (is_none()) {
-    ret += wds::NONE;
+    ret += NONE;
   } else {
     MAKE_HEX_STRING_2(edid_block_count, edid_block_count_);
     ret += edid_block_count + std::string(SPACE) + edid_payload_;
@@ -55,4 +56,5 @@ std::string DisplayEdid::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

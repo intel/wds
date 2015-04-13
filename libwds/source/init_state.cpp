@@ -21,11 +21,15 @@
 
 #include "init_state.h"
 
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/parser/options.h"
 #include "libwds/parser/reply.h"
 
 namespace wds {
+
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+
 namespace source {
 
 class M1Handler final : public SequencedMessageSender {
@@ -33,14 +37,14 @@ class M1Handler final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Options* options = new Options("*");
+    rtsp::Options* options = new rtsp::Options("*");
     options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
     return std::unique_ptr<Message>(options);
   }
 
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == RTSP_OK);
+    return (reply->response_code() == rtsp::STATUS_OK);
   }
 
 };
@@ -52,15 +56,15 @@ class M2Handler final : public MessageReceiver<Request::M2> {
   }
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
-    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
-    std::vector<wds::Method> supported_methods;
-    supported_methods.push_back(ORG_WFA_WFD_1_0);
-    supported_methods.push_back(GET_PARAMETER);
-    supported_methods.push_back(SET_PARAMETER);
-    supported_methods.push_back(PLAY);
-    supported_methods.push_back(PAUSE);
-    supported_methods.push_back(SETUP);
-    supported_methods.push_back(TEARDOWN);
+    auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
+    std::vector<rtsp::Method> supported_methods;
+    supported_methods.push_back(rtsp::ORG_WFA_WFD_1_0);
+    supported_methods.push_back(rtsp::GET_PARAMETER);
+    supported_methods.push_back(rtsp::SET_PARAMETER);
+    supported_methods.push_back(rtsp::PLAY);
+    supported_methods.push_back(rtsp::PAUSE);
+    supported_methods.push_back(rtsp::SETUP);
+    supported_methods.push_back(rtsp::TEARDOWN);
     reply->header().set_supported_methods(supported_methods);
     return std::move(reply);
   }

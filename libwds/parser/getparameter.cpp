@@ -23,6 +23,7 @@
 #include "getparameter.h"
 
 namespace wds {
+namespace rtsp {
 
 GetParameter::GetParameter(const std::string& request_uri)
  : Request(Request::MethodGetParameter, request_uri) {
@@ -38,4 +39,5 @@ std::string GetParameter::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

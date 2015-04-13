@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class Route: public Property {
  public:
@@ -45,6 +46,7 @@ class Route: public Property {
   Route::Destination destination_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // ROUTE_H_

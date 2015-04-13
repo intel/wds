@@ -21,7 +21,6 @@
 
 #include "cap_negotiation_state.h"
 
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/parser/audiocodecs.h"
 #include "libwds/parser/clientrtpports.h"
 #include "libwds/parser/getparameter.h"
@@ -33,6 +32,18 @@
 #include "libwds/public/media_manager.h"
 
 namespace wds {
+
+using rtsp::AudioCodecs;
+using rtsp::ClientRtpPorts;
+using rtsp::GetParameter;
+using rtsp::Message;
+using rtsp::Payload;
+using rtsp::Property;
+using rtsp::Request;
+using rtsp::Reply;
+using rtsp::SetParameter;
+using rtsp::VideoFormats;
+
 namespace source {
 
 class M3Handler final : public SequencedMessageSender {
@@ -67,11 +78,11 @@ std::unique_ptr<Message> M3Handler::CreateMessage() {
 }
 
 bool M3Handler::HandleReply(Reply* reply) {
-  if (reply->response_code() != RTSP_OK)
+  if (reply->response_code() != rtsp::STATUS_OK)
     return false;
 
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
-  auto prop = reply->payload().get_property(WFD_CLIENT_RTP_PORTS);
+  auto prop = reply->payload().get_property(rtsp::WFD_CLIENT_RTP_PORTS);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
   if (!ports){
     WDS_ERROR("Failed to obtain RTP ports from source.");
@@ -80,14 +91,14 @@ bool M3Handler::HandleReply(Reply* reply) {
   source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
 
   auto video_formats = static_cast<VideoFormats*>(
-      reply->payload().get_property(WFD_VIDEO_FORMATS).get());
+      reply->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
   if (!video_formats) {
     WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
     return false;
   }
 
   auto audio_codecs = static_cast<AudioCodecs*>(
-      reply->payload().get_property(WFD_AUDIO_CODECS).get());
+      reply->payload().get_property(rtsp::WFD_AUDIO_CODECS).get());
   if (!audio_codecs) {
     WDS_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
     return false;
@@ -117,7 +128,7 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
       std::shared_ptr<Property>(new ClientRtpPorts(ports.first, ports.second)));
   std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
   set_param->payload().add_property(
-      std::shared_ptr<Property>(new PresentationUrl(presentation_Url_1, "")));
+      std::shared_ptr<Property>(new rtsp::PresentationUrl(presentation_Url_1, "")));
   set_param->payload().add_property(
       std::shared_ptr<VideoFormats>(new VideoFormats(
           NativeVideoFormat(),  // Should be all zeros.
@@ -130,7 +141,7 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
 }
 
 bool M4Handler::HandleReply(Reply* reply) {
-  return (reply->response_code() == RTSP_OK);
+  return (reply->response_code() == rtsp::STATUS_OK);
 }
 
 CapNegotiationState::CapNegotiationState(const InitParams &init_params)

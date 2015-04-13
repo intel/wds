@@ -30,17 +30,18 @@
 #include "parser.tab.hpp"
 
 namespace wds {
+namespace rtsp {
 
 class HeaderScanner : public yyFlexLexer, public BaseLexer {
  public:
   HeaderScanner(std::istream *in)
- : yyFlexLexer(in),
-   BaseLexer() {};
+  : yyFlexLexer(in),
+    BaseLexer() {}
 
  private:
   int yylex() override;
 };
 
+}  // namespace rtsp
 }  // namespace wds
-
 #endif // HEADERSCANNER_H

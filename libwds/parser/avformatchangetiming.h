@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class AVFormatChangeTiming: public Property {
 public:
@@ -42,6 +43,7 @@ public:
   unsigned long long int dts_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // AVFORMATCHANGETIMING_H_

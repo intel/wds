@@ -29,6 +29,7 @@
 #include "constants.h"
 
 namespace wds {
+namespace rtsp {
 
 class Property {
  public:
@@ -48,5 +49,6 @@ class Property {
 };
 
 }  // namespace wds
+}  // namespace rtsp
 
 #endif  // PROPERTY_H_

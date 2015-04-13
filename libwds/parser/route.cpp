@@ -23,6 +23,7 @@
 #include "route.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 const char primary[] = "primary";
@@ -43,4 +44,5 @@ std::string Route::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

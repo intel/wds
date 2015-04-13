@@ -31,17 +31,19 @@
 #include "parser.tab.hpp"
 
 namespace wds {
+namespace rtsp {
 
 class ErrorScanner : public yyFlexLexer, public BaseLexer {
  public:
   ErrorScanner(std::istream *in)
- : yyFlexLexer(in),
-   BaseLexer() {};
+  : yyFlexLexer(in),
+    BaseLexer() { }
 
  private:
   int yylex() override;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif // ERRORSCANNER_H

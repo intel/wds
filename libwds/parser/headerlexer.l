@@ -1,7 +1,7 @@
 %option debug
 %option nodefault
 %option c++
-%option yyclass="wds::HeaderScanner"
+%option yyclass="wds::rtsp::HeaderScanner"
 %option prefix="Hdr_"
 %option nounput nomain noyywrap
 %option warn stack noyy_top_state
@@ -33,7 +33,7 @@
 
 #include <string>
 #include "headerscanner.h"
-typedef wds::Parser::token token;
+using token = wds::rtsp::Parser::token;
 #define yyterminate() return(token::END)
 %}
 

@@ -27,10 +27,11 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 
-std::string ToString(const AudioCodec& codec) {
+std::string ToString(const wds::AudioCodec& codec) {
   MAKE_HEX_STRING_8(audio_modes_str,
       static_cast<unsigned int>(codec.modes.to_ulong()));
   MAKE_HEX_STRING_2(latency_str, codec.latency);
@@ -47,7 +48,7 @@ AudioCodecs::AudioCodecs()
   : Property(WFD_AUDIO_CODECS, true) {
 }
 
-AudioCodecs::AudioCodecs(const std::vector<AudioCodec>& audio_codecs)
+AudioCodecs::AudioCodecs(const std::vector<wds::AudioCodec>& audio_codecs)
   : Property(WFD_AUDIO_CODECS),
     audio_codecs_(audio_codecs) {
 }
@@ -65,7 +66,7 @@ std::string AudioCodecs::ToString() const {
   auto it = audio_codecs_.begin();
   auto end = audio_codecs_.end();
   while (it != end) {
-    ret += wds::ToString(*it);
+    ret += wds::rtsp::ToString(*it);
     ++it;
     if (it != end)
       ret += ", ";
@@ -74,4 +75,5 @@ std::string AudioCodecs::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

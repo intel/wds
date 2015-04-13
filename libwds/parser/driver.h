@@ -32,6 +32,7 @@
 #include "parser.tab.hpp"
 
 namespace wds {
+namespace rtsp {
 
 class Driver {
  public:
@@ -45,6 +46,7 @@ class Driver {
   std::unique_ptr<Scanner> scanner_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // DRIVER_H_

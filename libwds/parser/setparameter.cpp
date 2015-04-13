@@ -24,6 +24,7 @@
 #include "triggermethod.h"
 
 namespace wds {
+namespace rtsp {
 
 SetParameter::SetParameter(const std::string& request_uri)
  : Request(Request::MethodSetParameter, request_uri) {
@@ -36,4 +37,5 @@ std::string SetParameter::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

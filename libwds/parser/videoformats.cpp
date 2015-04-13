@@ -26,6 +26,7 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 template <typename EnumType>
@@ -39,6 +40,9 @@ unsigned int EnumListToMask(const std::vector<EnumType>& from) {
   return result;
 }
 } //namespace
+
+using wds::SelectableH264VideoFormat;
+using wds::SupportedH264VideoFormats;
 
 H264Codec::H264Codec(unsigned char profile, unsigned char level,
     unsigned int cea_support, unsigned int vesa_support,
@@ -182,19 +186,19 @@ void H264Codec::ToSelectableVideoFormats(std::vector<SelectableH264VideoFormat>&
   auto profile = ToH264Profile(profile_);
   auto level = ToH264Level(level_);
   if (cea_support_ != 0) {
-    auto list = MaskToEnumList<CEARatesAndResolutions>(
+    auto list = MaskToEnumList<wds::CEARatesAndResolutions>(
         cea_support_, CEA1920x1080p24);
     for(auto rate_resolution: list)
       formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
   }
   if (vesa_support_ != 0) {
-    auto list = MaskToEnumList<VESARatesAndResolutions>(
+    auto list = MaskToEnumList<wds::VESARatesAndResolutions>(
         vesa_support_, VESA1920x1200p30);
     for(auto rate_resolution: list)
       formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
   }
   if (hh_support_ != 0) {
-    auto list = MaskToEnumList<HHRatesAndResolutions>(
+    auto list = MaskToEnumList<wds::HHRatesAndResolutions>(
         hh_support_, HH848x480p60);
     for(auto rate_resolution: list)
       formats.push_back(SelectableH264VideoFormat(profile, level, rate_resolution));
@@ -253,11 +257,11 @@ NativeVideoFormat VideoFormats::GetNativeFormat() const {
   unsigned selection_bits = native_ & 7;
   switch (selection_bits) {
   case 0: // 0b000 CEA
-    return GetFormatFromIndex<CEARatesAndResolutions>(index, CEA1920x1080p24);
+    return GetFormatFromIndex<wds::CEARatesAndResolutions>(index, CEA1920x1080p24);
   case 1: // 0b001 VESA
-    return GetFormatFromIndex<VESARatesAndResolutions>(index, VESA1920x1200p30);
+    return GetFormatFromIndex<wds::VESARatesAndResolutions>(index, VESA1920x1200p30);
   case 2: // 0b010 HH
-    return GetFormatFromIndex<HHRatesAndResolutions>(index, HH848x480p60);
+    return GetFormatFromIndex<wds::HHRatesAndResolutions>(index, HH848x480p60);
   default:
     assert(false);
     break;
@@ -279,7 +283,7 @@ std::string VideoFormats::ToString() const {
       + std::string(SEMICOLON)+ std::string(SPACE);
 
   if (is_none())
-    return ret + wds::NONE;
+    return ret + NONE;
 
   MAKE_HEX_STRING_2(native, native_);
   MAKE_HEX_STRING_2(preferred_display_mode, preferred_display_mode_);
@@ -299,4 +303,5 @@ std::string VideoFormats::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

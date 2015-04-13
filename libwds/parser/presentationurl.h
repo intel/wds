@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class PresentationUrl: public Property {
  public:
@@ -42,6 +43,7 @@ class PresentationUrl: public Property {
   std::string presentation_url_2_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // PRESENTATIONURL_H_

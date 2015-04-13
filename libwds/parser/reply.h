@@ -26,10 +26,11 @@
 #include "message.h"
 
 namespace wds {
+namespace rtsp {
 
 class Reply: public Message {
  public:
-  explicit Reply(int response_code = 200);
+  explicit Reply(int response_code = STATUS_OK);
   ~Reply() override;
 
   int response_code() const { return response_code_; }
@@ -41,6 +42,7 @@ class Reply: public Message {
   int response_code_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // REPLY_H_

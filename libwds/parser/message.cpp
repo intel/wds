@@ -25,13 +25,14 @@
 #include <cassert>
 
 namespace wds {
+namespace rtsp {
 
 namespace {
   const char kDefaultContentType[] = "text/parameters";
 }
 
-Message::Message(bool is_reply)
-  : is_reply_(is_reply) {
+Message::Message(Type type)
+  : type_(type) {
 }
 
 Message::~Message() {
@@ -70,7 +71,7 @@ std::string Message::ToString() const {
 }
 
 Request::Request(RTSPMethod method, const std::string& request_uri)
-  : Message(false),
+  : Message(REQUEST),
     id_(UNKNOWN),
     method_(method),
     request_uri_(request_uri) {
@@ -79,5 +80,5 @@ Request::Request(RTSPMethod method, const std::string& request_uri)
 Request::~Request() {
 }
 
-
+} // namespace rtsp
 } // namespace wds

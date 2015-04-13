@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class Standby: public Property {
 public:
@@ -34,6 +35,7 @@ public:
   std::string ToString() const override;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // STANDBY_H_

@@ -23,6 +23,7 @@
 #include "i2c.h"
 
 namespace wds {
+namespace rtsp {
 
 I2C::I2C(int port) : Property(WFD_I2C), port_(port) {
 }
@@ -32,8 +33,9 @@ I2C::~I2C() {
 
 std::string I2C::ToString() const {
   std::string ret = PropertyName::wfd_I2C + std::string(SEMICOLON)
-    + std::string(SPACE) + (is_supported() ? std::to_string(port()) : wds::NONE);
+    + std::string(SPACE) + (is_supported() ? std::to_string(port()) : NONE);
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

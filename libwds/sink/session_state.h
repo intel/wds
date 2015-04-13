@@ -32,19 +32,19 @@ class M6Handler final : public SequencedMessageSender {
   M6Handler(const InitParams& init_params, uint& keep_alive_timer);
 
  private:
-  std::unique_ptr<Message> CreateMessage() override;
-  bool HandleReply(Reply* reply) override;
+  std::unique_ptr<rtsp::Message> CreateMessage() override;
+  bool HandleReply(rtsp::Reply* reply) override;
 
   uint& keep_alive_timer_;
 };
 
-class M16Handler final : public MessageReceiver<Request::M16> {
+class M16Handler final : public MessageReceiver<rtsp::Request::M16> {
  public:
   M16Handler(const InitParams& init_params, uint& keep_alive_timer);
 
  private:
   bool HandleTimeoutEvent(uint timer_id) const override;
-  std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  std::unique_ptr<rtsp::Reply> HandleMessage(rtsp::Message* message) override;
 
   uint& keep_alive_timer_;
 };

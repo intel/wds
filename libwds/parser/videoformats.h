@@ -29,6 +29,7 @@
 #include <vector>
 
 namespace wds {
+namespace rtsp {
 
 struct H264Codec {
  public:
@@ -61,17 +62,17 @@ struct H264Codec {
   unsigned short max_vres_;
 };
 
-typedef std::vector<wds::H264Codec> H264Codecs;
+using H264Codecs = std::vector<H264Codec>;
 
 class VideoFormats: public Property {
  public:
   VideoFormats();
-  VideoFormats(NativeVideoFormat format,
+  VideoFormats(wds::NativeVideoFormat format,
                bool preferred_display_mode,
-               const std::vector<SelectableH264VideoFormat>& h264_formats);
-  VideoFormats(NativeVideoFormat format,
+               const std::vector<wds::SelectableH264VideoFormat>& h264_formats);
+  VideoFormats(wds::NativeVideoFormat format,
                bool preferred_display_mode,
-               const std::vector<SupportedH264VideoFormats>& h264_formats);
+               const std::vector<wds::SupportedH264VideoFormats>& h264_formats);
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);
@@ -88,6 +89,7 @@ class VideoFormats: public Property {
   H264Codecs h264_codecs_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // VIDEOFORMATS_H_

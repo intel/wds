@@ -29,20 +29,22 @@
 #include <vector>
 
 namespace wds {
+namespace rtsp {
 
 class AudioCodecs: public Property {
  public:
   AudioCodecs();
-  AudioCodecs(const std::vector<AudioCodec>& audio_codecs);
+  AudioCodecs(const std::vector<wds::AudioCodec>& audio_codecs);
   ~AudioCodecs() override;
 
-  const std::vector<AudioCodec>& audio_codecs() const { return audio_codecs_; }
+  const std::vector<wds::AudioCodec>& audio_codecs() const { return audio_codecs_; }
   std::string ToString() const override;
 
  private:
   std::vector<AudioCodec> audio_codecs_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // AUDIOCODECS_H_

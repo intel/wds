@@ -26,6 +26,7 @@
 #include "message.h"
 
 namespace wds {
+namespace rtsp {
 
 class Teardown : public Request {
  public:
@@ -34,6 +35,7 @@ class Teardown : public Request {
     std::string ToString() const override;
 };
 
-} // namespace wds
+}  // namespace rtsp
+}  // namespace wds
 
 #endif // TEARDOWN_H_

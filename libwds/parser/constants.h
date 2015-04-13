@@ -24,6 +24,7 @@
 #define CONSTANTS_H_
 
 namespace wds {
+namespace rtsp {
 
 const char SEMICOLON[] = ":";
 const char SPACE[] = " ";
@@ -130,6 +131,15 @@ namespace MethodName {
                               ORG_WFA_WFD1_0 };
 }
 
+enum RTSPStatusCode {
+  STATUS_OK = 200,
+  STATUS_SeeOther = 303,
+  STATUS_NotAcceptable = 406,
+  STATUS_UnsupportedMediaType = 415,
+  STATUS_NotImplemented = 501
+};
+
+} // namespace rtsp
 } // namespace wds
 
 #endif // CONSTANTS_H_

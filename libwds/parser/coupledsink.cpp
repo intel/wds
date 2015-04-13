@@ -26,6 +26,7 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 CoupledSink::CoupledSink(unsigned char status,
     unsigned long long int sink_address)
@@ -46,7 +47,7 @@ std::string CoupledSink::ToString() const {
     + std::string(SPACE);
 
   if (is_none()) {
-    ret += wds::NONE;
+    ret += NONE;
   } else {
     MAKE_HEX_STRING_2(status, status_);
     ret += status + std::string(SPACE);
@@ -55,11 +56,12 @@ std::string CoupledSink::ToString() const {
       MAKE_HEX_STRING_12(sink_address, sink_address_);
       ret += sink_address;
     } else {
-      ret += wds::NONE;
+      ret += NONE;
     }
   }
 
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

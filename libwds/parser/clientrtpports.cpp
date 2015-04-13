@@ -23,6 +23,7 @@
 #include "clientrtpports.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 const char profile[] = "RTP/AVP/UDP;unicast";
@@ -40,12 +41,12 @@ ClientRtpPorts::~ClientRtpPorts() {
 }
 
 std::string ClientRtpPorts::ToString() const {
-  std::string ret = PropertyName::wfd_client_rtp_ports + std::string(SEMICOLON)
+  return PropertyName::wfd_client_rtp_ports + std::string(SEMICOLON)
     + std::string(SPACE) + profile
     + std::string(SPACE) + std::to_string(rtp_port_0_)
     + std::string(SPACE) + std::to_string(rtp_port_1_)
     + std::string(SPACE) + mode;
-  return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

@@ -29,14 +29,20 @@
 #include "payload.h"
 
 namespace wds {
+namespace rtsp {
 
 class Message {
  public:
-  explicit Message(bool is_reply);
+  enum Type {
+    REQUEST,
+    REPLY
+  };
+
+  explicit Message(Type type);
   virtual ~Message();
 
-  bool is_reply() const { return is_reply_; }
-  bool is_request() const { return !is_reply_; }
+  bool is_reply() const { return type_ == REPLY; }
+  bool is_request() const { return type_ == REQUEST; }
 
   int cseq() const;
 
@@ -59,14 +65,14 @@ class Message {
   std::unique_ptr<Payload> payload_;
 
  private:
-  bool is_reply_;
+  Type type_;
 };
 
 class Request : public Message {
  public:
   enum ID {
-      UNKNOWN, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, M13, M14,
-      M15, M16
+    UNKNOWN, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, M13, M14,
+    M15, M16
   };
 
   enum RTSPMethod {
@@ -103,6 +109,7 @@ inline Request* ToRequest(Message* message) {
   return static_cast<Request*>(message);
 }
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // MESSAGE_H_

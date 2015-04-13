@@ -27,8 +27,8 @@
 #include <vector>
 #include "constants.h"
 
-
 namespace wds {
+namespace rtsp {
 
 class PropertyErrors {
  public:
@@ -48,6 +48,7 @@ class PropertyErrors {
   std::vector<unsigned short> error_codes_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // PROPERTYERRORS_H_

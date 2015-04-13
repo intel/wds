@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class UIBCSetting : public Property {
  public:
@@ -39,6 +40,6 @@ class UIBCSetting : public Property {
   bool is_enabled_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
-
 #endif  // UIBCSETTING_H_

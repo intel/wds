@@ -24,6 +24,7 @@
 #include "constants.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
   const char kTransport[] = "Transport: RTP/AVP/UDP;unicast;client_port=";
@@ -87,9 +88,10 @@ std::string TransportHeader::ToString() const {
         ret += "-" + std::to_string(server_port_ + 1);
     }
 
-    ret += wds::CRLF;
+    ret += CRLF;
   }
   return ret;
 }
 
-} // namespace wds
+}  // namespace rtsp
+}  // namespace wds

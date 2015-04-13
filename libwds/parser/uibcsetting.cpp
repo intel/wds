@@ -23,6 +23,7 @@
 #include "uibcsetting.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 const char enable[] = "enable";
@@ -45,4 +46,5 @@ std::string UIBCSetting::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

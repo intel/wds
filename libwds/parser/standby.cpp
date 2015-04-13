@@ -23,6 +23,7 @@
 #include "standby.h"
 
 namespace wds {
+namespace rtsp {
 
 Standby::Standby() : Property(WFD_STANDBY) {
 }
@@ -34,4 +35,5 @@ std::string Standby::ToString() const {
   return std::string("wfd_standby");
 }
 
+}  // namespace rtsp
 }  // namespace wds

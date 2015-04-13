@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class ClientRtpPorts: public Property {
  public:
@@ -41,6 +42,7 @@ class ClientRtpPorts: public Property {
   unsigned short rtp_port_1_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // CLIENTRTPPORTS_H_

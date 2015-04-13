@@ -25,6 +25,7 @@
 #include "macros.h"
 
 namespace wds {
+namespace rtsp {
 
 AVFormatChangeTiming::AVFormatChangeTiming(unsigned long long int pts,
     unsigned long long int dts)
@@ -47,4 +48,5 @@ std::string AVFormatChangeTiming::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

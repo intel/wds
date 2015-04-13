@@ -34,6 +34,7 @@
 typedef std::map<std::string, std::string> GenericHeaderMap;
 
 namespace wds {
+namespace rtsp {
 
 class Header {
   public:
@@ -82,6 +83,7 @@ class Header {
     GenericHeaderMap generic_headers_;
 };
 
+} // namespace rtsp
 } // namespace wds
 
 #endif // HEADER_H_

@@ -23,6 +23,7 @@
 #include "triggermethod.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
 const char* name[] = {MethodName::SETUP, MethodName::PAUSE,
@@ -44,4 +45,5 @@ std::string TriggerMethod::ToString() const {
   return ret;
 }
 
+}  // namespace rtsp
 }  // namespace wds

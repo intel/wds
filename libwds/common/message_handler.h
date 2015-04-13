@@ -71,11 +71,11 @@ class MessageHandler : public std::enable_shared_from_this<MessageHandler> {
   virtual void Start() = 0;
   virtual void Reset() = 0;
 
-  virtual bool CanSend(Message* message) const = 0;
-  virtual void Send(std::unique_ptr<Message> message) = 0;
+  virtual bool CanSend(rtsp::Message* message) const = 0;
+  virtual void Send(std::unique_ptr<rtsp::Message> message) = 0;
 
-  virtual bool CanHandle(Message* message) const = 0;
-  virtual void Handle(std::unique_ptr<Message> message) = 0;
+  virtual bool CanHandle(rtsp::Message* message) const = 0;
+  virtual void Handle(std::unique_ptr<rtsp::Message> message) = 0;
 
   // For handlers that require timeout
   virtual bool HandleTimeoutEvent(uint timer_id) const;
@@ -110,11 +110,11 @@ class MessageSequenceHandler : public MessageHandler,
   void Start() override;
   void Reset() override;
 
-  bool CanSend(Message* message) const override;
-  void Send(std::unique_ptr<Message> message) override;
+  bool CanSend(rtsp::Message* message) const override;
+  void Send(std::unique_ptr<rtsp::Message> message) override;
 
-  bool CanHandle(Message* message) const override;
-  void Handle(std::unique_ptr<Message> message) override;
+  bool CanHandle(rtsp::Message* message) const override;
+  void Handle(std::unique_ptr<rtsp::Message> message) override;
 
   bool HandleTimeoutEvent(uint timer_id) const override;
 
@@ -134,10 +134,10 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
   ~MessageSequenceWithOptionalSetHandler() override;
   void Start() override;
   void Reset() override;
-  bool CanSend(Message* message) const override;
-  void Send(std::unique_ptr<Message> message) override;
-  bool CanHandle(Message* message) const override;
-  void Handle(std::unique_ptr<Message> message) override;
+  bool CanSend(rtsp::Message* message) const override;
+  void Send(std::unique_ptr<rtsp::Message> message) override;
+  bool CanHandle(rtsp::Message* message) const override;
+  void Handle(std::unique_ptr<rtsp::Message> message) override;
 
   bool HandleTimeoutEvent(uint timer_id) const override;
 
@@ -164,26 +164,26 @@ class MessageReceiverBase : public MessageHandler {
   ~MessageReceiverBase() override;
 
  protected:
-  virtual std::unique_ptr<wds::Reply> HandleMessage(Message* message) = 0;
-  bool CanHandle(Message* message) const override;
-  void Handle(std::unique_ptr<Message> message) override;
+  virtual std::unique_ptr<wds::rtsp::Reply> HandleMessage(rtsp::Message* message) = 0;
+  bool CanHandle(rtsp::Message* message) const override;
+  void Handle(std::unique_ptr<rtsp::Message> message) override;
 
  private:
   void Start() override;
   void Reset() override;
-  bool CanSend(Message* message) const override;
-  void Send(std::unique_ptr<Message> message) override;
+  bool CanSend(rtsp::Message* message) const override;
+  void Send(std::unique_ptr<rtsp::Message> message) override;
 
   bool wait_for_message_;
 };
 
-template <Request::ID id>
+template <rtsp::Request::ID id>
 class MessageReceiver : public MessageReceiverBase {
  public:
   using MessageReceiverBase::MessageReceiverBase;
 
  protected:
-  bool CanHandle(Message* message) const override {
+  bool CanHandle(rtsp::Message* message) const override {
     return MessageReceiverBase::CanHandle(message) && message->is_request() &&
            id == ToRequest(message)->id();
   }
@@ -195,15 +195,15 @@ class MessageSenderBase : public MessageHandler {
   ~MessageSenderBase() override;
 
  protected:
-  virtual bool HandleReply(Reply* reply) = 0;
-  void Send(std::unique_ptr<Message> message) override;
+  virtual bool HandleReply(rtsp::Reply* reply) = 0;
+  void Send(std::unique_ptr<rtsp::Message> message) override;
   void Reset() override;
   bool HandleTimeoutEvent(uint timer_id) const override;
 
 
  private:
-  bool CanHandle(Message* message) const override;
-  void Handle(std::unique_ptr<Message> message) override;
+  bool CanHandle(rtsp::Message* message) const override;
+  void Handle(std::unique_ptr<rtsp::Message> message) override;
 
   virtual int GetResponseTimeout() const;
 
@@ -215,13 +215,13 @@ class MessageSenderBase : public MessageHandler {
 };
 
 // To be used for optional senders.
-template <Request::ID id>
+template <rtsp::Request::ID id>
 class OptionalMessageSender : public MessageSenderBase {
  public:
   using MessageSenderBase::MessageSenderBase;
 
  protected:
-  bool CanSend(Message* message) const override {
+  bool CanSend(rtsp::Message* message) const override {
     assert(message);
     return message->is_request() && ToRequest(message)->id() == id;
   }
@@ -237,14 +237,14 @@ class SequencedMessageSender : public MessageSenderBase {
   ~SequencedMessageSender() override;
 
  protected:
-  virtual std::unique_ptr<Message> CreateMessage() = 0;
+  virtual std::unique_ptr<rtsp::Message> CreateMessage() = 0;
 
  private:
   void Start() override;
   void Reset() override;
-  bool CanSend(Message* message) const override;
+  bool CanSend(rtsp::Message* message) const override;
 
-  Message* to_be_send_;
+  rtsp::Message* to_be_send_;
 };
 
 }  // namespace wds

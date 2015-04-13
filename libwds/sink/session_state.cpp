@@ -25,13 +25,16 @@
 
 #include "cap_negotiation_state.h"
 #include "streaming_state.h"
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/parser/play.h"
 #include "libwds/parser/reply.h"
 #include "libwds/parser/setup.h"
 #include "libwds/parser/transportheader.h"
 
 namespace wds {
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+
 namespace sink {
 
 M16Handler::M16Handler(const InitParams& init_params, uint& keep_alive_timer)
@@ -47,7 +50,7 @@ std::unique_ptr<Reply> M16Handler::HandleMessage(Message* message) {
   sender_->ReleaseTimer(keep_alive_timer_);
   keep_alive_timer_ = sender_->CreateTimer(60);
 
-  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+  return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
 
 M6Handler::M6Handler(const InitParams& init_params, uint& keep_alive_timer)
@@ -55,8 +58,8 @@ M6Handler::M6Handler(const InitParams& init_params, uint& keep_alive_timer)
     keep_alive_timer_(keep_alive_timer) {}
 
 std::unique_ptr<Message> M6Handler::CreateMessage() {
-  auto setup = new Setup(ToSinkMediaManager(manager_)->GetPresentationUrl());
-  auto transport = new TransportHeader();
+  auto setup = new rtsp::Setup(ToSinkMediaManager(manager_)->GetPresentationUrl());
+  auto transport = new rtsp::TransportHeader();
   // we assume here that there is no coupled secondary sink
   transport->set_client_port(ToSinkMediaManager(manager_)->GetLocalRtpPorts().first);
   setup->header().set_transport(transport);
@@ -68,7 +71,7 @@ std::unique_ptr<Message> M6Handler::CreateMessage() {
 
 bool M6Handler::HandleReply(Reply* reply) {
   const std::string& session_id = reply->header().session();
-  if(reply->response_code() == RTSP_OK && !session_id.empty()) {
+  if(reply->response_code() == rtsp::STATUS_OK && !session_id.empty()) {
     ToSinkMediaManager(manager_)->SetSessionId(session_id);
     // FIXME : take timeout value from session.
     keep_alive_timer_ = sender_->CreateTimer(60);
@@ -83,7 +86,7 @@ class M7Handler final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Play* play = new Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    rtsp::Play* play = new rtsp::Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
     play->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
     play->header().set_cseq(send_cseq_++);
     play->header().set_require_wfd_support(true);
@@ -92,7 +95,7 @@ class M7Handler final : public SequencedMessageSender {
   }
 
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == RTSP_OK);
+    return (reply->response_code() == rtsp::STATUS_OK);
   }
 };
 

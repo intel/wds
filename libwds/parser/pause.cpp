@@ -23,6 +23,7 @@
 #include "pause.h"
 
 namespace wds {
+namespace rtsp {
 
 Pause::Pause(const std::string& request_uri)
  : Request(Request::MethodPause, request_uri) {
@@ -38,4 +39,5 @@ std::string Pause::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

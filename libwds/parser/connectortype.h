@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class ConnectorType: public Property {
  public:
@@ -40,6 +41,6 @@ class ConnectorType: public Property {
   unsigned short connector_type_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
-
 #endif  // CONNECTORTYPE_H_

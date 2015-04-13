@@ -23,6 +23,7 @@
 #include "payload.h"
 
 namespace wds {
+namespace rtsp {
 
 Payload::Payload() {
 }
@@ -43,7 +44,7 @@ Payload::Payload(const PropertyErrorMap& property_errors)
 Payload::~Payload() {
 }
 
-std::shared_ptr<wds::Property> Payload::get_property(std::string name) const
+std::shared_ptr<Property> Payload::get_property(std::string name) const
 {
   auto property = properties_.find(name);
   if (property != properties_.end())
@@ -51,16 +52,16 @@ std::shared_ptr<wds::Property> Payload::get_property(std::string name) const
   return nullptr;
 }
 
-std::shared_ptr<wds::Property> Payload::get_property(wds::PropertyType type) const
+std::shared_ptr<Property> Payload::get_property(PropertyType type) const
 {
   if (type == WFD_GENERIC)
     return nullptr;
 
-  return get_property(wds::PropertyName::name[type]);
+  return get_property(PropertyName::name[type]);
 }
 
-bool Payload::has_property(wds::PropertyType type) const {
-  return properties_.find(wds::PropertyName::name[type]) != properties_.end();
+bool Payload::has_property(PropertyType type) const {
+  return properties_.find(PropertyName::name[type]) != properties_.end();
 }
 
 void Payload::add_property(const std::shared_ptr<Property>& property) {
@@ -76,7 +77,7 @@ const PropertyMap& Payload::properties() const {
   return properties_;
 }
 
-std::shared_ptr<wds::PropertyErrors> Payload::get_property_error(std::string name) const
+std::shared_ptr<PropertyErrors> Payload::get_property_error(std::string name) const
 {
   auto property_error = property_errors_.find(name);
   if (property_error != property_errors_.end())
@@ -84,15 +85,15 @@ std::shared_ptr<wds::PropertyErrors> Payload::get_property_error(std::string nam
   return nullptr;
 }
 
-std::shared_ptr<wds::PropertyErrors> Payload::get_property_error(wds::PropertyType type) const
+std::shared_ptr<PropertyErrors> Payload::get_property_error(PropertyType type) const
 {
   if (type == WFD_GENERIC)
     return nullptr;
 
-  return get_property_error(wds::PropertyName::name[type]);
+  return get_property_error(PropertyName::name[type]);
 }
 
-void Payload::add_property_error(const std::shared_ptr<wds::PropertyErrors>& errors) {
+void Payload::add_property_error(const std::shared_ptr<PropertyErrors>& errors) {
   if (errors->type() == WFD_GENERIC) {
     property_errors_[errors->generic_property_name()] = errors;
   } else {
@@ -105,7 +106,7 @@ const PropertyErrorMap& Payload::property_errors() const {
 }
 
 void Payload::add_get_parameter_property(const PropertyType& type) {
-  request_properties_.push_back(wds::PropertyName::name[type]);
+  request_properties_.push_back(PropertyName::name[type]);
 }
 
 void Payload::add_get_parameter_property(const std::string& generic_property) {
@@ -147,4 +148,5 @@ std::string Payload::ToString() const {
   return ret;
 }
 
-} // namespace wds
+}  // namespace rtsp
+}  // namespace wds

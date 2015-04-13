@@ -29,6 +29,7 @@
 #include <utility>
 
 namespace wds {
+namespace rtsp {
 
 class UIBCCapability: public Property {
  public:
@@ -78,6 +79,7 @@ class UIBCCapability: public Property {
   bool has_capabilities_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // UIBCCAPABILITY_H_

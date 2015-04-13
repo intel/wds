@@ -30,6 +30,7 @@
 class yyFlexLexer;
 
 namespace wds {
+namespace rtsp {
 
 class BaseLexer {
  public:
@@ -52,6 +53,7 @@ public:
   std::unique_ptr<BaseLexer> lexer_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif // SCANNER_H

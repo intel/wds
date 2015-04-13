@@ -34,15 +34,15 @@ class RTSPInputHandler {
   virtual ~RTSPInputHandler();
 
   void InputReceived(const std::string& input);
-  virtual void MessageParsed(std::unique_ptr<Message> message) = 0;
+  virtual void MessageParsed(std::unique_ptr<rtsp::Message> message) = 0;
 
  private:
   bool ParseHeader();
   bool ParsePayload();
 
-  Driver driver_;
+  rtsp::Driver driver_;
   std::string rtsp_recieve_buffer_;
-  std::unique_ptr<Message> message_;
+  std::unique_ptr<rtsp::Message> message_;
 };
 
 }

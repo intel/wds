@@ -35,6 +35,9 @@
 #include "session_state.h"
 
 namespace wds {
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
 
 namespace {
 
@@ -52,9 +55,9 @@ bool InitializeRequestId(Request* request) {
       id = Request::M3;
     break;
   case Request::MethodSetParameter:
-    if (request->payload().has_property(WFD_PRESENTATION_URL))
+    if (request->payload().has_property(rtsp::WFD_PRESENTATION_URL))
       id = Request::M4;
-    else if (request->payload().has_property(WFD_TRIGGER_METHOD))
+    else if (request->payload().has_property(rtsp::WFD_TRIGGER_METHOD))
       id = Request::M5;
     break;
   default:
@@ -160,15 +163,15 @@ bool SinkImpl::HandleCommand(std::unique_ptr<Message> command) {
 }
 
 bool SinkImpl::Teardown() {
-  return HandleCommand(CreateCommand<wds::Teardown, Request::M8>());
+  return HandleCommand(CreateCommand<rtsp::Teardown, Request::M8>());
 }
 
 bool SinkImpl::Play() {
-  return HandleCommand(CreateCommand<wds::Play, Request::M7>());
+  return HandleCommand(CreateCommand<rtsp::Play, Request::M7>());
 }
 
 bool SinkImpl::Pause() {
-  return HandleCommand(CreateCommand<wds::Pause, Request::M9>());
+  return HandleCommand(CreateCommand<rtsp::Pause, Request::M9>());
 }
 
 void SinkImpl::MessageParsed(std::unique_ptr<Message> message) {

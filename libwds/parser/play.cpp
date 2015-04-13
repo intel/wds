@@ -23,6 +23,7 @@
 #include "play.h"
 
 namespace wds {
+namespace rtsp {
 
 Play::Play(const std::string& request_uri)
  : Request(Request::MethodPlay, request_uri) {
@@ -35,4 +36,5 @@ std::string Play::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

@@ -23,6 +23,7 @@
 #include "reply.h"
 
 namespace wds {
+namespace rtsp {
 
 namespace {
   const char kRTSPHeader[] = "RTSP/1.0 ";
@@ -30,8 +31,8 @@ namespace {
 }
 
 Reply::Reply(int response_code)
-: Message(true /* is_reply */),
-  response_code_(response_code) {
+  : Message(Message::REPLY),
+    response_code_(response_code) {
 }
 
 Reply::~Reply() {
@@ -44,4 +45,5 @@ std::string Reply::ToString() const {
   return ret + Message::ToString();
 }
 
+}  // namespace rtsp
 }  // namespace wds

@@ -26,6 +26,7 @@
 #include "property.h"
 
 namespace wds {
+namespace rtsp {
 
 class TriggerMethod : public Property {
  public:
@@ -47,6 +48,7 @@ class TriggerMethod : public Property {
   TriggerMethod::Method method_;
 };
 
+}  // namespace rtsp
 }  // namespace wds
 
 #endif  // TRIGGERMETHOD_H_

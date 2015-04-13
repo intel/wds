@@ -23,6 +23,7 @@
 #include "setup.h"
 
 namespace wds {
+namespace rtsp {
 
 Setup::Setup(const std::string& request_uri)
  : Request(Request::MethodSetup, request_uri) {
@@ -38,4 +39,5 @@ std::string Setup::ToString() const {
   return ret + Message::ToString();
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

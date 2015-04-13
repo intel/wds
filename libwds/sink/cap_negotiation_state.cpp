@@ -23,7 +23,6 @@
 
 #include <iostream>
 
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/parser/audiocodecs.h"
 #include "libwds/parser/clientrtpports.h"
 #include "libwds/parser/connectortype.h"
@@ -45,6 +44,10 @@
 #include "libwds/parser/videoformats.h"
 
 namespace wds {
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+
 namespace sink {
 
 
@@ -53,10 +56,12 @@ M3Handler::M3Handler(const InitParams& init_params)
 }
 
 std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
-  auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
+  using namespace rtsp;
+
+  auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
   auto props = message->payload().get_parameter_properties();
   for (auto it = props.begin(); it != props.end(); ++it) {
-      std::shared_ptr<Property> new_prop;
+      std::shared_ptr<rtsp::Property> new_prop;
       if (*it == PropertyName::name[PropertyType::WFD_AUDIO_CODECS]){
           // FIXME: declare that we support absolutely every audio codec/format,
           // but there should be a MediaManager API for it
@@ -67,10 +72,10 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           codec_list.push_back(codec_lpcm);
           codec_list.push_back(codec_aac);
           codec_list.push_back(codec_ac3);
-          new_prop.reset(new AudioCodecs(codec_list));
+          new_prop.reset(new rtsp::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_VIDEO_FORMATS]){
-          new_prop.reset(new VideoFormats(ToSinkMediaManager(manager_)->GetSupportedNativeVideoFormat(),
+          new_prop.reset(new rtsp::VideoFormats(ToSinkMediaManager(manager_)->GetSupportedNativeVideoFormat(),
               false,
               ToSinkMediaManager(manager_)->GetSupportedH264VideoFormats()));
           reply->payload().add_property(new_prop);
@@ -104,7 +109,7 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           reply->payload().add_property(new_prop);
       } else {
           WDS_ERROR("** GET_PARAMETER: Property not supported");
-          return std::unique_ptr<Reply>(new Reply(RTSP_NotImplemented));
+          return std::unique_ptr<Reply>(new Reply(STATUS_NotImplemented));
       }
   }
 
@@ -118,26 +123,26 @@ M4Handler::M4Handler(const InitParams& init_params)
 
 std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
   auto presentation_url =
-      static_cast<PresentationUrl*>(message->payload().get_property(WFD_PRESENTATION_URL).get());
+      static_cast<rtsp::PresentationUrl*>(message->payload().get_property(rtsp::WFD_PRESENTATION_URL).get());
   assert(presentation_url);
   SinkMediaManager* sink_media_manager = ToSinkMediaManager(manager_);
   sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
 
   auto video_formats =
-      static_cast<VideoFormats*>(message->payload().get_property(WFD_VIDEO_FORMATS).get());
+      static_cast<rtsp::VideoFormats*>(message->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
   assert(video_formats);
   if (!sink_media_manager->SetOptimalVideoFormat(video_formats->GetSelectableH264Formats()[0])) {
-    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_SeeOther));
-    auto payload = std::unique_ptr<Payload>(new Payload());
-    std::vector<unsigned short> error_codes = {RTSP_UnsupportedMediaType};
+    auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_SeeOther));
+    auto payload = std::unique_ptr<rtsp::Payload>(new rtsp::Payload());
+    std::vector<unsigned short> error_codes = {rtsp::STATUS_UnsupportedMediaType};
     auto property_errors =
-        std::make_shared<PropertyErrors>(WFD_VIDEO_FORMATS, error_codes);
+        std::make_shared<rtsp::PropertyErrors>(rtsp::WFD_VIDEO_FORMATS, error_codes);
     payload->add_property_error(property_errors);
     reply->set_payload(std::move(payload));
     return std::move(reply);
   }
 
-  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+  return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
 
 class M5Handler final : public MessageReceiver<Request::M5> {
@@ -147,12 +152,12 @@ class M5Handler final : public MessageReceiver<Request::M5> {
   }
   std::unique_ptr<Reply> HandleMessage(Message* message) override {
     auto property =
-        static_cast<TriggerMethod*>(message->payload().get_property(WFD_TRIGGER_METHOD).get());
+        static_cast<rtsp::TriggerMethod*>(message->payload().get_property(rtsp::WFD_TRIGGER_METHOD).get());
 
-    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
+    auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
     reply->header().set_cseq(message->cseq());
-    if (property->method() != TriggerMethod::SETUP) {
-      reply->set_response_code(RTSP_SeeOther);
+    if (property->method() != rtsp::TriggerMethod::SETUP) {
+      reply->set_response_code(rtsp::STATUS_SeeOther);
     }
 
     return std::move(reply);

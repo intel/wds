@@ -28,6 +28,7 @@
 #include "reply.h"
 
 namespace wds {
+namespace rtsp {
 
 BaseLexer::~BaseLexer() {
 }
@@ -42,7 +43,7 @@ Scanner::Scanner(std::istream* in, std::unique_ptr<Message>& message) {
     lexer_.reset(new HeaderScanner(in));
   } else if (message->is_reply()) {
     Reply* reply = static_cast<Reply*>(message.get());
-    if (reply->response_code() == 303)
+    if (reply->response_code() == STATUS_SeeOther)
       lexer_.reset(new ErrorScanner(in));
     else
       lexer_.reset(new MessageScanner(in, true));
@@ -59,4 +60,5 @@ int Scanner::yylex(Parser::semantic_type *lval) {
   return lexer_->yylex(lval);
 }
 
-} /* namespace wds */
+}  // namespace rtsp
+}  // namespace wds

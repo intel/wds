@@ -3,7 +3,7 @@
 %debug 
 %verbose
 %defines
-%define api.namespace {wds}
+%define api.namespace {wds::rtsp}
 %define parser_class_name {Parser}
 %start start
 
@@ -18,6 +18,8 @@
    #include "uibccapability.h"
    
    namespace wds {
+      struct AudioCodec;
+   namespace rtsp {
       class Driver;
       class Scanner;
       class Message;
@@ -29,7 +31,7 @@
       class VideoFormats;
       struct H264Codec;
       struct H264Codec3d;
-      struct AudioCodec;
+   }
    }
 }
 
@@ -121,7 +123,7 @@
    Property* property;
    std::vector<unsigned short>* error_list;
    PropertyErrors* property_errors;
-   std::map<wds::PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
+   std::map<PropertyType, std::shared_ptr<PropertyErrors>>* property_error_map;
    std::vector<H264Codec>* codecs;
    H264Codec* codec;
    std::vector<H264Codec3d>* codecs_3d;
@@ -506,14 +508,14 @@ wfd_methods:
   ;
 
 wfd_method: 
-    WFD_OPTIONS { $$ = wds::OPTIONS; }
-  | WFD_SET_PARAMETER { $$ = wds::SET_PARAMETER; }
-  | WFD_GET_PARAMETER { $$ = wds::GET_PARAMETER; }
-  | WFD_SETUP { $$ = wds::SETUP; }
-  | WFD_PLAY { $$ = wds::PLAY; }
-  | WFD_TEARDOWN { $$ = wds::TEARDOWN; }
-  | WFD_PAUSE { $$ = wds::PAUSE; }
-  | WFD_TAG { $$ = wds::ORG_WFA_WFD_1_0; }
+    WFD_OPTIONS { $$ = wds::rtsp::OPTIONS; }
+  | WFD_SET_PARAMETER { $$ = wds::rtsp::SET_PARAMETER; }
+  | WFD_GET_PARAMETER { $$ = wds::rtsp::GET_PARAMETER; }
+  | WFD_SETUP { $$ = wds::rtsp::SETUP; }
+  | WFD_PLAY { $$ = wds::rtsp::PLAY; }
+  | WFD_TEARDOWN { $$ = wds::rtsp::TEARDOWN; }
+  | WFD_PAUSE { $$ = wds::rtsp::PAUSE; }
+  | WFD_TAG { $$ = wds::rtsp::ORG_WFA_WFD_1_0; }
   ;
   
 wfd_ows: 
@@ -1097,7 +1099,7 @@ wfd_connector_type:
 
 %%
 
-void wds::Parser::error(const std::string &err_message)
+void wds::rtsp::Parser::error(const std::string &err_message)
 {
   message = nullptr;
 }

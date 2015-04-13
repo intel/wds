@@ -28,6 +28,7 @@
 #include <sstream>
 
 namespace wds {
+namespace rtsp {
 
 Driver::~Driver() {
 }
@@ -47,5 +48,6 @@ void Driver::Parse(const std::string& input, std::unique_ptr<Message>& message) 
   parser_->parse();
 }
 
+} // namespace rtsp
 } // namespace wds
 
