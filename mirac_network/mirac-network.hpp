@@ -28,7 +28,7 @@
 #include <cstring>
 #include <string>
 
-#include <mirac-exception.hpp>
+#include "mirac-exception.hpp"
 
 
 class MiracConnectionLostException : public MiracException

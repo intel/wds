@@ -3,7 +3,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread -std=c++11")
 
 include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("${PROJECT_SOURCE_DIR}/libwds/public")
 include_directories ("${PROJECT_SOURCE_DIR}/libwds/parser")
 include_directories ("${PROJECT_SOURCE_DIR}/p2p")
