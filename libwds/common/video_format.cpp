@@ -28,6 +28,7 @@
 
 namespace wds {
 
+// FIXME : find a better place for log functions initialization.
 static void Dummy(const char*, ...) {}
 LogSystem::LogFunction LogSystem::log_func_ = &Dummy;
 LogSystem::LogFunction LogSystem::vlog_func_ = &Dummy;
@@ -116,25 +117,25 @@ static QualityInfo hh_info_table[] = {
 
 #define HH_TABLE_LENGTH  sizeof(hh_info_table) / sizeof(QualityInfo)
 
-QualityInfo get_cea_info(const SelectableH264VideoFormat& format) {
+QualityInfo get_cea_info(const H264VideoFormat& format) {
   if (format.rate_resolution > CEA_TABLE_LENGTH)
     assert(false);
   return cea_info_table[format.rate_resolution];
 }
 
-QualityInfo get_vesa_info(const SelectableH264VideoFormat& format) {
+QualityInfo get_vesa_info(const H264VideoFormat& format) {
   if (format.rate_resolution > VESA_TABLE_LENGTH)
     assert(false);
   return vesa_info_table[format.rate_resolution];
 }
 
-QualityInfo get_hh_info(const SelectableH264VideoFormat& format) {
+QualityInfo get_hh_info(const H264VideoFormat& format) {
   if (format.rate_resolution > HH_TABLE_LENGTH)
     assert(false);
   return hh_info_table[format.rate_resolution];
 }
 
-QualityInfo get_quality_info(const SelectableH264VideoFormat& format) {
+QualityInfo get_quality_info(const H264VideoFormat& format) {
   QualityInfo info;
   switch (format.type) {
   case CEA:
@@ -153,17 +154,17 @@ QualityInfo get_quality_info(const SelectableH264VideoFormat& format) {
   return info;
 }
 
-std::pair<uint, uint> get_resolution(const SelectableH264VideoFormat& format) {
+std::pair<uint, uint> get_resolution(const H264VideoFormat& format) {
   QualityInfo info = get_quality_info(format);
   return std::pair<uint, uint>(info.width, info.height);
 }
 
-bool operator == (const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
+bool operator == (const H264VideoFormat& a, const H264VideoFormat& b) {
   return (a.type == b.type)
       && (get_resolution(a) == get_resolution(b));
 }
 
-bool operator < (const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
+bool operator < (const H264VideoFormat& a, const H264VideoFormat& b) {
   if (get_quality_info(a).weight != get_quality_info(b).weight)
     return get_quality_info(a).weight < get_quality_info(b).weight;
   if (a.profile != b.profile)
@@ -171,14 +172,46 @@ bool operator < (const SelectableH264VideoFormat& a, const SelectableH264VideoFo
   return a.level < b.level;
 }
 
-bool video_format_sort_func(const SelectableH264VideoFormat& a, const SelectableH264VideoFormat& b) {
+bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) {
   return b < a;
 }
 
-SelectableH264VideoFormat FindOptimalVideoFormat(
+template <typename RREnum>
+void PopulateVideoFormatList(
+    H264Profile profile,
+    H264Level level,
+    const RateAndResolutionsBitmap& bitmap,
+    RREnum max_value,
+    std::vector<H264VideoFormat>& formats) {
+  if (bitmap.none())
+    return;
+
+  for (RateAndResolution rr = 0; rr <= static_cast<RateAndResolution>(max_value); ++rr) {
+    if (bitmap.test(rr))
+      formats.push_back(H264VideoFormat(profile, level, static_cast<RREnum>(rr)));
+  }
+}
+
+void PopulateVideoFormatList(
+    const H264VideoCodec& codec, std::vector<H264VideoFormat>& formats) {
+  PopulateVideoFormatList<CEARatesAndResolutions>(
+      codec.profile, codec.level, codec.cea_rr, CEA1920x1080p24, formats);
+  PopulateVideoFormatList<VESARatesAndResolutions>(
+      codec.profile, codec.level, codec.vesa_rr, VESA1920x1200p30, formats);
+  PopulateVideoFormatList<HHRatesAndResolutions>(
+      codec.profile, codec.level, codec.hh_rr, HH848x480p60, formats);
+}
+
+H264VideoFormat FindOptimalVideoFormat(
     const NativeVideoFormat& native,
-    std::vector<SelectableH264VideoFormat> local_formats,
-    std::vector<SelectableH264VideoFormat> remote_formats) {
+    const std::vector<H264VideoCodec>& local_codecs,
+    const std::vector<H264VideoCodec>& remote_codecs) {
+  std::vector<H264VideoFormat> local_formats, remote_formats;
+  for (const auto& codec : local_codecs)
+    PopulateVideoFormatList(codec, local_formats);
+  for (const auto& codec : remote_codecs)
+    PopulateVideoFormatList(codec, remote_formats);
+
   std::sort(local_formats.begin(), local_formats.end(),
       video_format_sort_func);
   std::sort(remote_formats.begin(), remote_formats.end(),
@@ -187,7 +220,7 @@ SelectableH264VideoFormat FindOptimalVideoFormat(
   auto it = local_formats.begin();
   auto end = local_formats.end();
 
-  SelectableH264VideoFormat format(CBP,
+  H264VideoFormat format(CBP,
       k3_1, CEA640x480p60);
 
   while(it != end) {

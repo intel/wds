@@ -40,26 +40,24 @@ struct H264Codec {
       unsigned char frame_rate_control_support,
       unsigned short max_hres, unsigned short max_vres);
 
-  H264Codec(SelectableH264VideoFormat format);
+  H264Codec(const H264VideoFormat& format);
+  H264Codec(const H264VideoCodec& format);
 
-  H264Codec(SupportedH264VideoFormats format);
-
-  void ToSelectableVideoFormats(std::vector<SelectableH264VideoFormat>& formats) const;
+  H264VideoCodec ToH264VideoCodec() const;
 
   std::string ToString() const;
 
- private:
-  unsigned char profile_;
-  unsigned char level_;
-  unsigned int cea_support_;
-  unsigned int vesa_support_;
-  unsigned int hh_support_;
-  unsigned char latency_;
-  unsigned short min_slice_size_;
-  unsigned short slice_enc_params_;
-  unsigned char frame_rate_control_support_;
-  unsigned short max_hres_;
-  unsigned short max_vres_;
+  unsigned char profile;
+  unsigned char level;
+  unsigned int cea_support;
+  unsigned int vesa_support;
+  unsigned int hh_support;
+  unsigned char latency;
+  unsigned short min_slice_size;
+  unsigned short slice_enc_params;
+  unsigned char frame_rate_control_support;
+  unsigned short max_hres;
+  unsigned short max_vres;
 };
 
 using H264Codecs = std::vector<H264Codec>;
@@ -67,19 +65,21 @@ using H264Codecs = std::vector<H264Codec>;
 class VideoFormats: public Property {
  public:
   VideoFormats();
-  VideoFormats(wds::NativeVideoFormat format,
+  VideoFormats(NativeVideoFormat format,
                bool preferred_display_mode,
-               const std::vector<wds::SelectableH264VideoFormat>& h264_formats);
-  VideoFormats(wds::NativeVideoFormat format,
+               const std::vector<H264VideoFormat>& h264_formats);
+  VideoFormats(NativeVideoFormat format,
                bool preferred_display_mode,
-               const std::vector<wds::SupportedH264VideoFormats>& h264_formats);
+               const std::vector<H264VideoCodec>& h264_formats);
   VideoFormats(unsigned char native,
                unsigned char preferred_display_mode,
                const H264Codecs& h264_codecs);
   ~VideoFormats() override;
 
   NativeVideoFormat GetNativeFormat() const;
-  std::vector<SelectableH264VideoFormat> GetSelectableH264Formats() const;
+
+  std::vector<H264VideoFormat> GetH264Formats() const;
+  std::vector<H264VideoCodec> GetH264VideoCodecs() const;
 
   std::string ToString() const override;
 

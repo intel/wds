@@ -37,11 +37,9 @@ class DesktopMediaManager : public wds::SourceMediaManager {
   std::pair<int,int> GetSinkRtpPorts() const override;
   int GetLocalRtpPort() const override;
 
-  std::vector<wds::SelectableH264VideoFormat> GetSelectableH264VideoFormats() const override;
-  bool InitOptimalVideoFormat(
-      const wds::NativeVideoFormat& sink_native_format,
-      const std::vector<wds::SelectableH264VideoFormat>& sink_supported_formats) override;
-  wds::SelectableH264VideoFormat GetOptimalVideoFormat() const override;
+  bool InitOptimalVideoFormat(const wds::NativeVideoFormat& sink_native_format,
+      const std::vector<wds::H264VideoCodec>& sink_supported_codecs) override;
+  wds::H264VideoFormat GetOptimalVideoFormat() const override;
   bool InitOptimalAudioFormat(const std::vector<wds::AudioCodec>& sink_supported_codecs) override;
   wds::AudioCodec GetOptimalAudioFormat() const override;
   void SendIDRPicture() override;
@@ -51,7 +49,7 @@ class DesktopMediaManager : public wds::SourceMediaManager {
   std::unique_ptr<MiracGstTestSource> gst_pipeline_;
   int sink_port1_;
   int sink_port2_;
-  wds::SelectableH264VideoFormat format_;
+  wds::H264VideoFormat format_;
 };
 
 #endif // DESKTOP_MEDIA_MANAGER_H_

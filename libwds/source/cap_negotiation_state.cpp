@@ -92,27 +92,25 @@ bool M3Handler::HandleReply(Reply* reply) {
 
   auto video_formats = static_cast<VideoFormats*>(
       reply->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
+
+  auto audio_codecs = static_cast<AudioCodecs*>(
+      reply->payload().get_property(rtsp::WFD_AUDIO_CODECS).get());
+
   if (!video_formats) {
     WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
     return false;
   }
 
-  auto audio_codecs = static_cast<AudioCodecs*>(
-      reply->payload().get_property(rtsp::WFD_AUDIO_CODECS).get());
-  if (!audio_codecs) {
-    WDS_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
-    return false;
-  }
-
   if (!source_manager->InitOptimalVideoFormat(
       video_formats->GetNativeFormat(),
-      video_formats->GetSelectableH264Formats())) {
-    WDS_ERROR("Failed to initalize optimal video format.");
+      video_formats->GetH264VideoCodecs())) {
+    WDS_ERROR("Cannot initalize optimal video format from the supported by sink.");
     return false;
   }
 
-  if (!source_manager->InitOptimalAudioFormat(audio_codecs->audio_codecs())) {
-    WDS_ERROR("Failed to initalize optimal audio format.");
+  if (audio_codecs && !source_manager->InitOptimalAudioFormat(
+      audio_codecs->audio_codecs())) {
+    WDS_ERROR("Cannot initalize optimal audio format from the supported by sink.");
     return false;
   }
 
