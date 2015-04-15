@@ -25,6 +25,8 @@
 
 namespace wds {
 
+using rtsp::Message;
+
 RTSPInputHandler::~RTSPInputHandler() {
 }
 

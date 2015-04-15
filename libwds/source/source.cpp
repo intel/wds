@@ -29,11 +29,15 @@
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
 #include "libwds/public/wds_export.h"
-#include "libwds/parser/getparameter.h"
-#include "libwds/parser/setparameter.h"
+#include "libwds/rtsp/getparameter.h"
+#include "libwds/rtsp/setparameter.h"
 #include "libwds/public/media_manager.h"
 
 namespace wds {
+
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
 
 namespace {
 
@@ -56,17 +60,17 @@ bool InitializeRequestId(Request* request) {
     id = Request::M9;
     break;
   case Request::MethodSetParameter:
-    if (request->payload().has_property(WFD_ROUTE))
+    if (request->payload().has_property(rtsp::WFD_ROUTE))
       id = Request::M10;
-    else if (request->payload().has_property(WFD_CONNECTOR_TYPE))
+    else if (request->payload().has_property(rtsp::WFD_CONNECTOR_TYPE))
       id = Request::M11;
-    else if (request->payload().has_property(WFD_STANDBY))
+    else if (request->payload().has_property(rtsp::WFD_STANDBY))
       id = Request::M12;
-    else if (request->payload().has_property(WFD_IDR_REQUEST))
+    else if (request->payload().has_property(rtsp::WFD_IDR_REQUEST))
       id = Request::M13;
-    else if (request->payload().has_property(WFD_UIBC_CAPABILITY))
+    else if (request->payload().has_property(rtsp::WFD_UIBC_CAPABILITY))
       id = Request::M14;
-    else if (request->payload().has_property(WFD_UIBC_SETTING))
+    else if (request->payload().has_property(rtsp::WFD_UIBC_SETTING))
       id = Request::M15;
     break;
   default:
@@ -155,7 +159,7 @@ void SourceImpl::OnTimerEvent(uint timer_id) {
 void SourceImpl::SendKeepAlive() {
   delegate_->ReleaseTimer(keep_alive_timer_);
   auto get_param = std::unique_ptr<Request>(
-      new GetParameter("rtsp://localhost/wfd1.0"));
+      new rtsp::GetParameter("rtsp://localhost/wfd1.0"));
   get_param->header().set_cseq(state_machine_->GetNextCSeq());
   get_param->set_id(Request::M16);
 
@@ -176,12 +180,12 @@ void SourceImpl::ResetAndTeardownMedia() {
 
 namespace  {
 
-std::unique_ptr<Message> CreateM5(int send_cseq, TriggerMethod::Method method) {
+std::unique_ptr<Message> CreateM5(int send_cseq, rtsp::TriggerMethod::Method method) {
   auto set_param = std::unique_ptr<Request>(
-      new SetParameter("rtsp://localhost/wfd1.0"));
+      new rtsp::SetParameter("rtsp://localhost/wfd1.0"));
   set_param->header().set_cseq(send_cseq);
   set_param->payload().add_property(
-      std::shared_ptr<Property>(new TriggerMethod(method)));
+      std::shared_ptr<rtsp::Property>(new rtsp::TriggerMethod(method)));
   set_param->set_id(Request::M5);
   return std::move(set_param);
 }
@@ -190,7 +194,7 @@ std::unique_ptr<Message> CreateM5(int send_cseq, TriggerMethod::Method method) {
 
 bool SourceImpl::Teardown() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     TriggerMethod::TEARDOWN);
+                     rtsp::TriggerMethod::TEARDOWN);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -200,7 +204,7 @@ bool SourceImpl::Teardown() {
 
 bool SourceImpl::Play() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     TriggerMethod::PLAY);
+                     rtsp::TriggerMethod::PLAY);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;
@@ -210,7 +214,7 @@ bool SourceImpl::Play() {
 
 bool SourceImpl::Pause() {
   auto m5 = CreateM5(state_machine_->GetNextCSeq(),
-                     TriggerMethod::PAUSE);
+                     rtsp::TriggerMethod::PAUSE);
 
   if (!state_machine_->CanSend(m5.get()))
     return false;

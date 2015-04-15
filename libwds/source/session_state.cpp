@@ -24,12 +24,16 @@
 #include "libwds/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "libwds/common/rtsp_status_code.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/setparameter.h"
-#include "libwds/parser/triggermethod.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/setparameter.h"
+#include "libwds/rtsp/triggermethod.h"
 
 namespace wds {
+
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+
 namespace source {
 
 class M5Handler final : public SequencedMessageSender {
@@ -38,15 +42,15 @@ class M5Handler final : public SequencedMessageSender {
 
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
+    rtsp::SetParameter* set_param = new rtsp::SetParameter("rtsp://localhost/wfd1.0");
     set_param->header().set_cseq(send_cseq_++);
     set_param->payload().add_property(
-        std::shared_ptr<wds::Property>(new TriggerMethod(TriggerMethod::SETUP)));
+        std::shared_ptr<rtsp::Property>(new rtsp::TriggerMethod(rtsp::TriggerMethod::SETUP)));
     return std::unique_ptr<Message>(set_param);
   }
 
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == RTSP_OK);
+    return (reply->response_code() == rtsp::STATUS_OK);
   }
 
 };
@@ -60,12 +64,12 @@ class M6Handler final : public MessageReceiver<Request::M6> {
 
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
-    auto reply = std::unique_ptr<Reply>(new Reply(RTSP_OK));
+    auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
     // todo: generate unique session id
     reply->header().set_session("abcdefg123456");
     reply->header().set_timeout(kDefaultKeepAliveTimeout);
 
-    auto transport = new TransportHeader();
+    auto transport = new rtsp::TransportHeader();
     // we assume here that there is no coupled secondary sink
     transport->set_client_port(ToSourceMediaManager(manager_)->GetSinkRtpPorts().first);
     transport->set_server_port(ToSourceMediaManager(manager_)->GetLocalRtpPort());
@@ -92,7 +96,7 @@ std::unique_ptr<Reply> M7Handler::HandleMessage(
   if (!manager_->IsPaused())
     return nullptr; // FIXME : Shouldn't we just send error code?
   manager_->Play();
-  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+  return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
 
 M8Handler::M8Handler(const InitParams& init_params)
@@ -101,7 +105,7 @@ M8Handler::M8Handler(const InitParams& init_params)
 
 std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
   manager_->Teardown(); // FIXME : make proper reset.
-  return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+  return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
 
 
@@ -110,7 +114,7 @@ M16Sender::M16Sender(const InitParams& init_params)
 }
 
 bool M16Sender::HandleReply(Reply* reply) {
-  return (reply->response_code() == RTSP_OK);
+  return (reply->response_code() == rtsp::STATUS_OK);
 }
 
 SessionState::SessionState(const InitParams& init_params, uint& timer_id,

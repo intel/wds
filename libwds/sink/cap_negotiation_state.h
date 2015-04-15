@@ -34,16 +34,16 @@ class CapNegotiationState : public MessageSequenceWithOptionalSetHandler {
   CapNegotiationState(const InitParams& init_params);
 };
 
-class M4Handler final : public MessageReceiver<Request::M4> {
+class M4Handler final : public MessageReceiver<rtsp::Request::M4> {
  public:
   M4Handler(const InitParams& init_params);
-  std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  std::unique_ptr<rtsp::Reply> HandleMessage(rtsp::Message* message) override;
 };
 
-class M3Handler final : public MessageReceiver<Request::M3> {
+class M3Handler final : public MessageReceiver<rtsp::Request::M3> {
  public:
   M3Handler(const InitParams& init_params);
-  std::unique_ptr<Reply> HandleMessage(Message* message) override;
+  std::unique_ptr<rtsp::Reply> HandleMessage(rtsp::Message* message) override;
 };
 
 }  // namespace sink

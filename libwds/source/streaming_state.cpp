@@ -22,12 +22,16 @@
 #include "streaming_state.h"
 
 #include "cap_negotiation_state.h"
-#include "libwds/common/rtsp_status_code.h"
 #include "libwds/public/media_manager.h"
 #include "session_state.h"
-#include "libwds/parser/reply.h"
+#include "libwds/rtsp/reply.h"
 
 namespace wds {
+
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+
 namespace source {
 
 class M9Handler final : public MessageReceiver<Request::M9> {
@@ -38,10 +42,10 @@ class M9Handler final : public MessageReceiver<Request::M9> {
 
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
-    int response_code = RTSP_NotAcceptable;
+    int response_code = rtsp::STATUS_NotAcceptable;
     if (!manager_->IsPaused()) {
       manager_->Pause();
-      response_code = RTSP_OK;
+      response_code = rtsp::STATUS_OK;
     }
     return std::unique_ptr<Reply>(new Reply(response_code));
   }
@@ -53,7 +57,7 @@ class M5Sender final : public OptionalMessageSender<Request::M5> {
     : OptionalMessageSender<Request::M5>(init_params) {
   }
   bool HandleReply(Reply* reply) override {
-    return (reply->response_code() == RTSP_OK);
+    return (reply->response_code() == rtsp::STATUS_OK);
   }
 };
 
@@ -66,7 +70,7 @@ class M13Handler final : public MessageReceiver<Request::M13> {
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     ToSourceMediaManager(manager_)->SendIDRPicture();
-    return std::unique_ptr<Reply>(new Reply(RTSP_OK));
+    return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
   }
 };
 

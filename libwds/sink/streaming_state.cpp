@@ -24,15 +24,19 @@
 #include "libwds/public/media_manager.h"
 
 #include "cap_negotiation_state.h"
-#include "libwds/common/rtsp_status_code.h"
-#include "libwds/parser/pause.h"
-#include "libwds/parser/play.h"
-#include "libwds/parser/reply.h"
-#include "libwds/parser/teardown.h"
-#include "libwds/parser/triggermethod.h"
+#include "libwds/rtsp/pause.h"
+#include "libwds/rtsp/play.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/teardown.h"
+#include "libwds/rtsp/triggermethod.h"
 #include "session_state.h"
 
 namespace wds {
+using rtsp::Message;
+using rtsp::Request;
+using rtsp::Reply;
+using rtsp::TriggerMethod;
+
 namespace sink {
 
 template <TriggerMethod::Method method>
@@ -47,7 +51,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
       return false;
 
     auto property =
-      static_cast<TriggerMethod*>(message->payload().get_property(WFD_TRIGGER_METHOD).get());
+      static_cast<TriggerMethod*>(message->payload().get_property(rtsp::WFD_TRIGGER_METHOD).get());
     return  method == property->method();
   }
 
@@ -61,14 +65,14 @@ class M7Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Play* play = new Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    rtsp::Play* play = new rtsp::Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
     play->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
     play->header().set_cseq (send_cseq_++);
     return std::unique_ptr<Message>(play);
   }
 
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == RTSP_OK) {
+    if (reply->response_code() == rtsp::STATUS_OK) {
       manager_->Play();
       return true;
     }
@@ -90,7 +94,7 @@ class M8Sender final : public SequencedMessageSender {
   using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Teardown* teardown = new Teardown(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    rtsp::Teardown* teardown = new rtsp::Teardown(ToSinkMediaManager(manager_)->GetPresentationUrl());
     teardown->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
     teardown->header().set_cseq(send_cseq_++);
     return std::unique_ptr<Message>(teardown);
@@ -98,7 +102,7 @@ class M8Sender final : public SequencedMessageSender {
 
   bool HandleReply(Reply* reply) override {
     if (!ToSinkMediaManager(manager_)->GetSessionId().empty() &&
-        (reply->response_code() == RTSP_OK)) {
+        (reply->response_code() == rtsp::STATUS_OK)) {
       manager_->Teardown();
       return true;
     }
@@ -117,14 +121,14 @@ class M9Sender final : public SequencedMessageSender {
     using SequencedMessageSender::SequencedMessageSender;
  private:
   std::unique_ptr<Message> CreateMessage() override {
-    Pause* pause = new Pause(ToSinkMediaManager(manager_)->GetPresentationUrl());
+    rtsp::Pause* pause = new rtsp::Pause(ToSinkMediaManager(manager_)->GetPresentationUrl());
     pause->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
     pause->header().set_cseq(send_cseq_++);
     return std::unique_ptr<Message>(pause);
   }
 
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == RTSP_OK) {
+    if (reply->response_code() == rtsp::STATUS_OK) {
       manager_->Pause();
       return true;
     }
@@ -148,7 +152,7 @@ class M7SenderOptional final : public OptionalMessageSender<Request::M7> {
   }
  private:
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == RTSP_OK) {
+    if (reply->response_code() == rtsp::STATUS_OK) {
       manager_->Play();
       return true;
     }
@@ -171,7 +175,7 @@ class M8SenderOptional final : public OptionalMessageSender<Request::M8> {
  private:
   bool HandleReply(Reply* reply) override {
     // todo: if successfull, switch to init state
-    if (reply->response_code() == RTSP_OK) {
+    if (reply->response_code() == rtsp::STATUS_OK) {
       manager_->Teardown();
       return true;
     }
@@ -187,7 +191,7 @@ class M9SenderOptional final : public OptionalMessageSender<Request::M9> {
   }
  private:
   bool HandleReply(Reply* reply) override {
-    if (reply->response_code() == RTSP_OK) {
+    if (reply->response_code() == rtsp::STATUS_OK) {
       manager_->Pause();
       return true;
     }

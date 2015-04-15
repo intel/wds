@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(wds)
 enable_testing()
-add_subdirectory(libwds/parser)
+add_subdirectory(libwds/rtsp)
 add_subdirectory(libwds/common)
 add_subdirectory(libwds/source)
 add_subdirectory(libwds/sink)
