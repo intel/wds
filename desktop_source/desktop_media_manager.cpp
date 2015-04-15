@@ -61,33 +61,44 @@ int DesktopMediaManager::GetLocalRtpPort() const {
   return gst_pipeline_->UdpSourcePort();
 }
 
-std::vector<wds::SelectableH264VideoFormat>
-DesktopMediaManager::GetSelectableH264VideoFormats() const {
-  static std::vector<wds::SelectableH264VideoFormat> formats;
-  if (formats.empty()) {
+namespace {
+
+std::vector<wds::H264VideoCodec> GetH264VideoCodecs() {
+  static std::vector<wds::H264VideoCodec> codecs;
+  if (codecs.empty()) {
+    wds::RateAndResolutionsBitmap cea_rr;
+    wds::RateAndResolutionsBitmap vesa_rr;
+    wds::RateAndResolutionsBitmap hh_rr;
     wds::RateAndResolution i;
-    for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; i++)
-        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::CEARatesAndResolutions>(i)));
-    for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; i++)
-        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::VESARatesAndResolutions>(i)));
-    for (i = wds::HH800x480p30; i <= wds::HH848x480p60; i++)
-        formats.push_back(wds::SelectableH264VideoFormat(wds::CHP, wds::k4_2, static_cast<wds::HHRatesAndResolutions>(i)));
+    // declare that we support all resolutions, CHP and level 4.2
+    // gstreamer should handle all of it :)
+    for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; ++i)
+      cea_rr.set(i);
+    for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; ++i)
+      vesa_rr.set(i);
+    for (i = wds::HH800x480p30; i <= wds::HH848x480p60; ++i)
+      hh_rr.set(i);
+
+    wds::H264VideoCodec codec(wds::CHP, wds::k4_2, cea_rr, vesa_rr, hh_rr);
+    codecs.push_back(codec);
   }
 
-  return formats;
+  return codecs;
+}
+
 }
 
 bool DesktopMediaManager::InitOptimalVideoFormat(
     const wds::NativeVideoFormat& sink_native_format,
-    const std::vector<wds::SelectableH264VideoFormat>& sink_supported_formats) {
+    const std::vector<wds::H264VideoCodec>& sink_supported_codecs) {
 
   format_ = wds::FindOptimalVideoFormat(sink_native_format,
-                                        GetSelectableH264VideoFormats(),
-                                        sink_supported_formats);
+                                        GetH264VideoCodecs(),
+                                        sink_supported_codecs);
   return true;
 }
 
-wds::SelectableH264VideoFormat DesktopMediaManager::GetOptimalVideoFormat() const {
+wds::H264VideoFormat DesktopMediaManager::GetOptimalVideoFormat() const {
   return format_;
 }
 

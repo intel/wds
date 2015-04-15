@@ -124,13 +124,13 @@ class SinkMediaManager : public MediaManager {
    * Returns list of supported H264 video formats
    * @return vector of supported H264 video formats
    */
-  virtual std::vector<SupportedH264VideoFormats> GetSupportedH264VideoFormats() const = 0;
+  virtual std::vector<H264VideoCodec> GetSupportedH264VideoCodecs() const = 0;
 
   /**
    * Returns native video format of a device
    * @return native video format
    */
-  virtual NativeVideoFormat GetSupportedNativeVideoFormat() const = 0;
+  virtual NativeVideoFormat GetNativeVideoFormat() const = 0;
 
   /**
    * Sets optimal H264 format that would be used to send / receive video stream
@@ -138,7 +138,7 @@ class SinkMediaManager : public MediaManager {
    * @param optimal H264 format
    * @return true if format can be used by media manager, false otherwise
    */
-  virtual bool SetOptimalVideoFormat(const SelectableH264VideoFormat& optimal_format) = 0;
+  virtual bool SetOptimalVideoFormat(const H264VideoFormat& optimal_format) = 0;
 };
 
 /**
@@ -180,12 +180,6 @@ class SourceMediaManager : public MediaManager {
   virtual int GetLocalRtpPort() const = 0;
 
   /**
-   * Returns list of supported H264 video formats
-   * @return vector of supported H264 video formats
-   */
-  virtual std::vector<SelectableH264VideoFormat> GetSelectableH264VideoFormats() const = 0;
-
-  /**
    * Initializes optimal video format
    * The optimal video format will be returned by GetOptimalVideoFormat
    *
@@ -195,14 +189,14 @@ class SourceMediaManager : public MediaManager {
    */
   virtual bool InitOptimalVideoFormat(
       const NativeVideoFormat& sink_native_format,
-      const std::vector<SelectableH264VideoFormat>& sink_supported_formats) = 0;
+      const std::vector<H264VideoCodec>& sink_supported_codecs) = 0;
 
   /**
    * Gets optimal H264 format @see InitOptimalVideoFormat
    *
    * @return optimal H264 format
    */
-  virtual SelectableH264VideoFormat GetOptimalVideoFormat() const = 0;
+  virtual H264VideoFormat GetOptimalVideoFormat() const = 0;
 
   /**
    * Initializes optimal audio codec
@@ -234,20 +228,6 @@ inline SourceMediaManager* ToSourceMediaManager(MediaManager* mng) {
 inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng) {
   return static_cast<SinkMediaManager*>(mng);
 }
-
-/**
- * An auxiliary function to find the optimal format for streaming.
- * The quality selection algorithm will pick codec with higher bandwidth.
- *
- * @param native format of a remote device
- * @param local_formats of H264 formats that are supported by local device
- * @param remote_formats of H264 formats that are supported by remote device
- * @return optimal H264 video format
- */
-WDS_EXPORT SelectableH264VideoFormat FindOptimalVideoFormat(
-    const NativeVideoFormat& remote_device_native_format,
-    std::vector<SelectableH264VideoFormat> local_formats,
-    std::vector<SelectableH264VideoFormat> remote_formats);
 
 }  // namespace wds
 

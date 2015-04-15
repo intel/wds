@@ -61,32 +61,30 @@ std::string GstSinkMediaManager::GetSessionId() const {
   return session_;
 }
 
-std::vector<wds::SupportedH264VideoFormats>
-GstSinkMediaManager::GetSupportedH264VideoFormats() const {
+std::vector<wds::H264VideoCodec>
+GstSinkMediaManager::GetSupportedH264VideoCodecs() const {
+  wds::RateAndResolutionsBitmap cea_rr;
+  wds::RateAndResolutionsBitmap vesa_rr;
+  wds::RateAndResolutionsBitmap hh_rr;
+  wds::RateAndResolution i;
   // declare that we support all resolutions, CHP and level 4.2
   // gstreamer should handle all of it :)
-  std::vector<wds::CEARatesAndResolutions> cea_rr;
-  std::vector<wds::VESARatesAndResolutions> vesa_rr;
-  std::vector<wds::HHRatesAndResolutions> hh_rr;
-  wds::RateAndResolution i;
-
-  for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; i++)
-      cea_rr.push_back(static_cast<wds::CEARatesAndResolutions>(i));
-  for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; i++)
-      vesa_rr.push_back(static_cast<wds::VESARatesAndResolutions>(i));
-  for (i = wds::HH800x480p30; i <= wds::HH848x480p60; i++)
-      hh_rr.push_back(static_cast<wds::HHRatesAndResolutions>(i));
-  return {wds::SupportedH264VideoFormats(wds::CHP, wds::k4_2, cea_rr, vesa_rr, hh_rr),
-          wds::SupportedH264VideoFormats(wds::CBP, wds::k4_2, cea_rr, vesa_rr, hh_rr)};
+  for (i = wds::CEA640x480p60; i <= wds::CEA1920x1080p24; ++i)
+    cea_rr.set(i);
+  for (i = wds::VESA800x600p30; i <= wds::VESA1920x1200p30; ++i)
+    vesa_rr.set(i);
+  for (i = wds::HH800x480p30; i <= wds::HH848x480p60; ++i)
+    hh_rr.set(i);
+  return {wds::H264VideoCodec(wds::CHP, wds::k4_2, cea_rr, vesa_rr, hh_rr),
+          wds::H264VideoCodec(wds::CBP, wds::k4_2, cea_rr, vesa_rr, hh_rr)};
 }
 
-wds::NativeVideoFormat GstSinkMediaManager::GetSupportedNativeVideoFormat() const {
+wds::NativeVideoFormat GstSinkMediaManager::GetNativeVideoFormat() const {
   // pick the maximum possible resolution, let gstreamer deal with it
   // TODO: get the actual screen size of the system
   return wds::NativeVideoFormat(wds::CEA1920x1080p60);
 }
 
-bool GstSinkMediaManager::SetOptimalVideoFormat(
-    const wds::SelectableH264VideoFormat& optimal_format) {
+bool GstSinkMediaManager::SetOptimalVideoFormat(const wds::H264VideoFormat& optimal_format) {
   return true;
 }

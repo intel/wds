@@ -4,4 +4,4 @@ set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -Wall")
 include_directories ("${PROJECT_SOURCE_DIR}" )
 
 add_library(wdscommon OBJECT
-    message_handler.cpp rtsp_input_handler.cpp source_media_manager.cpp)
+    message_handler.cpp rtsp_input_handler.cpp video_format.cpp)

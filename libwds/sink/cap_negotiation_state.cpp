@@ -75,9 +75,9 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new rtsp::AudioCodecs(codec_list));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_VIDEO_FORMATS]){
-          new_prop.reset(new rtsp::VideoFormats(ToSinkMediaManager(manager_)->GetSupportedNativeVideoFormat(),
+          new_prop.reset(new rtsp::VideoFormats(ToSinkMediaManager(manager_)->GetNativeVideoFormat(),
               false,
-              ToSinkMediaManager(manager_)->GetSupportedH264VideoFormats()));
+              ToSinkMediaManager(manager_)->GetSupportedH264VideoCodecs()));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_3D_FORMATS]){
           new_prop.reset(new Formats3d());
@@ -130,8 +130,19 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
 
   auto video_formats =
       static_cast<rtsp::VideoFormats*>(message->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
-  assert(video_formats);
-  if (!sink_media_manager->SetOptimalVideoFormat(video_formats->GetSelectableH264Formats()[0])) {
+
+  if (!video_formats) {
+    WDS_ERROR("Failed to obtain 'wfd-video-formats' in M4 handler.");
+    return nullptr;
+  }
+
+  const auto& selected_formats = video_formats->GetH264Formats();
+  if (selected_formats.size() != 1) {
+    WDS_ERROR("Failed to obtain optimal video format from 'wfd-video-formats' in M4 handler.");
+    return nullptr;
+  }
+
+  if (!sink_media_manager->SetOptimalVideoFormat(selected_formats[0])) {
     auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_SeeOther));
     auto payload = std::unique_ptr<rtsp::Payload>(new rtsp::Payload());
     std::vector<unsigned short> error_codes = {rtsp::STATUS_UnsupportedMediaType};
