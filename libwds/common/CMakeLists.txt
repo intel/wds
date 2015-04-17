@@ -5,3 +5,4 @@ include_directories ("${PROJECT_SOURCE_DIR}" )
 
 add_library(wdscommon OBJECT
     message_handler.cpp rtsp_input_handler.cpp video_format.cpp)
+add_dependencies(wdscommon wdsrtsp)
