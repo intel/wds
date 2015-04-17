@@ -31,9 +31,3 @@ add_library(wdsrtsp OBJECT
     standbyresumecapability.cpp standby.cpp idrrequest.cpp connectortype.cpp
     preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp scanner.cpp
 )
-
-add_executable(test-wds tests.cpp $<TARGET_OBJECTS:wdsrtsp> $<TARGET_OBJECTS:wdscommon>)
-set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")
-target_link_libraries (test-wds)
-
-add_test(WfdTest test-wds)
