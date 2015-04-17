@@ -6,3 +6,4 @@ include_directories ("${PROJECT_SOURCE_DIR}" )
 add_library(wdssource OBJECT
     source.cpp cap_negotiation_state.cpp init_state.cpp
     session_state.cpp streaming_state.cpp)
+add_dependencies(wdssource wdsrtsp)

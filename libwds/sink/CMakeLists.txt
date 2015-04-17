@@ -7,3 +7,4 @@ add_library(wdssink OBJECT
     sink.cpp cap_negotiation_state.cpp init_state.cpp
     session_state.cpp streaming_state.cpp
 )
+add_dependencies(wdssink wdsrtsp)
