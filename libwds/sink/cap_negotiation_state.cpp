@@ -123,11 +123,13 @@ M4Handler::M4Handler(const InitParams& init_params)
 }
 
 std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
+  SinkMediaManager* sink_media_manager = ToSinkMediaManager(manager_);
+
   auto presentation_url =
       static_cast<rtsp::PresentationUrl*>(message->payload().get_property(rtsp::WFD_PRESENTATION_URL).get());
-  assert(presentation_url);
-  SinkMediaManager* sink_media_manager = ToSinkMediaManager(manager_);
-  sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
+  if (presentation_url) {
+    sink_media_manager->SetPresentationUrl(presentation_url->presentation_url_1());
+  }
 
   auto video_formats =
       static_cast<rtsp::VideoFormats*>(message->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
