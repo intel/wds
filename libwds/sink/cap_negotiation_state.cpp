@@ -109,8 +109,7 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new StandbyResumeCapability(false));
           reply->payload().add_property(new_prop);
       } else {
-          WDS_ERROR("** GET_PARAMETER: Property not supported");
-          return std::unique_ptr<Reply>(new Reply(STATUS_NotImplemented));
+          WDS_WARNING("** GET_PARAMETER: Ignoring unsupported property '%s'.", (*it).c_str());
       }
   }
 
