@@ -1,7 +1,7 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fvisibility=hidden -fPIC")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -Wall")
 
-include_directories ("${PROJECT_SOURCE_DIR}" )
+include_directories ("${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/libwds/rtsp" "${PROJECT_BINARY_DIR}/libwds/rtsp")
 
 add_library(wdssink OBJECT
     sink.cpp cap_negotiation_state.cpp init_state.cpp
