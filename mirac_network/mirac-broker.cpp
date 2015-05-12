@@ -215,6 +215,8 @@ MiracBroker::~MiracBroker ()
         g_source_remove(connect_wait_id_);
         connect_wait_id_ = 0;
     }
+    for (auto it = timers_.begin(); it != timers_.end(); it++)
+        g_source_remove(*it);
 }
 
 void MiracBroker::SendRTSPData(const std::string& data) {
@@ -229,10 +231,14 @@ std::string MiracBroker::GetLocalIPAddress() const {
   return "127.0.0.1";  // FIXME : return the actual local IP address.
 }
 
+static void on_timeout_remove(gpointer user_data) {
+  TimerCallbackData* data = static_cast<TimerCallbackData*>(user_data);
+  delete data;
+}
+
 static gboolean on_timeout(gpointer user_data) {
   TimerCallbackData* data = static_cast<TimerCallbackData*>(user_data);
   data->delegate_->OnTimeout(data->timer_id_);
-  delete data;
   return FALSE;
 }
 
@@ -243,10 +249,12 @@ void MiracBroker::OnTimeout(uint timer_id) {
 
 uint MiracBroker::CreateTimer(int seconds) {
   TimerCallbackData* data = new TimerCallbackData(this);
-  uint timer_id = g_timeout_add_seconds(
+  uint timer_id = g_timeout_add_seconds_full(
+                        G_PRIORITY_DEFAULT,
                         seconds,
                         on_timeout,
-                        data);
+                        data,
+                        on_timeout_remove);
   if (timer_id > 0) {
     data->timer_id_ = timer_id;
     timers_.push_back(timer_id);
