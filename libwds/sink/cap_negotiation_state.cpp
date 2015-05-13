@@ -56,6 +56,7 @@ M3Handler::M3Handler(const InitParams& init_params)
 }
 
 std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
+  // FIXME : resolve clashes between wds exported and internal rtsp type names.
   using namespace rtsp;
 
   auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
@@ -102,7 +103,7 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
           new_prop.reset(new UIBCCapability());
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_CONNECTOR_TYPE]){
-          new_prop.reset(new ConnectorType());
+          new_prop.reset(new rtsp::ConnectorType(ToSinkMediaManager(manager_)->GetConnectorType()));
           reply->payload().add_property(new_prop);
       } else if (*it == PropertyName::name[PropertyType::WFD_STANDBY_RESUME_CAPABILITY]){
           new_prop.reset(new StandbyResumeCapability(false));

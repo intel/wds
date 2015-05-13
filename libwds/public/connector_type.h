@@ -1,7 +1,7 @@
 /*
  * This file is part of Wireless Display Software for Linux OS
  *
- * Copyright (C) 2014 Intel Corporation.
+ * Copyright (C) 2015 Intel Corporation.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,30 +19,18 @@
  * 02110-1301 USA
  */
 
-
-#ifndef CONNECTORTYPE_H_
-#define CONNECTORTYPE_H_
-
-#include "property.h"
-#include "libwds/public/connector_type.h"
+#ifndef CONNECTOR_TYPE_H_
+#define CONNECTOR_TYPE_H_
 
 namespace wds {
-namespace rtsp {
 
-class ConnectorType: public Property {
- public:
-  ConnectorType();
-  explicit ConnectorType(unsigned char connector_type);
-  explicit ConnectorType(wds::ConnectorType connector_type);
-  ~ConnectorType() override;
-
-  unsigned char connector_type() const { return connector_type_; }
-  std::string ToString() const override;
-
- private:
-  unsigned char connector_type_;
+enum ConnectorType {
+  ConnectorTypeVGA = 0,
+  // TODO : Add the rest of connector types.
+  ConnectorTypeUndefined = 255,
+  ConnectorTypeNone
 };
 
-}  // namespace rtsp
 }  // namespace wds
-#endif  // CONNECTORTYPE_H_
+
+#endif  // CONNECTOR_TYPE_H_

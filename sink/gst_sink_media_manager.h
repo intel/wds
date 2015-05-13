@@ -44,6 +44,7 @@ class GstSinkMediaManager : public wds::SinkMediaManager {
   std::vector<wds::H264VideoCodec> GetSupportedH264VideoCodecs() const override;
   wds::NativeVideoFormat GetNativeVideoFormat() const override;
   bool SetOptimalVideoFormat(const wds::H264VideoFormat& optimal_format) override;
+  wds::ConnectorType GetConnectorType() const override;
 
  private:
   std::string hostname_;

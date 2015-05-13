@@ -28,12 +28,19 @@ namespace wds {
 namespace rtsp {
 
 ConnectorType::ConnectorType()
-  : Property(WFD_CONNECTOR_TYPE, true) {
+  : Property(WFD_CONNECTOR_TYPE, true),
+    connector_type_() {
 }
 
-ConnectorType::ConnectorType(unsigned short connector_type)
+ConnectorType::ConnectorType(unsigned char connector_type)
   : Property(WFD_CONNECTOR_TYPE),
     connector_type_(connector_type) {
+}
+
+ConnectorType::ConnectorType(wds::ConnectorType connector_type)
+  : Property(WFD_CONNECTOR_TYPE, connector_type == wds::ConnectorTypeNone) {
+  connector_type_ = is_none() ? 0  // Ignored.
+                              : static_cast<unsigned char>(connector_type);
 }
 
 ConnectorType::~ConnectorType() {
