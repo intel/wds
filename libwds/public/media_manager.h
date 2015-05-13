@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "audio_codec.h"
+#include "connector_type.h"
 #include "video_format.h"
 #include "wds_export.h"
 
@@ -139,6 +140,12 @@ class SinkMediaManager : public MediaManager {
    * @return true if format can be used by media manager, false otherwise
    */
   virtual bool SetOptimalVideoFormat(const H264VideoFormat& optimal_format) = 0;
+
+  /**
+   * Returns active connector type of a device
+   * @return connector type. @see ConnectorType
+   */
+  virtual ConnectorType GetConnectorType() const = 0;
 };
 
 /**

@@ -88,3 +88,7 @@ wds::NativeVideoFormat GstSinkMediaManager::GetNativeVideoFormat() const {
 bool GstSinkMediaManager::SetOptimalVideoFormat(const wds::H264VideoFormat& optimal_format) {
   return true;
 }
+
+wds::ConnectorType GstSinkMediaManager::GetConnectorType() const {
+  return wds::ConnectorTypeNone;
+}
