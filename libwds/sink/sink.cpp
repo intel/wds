@@ -57,6 +57,8 @@ bool InitializeRequestId(Request* request) {
   case Request::MethodSetParameter:
     if (request->payload().has_property(rtsp::WFD_PRESENTATION_URL))
       id = Request::M4;
+    else if (request->payload().has_property(rtsp::WFD_AV_FORMAT_CHANGE_TIMING))
+      id = Request::M4;
     else if (request->payload().has_property(rtsp::WFD_TRIGGER_METHOD))
       id = Request::M5;
     break;
