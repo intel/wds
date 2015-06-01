@@ -208,7 +208,7 @@ std::string MiracNetwork::GetPeerAddress ()
         reinterpret_cast<struct sockaddr *> (addrbuf.get()), addrsize,
         namebuf.get(), MIRAC_MAX_NAMELEN,
         servbuf.get(), MIRAC_MAX_NAMELEN,
-        NI_NOFQDN|NI_NUMERICSERV);
+        NI_NOFQDN|NI_NUMERICHOST|NI_NUMERICSERV);
     if (ec)
         throw MiracException(gai_strerror(ec), __FUNCTION__);
     return std::string(namebuf.get());
