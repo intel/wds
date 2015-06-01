@@ -64,6 +64,7 @@ class MiracBroker : public wds::Peer::Delegate
         static gboolean listen_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean connect_cb (gint fd, GIOCondition condition, gpointer data_ptr);
         static gboolean try_connect(gpointer data_ptr);
+        static void on_timeout_remove(gpointer user_data);
 
         gboolean send_cb (gint fd, GIOCondition condition);
         gboolean receive_cb (gint fd, GIOCondition condition);
