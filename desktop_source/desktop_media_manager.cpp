@@ -46,6 +46,10 @@ bool DesktopMediaManager::IsPaused() const {
   return (gst_pipeline_->GetState() != GST_STATE_PLAYING);
 }
 
+wds::SessionType DesktopMediaManager::GetSessionType() const {
+  return wds::VideoSession;
+}
+
 void DesktopMediaManager::SetSinkRtpPorts(int port1, int port2) {
   sink_port1_ = port1;
   sink_port2_ = port2;
