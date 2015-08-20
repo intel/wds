@@ -67,11 +67,14 @@ class M4Handler final : public SequencedMessageSender {
 std::unique_ptr<Message> M3Handler::CreateMessage() {
   GetParameter* get_param = new GetParameter("rtsp://localhost/wfd1.0");
   get_param->header().set_cseq(send_cseq_++);
-  // todo: get data from environment (e.g. if video / audio / hdcp required)
-  // and request only needed parameters
   std::vector<std::string> props;
-  props.push_back("wfd_video_formats");
-  props.push_back("wfd_audio_codecs");
+
+  SessionType media_type = ToSourceMediaManager(manager_)->GetSessionType();
+  if (media_type & VideoSession)
+    props.push_back("wfd_video_formats");
+  if (media_type & AudioSession)
+    props.push_back("wfd_audio_codecs");
+
   props.push_back("wfd_client_rtp_ports");
   get_param->set_payload(std::unique_ptr<Payload>(new Payload(props)));
   return std::unique_ptr<Message>(get_param);
@@ -96,12 +99,17 @@ bool M3Handler::HandleReply(Reply* reply) {
   auto audio_codecs = static_cast<AudioCodecs*>(
       reply->payload().get_property(rtsp::WFD_AUDIO_CODECS).get());
 
-  if (!video_formats) {
+  if (!video_formats && (source_manager->GetSessionType() & VideoSession)) {
     WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
     return false;
   }
 
-  if (!source_manager->InitOptimalVideoFormat(
+  if (!audio_codecs && (source_manager->GetSessionType() & AudioSession)) {
+    WDS_ERROR("Failed to obtain WFD_AUDIO_CODECS property");
+    return false;
+  }
+
+  if (video_formats && !source_manager->InitOptimalVideoFormat(
       video_formats->GetNativeFormat(),
       video_formats->GetH264VideoCodecs())) {
     WDS_ERROR("Cannot initalize optimal video format from the supported by sink.");

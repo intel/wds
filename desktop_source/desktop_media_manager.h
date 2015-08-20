@@ -36,6 +36,7 @@ class DesktopMediaManager : public wds::SourceMediaManager {
   void SetSinkRtpPorts(int port1, int port2) override;
   std::pair<int,int> GetSinkRtpPorts() const override;
   int GetLocalRtpPort() const override;
+  wds::SessionType GetSessionType() const override;
 
   bool InitOptimalVideoFormat(const wds::NativeVideoFormat& sink_native_format,
       const std::vector<wds::H264VideoCodec>& sink_supported_codecs) override;

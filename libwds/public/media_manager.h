@@ -31,6 +31,12 @@
 
 namespace wds {
 
+enum SessionType {
+  AudioSession = 1,  // Audio only session
+  VideoSession = 1 << 1,  // Video only session
+  AudioVideoSession = AudioSession | VideoSession  // Audio/video session
+};
+
 /**
  * MediaManager interface.
  *
@@ -66,6 +72,7 @@ class MediaManager {
    * @return true if media stream is paused, false otherwise.
    */
   virtual bool IsPaused() const = 0;
+
 };
 
 /**
@@ -157,6 +164,13 @@ class SinkMediaManager : public MediaManager {
 class SourceMediaManager : public MediaManager {
  public:
    ~SourceMediaManager() override { }
+
+   /**
+    * Returns media type for the current session.
+    * @see MediaType
+    * @return media time.
+    */
+   virtual SessionType GetSessionType() const = 0;
 
   /**
    * Sets RTP ports used by WFD sink to receive media streams.
