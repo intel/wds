@@ -58,6 +58,8 @@ using AudioModes = std::bitset<32>;
  * Repersents a <audio-format, modes, latency> tuple used in 'wfd-audio-codecs'.
  */
 struct AudioCodec {
+  AudioCodec()
+  : format(LPCM), modes(AudioModes().set(LPCM_48K_16B_2CH)), latency(0) {}
   AudioCodec(AudioFormats format, const AudioModes& modes, unsigned latency)
   : format(format), modes(modes), latency(latency) {}
 
