@@ -210,7 +210,8 @@ WDS_EXPORT void PopulateVideoFormatList(
 WDS_EXPORT H264VideoFormat FindOptimalVideoFormat(
     const NativeVideoFormat& remote_native_format,
     const std::vector<H264VideoCodec>& local_codecs,
-    const std::vector<H264VideoCodec>& remote_codecs);
+    const std::vector<H264VideoCodec>& remote_codecs,
+    bool* success = nullptr);
 
 }  // namespace wds
 
