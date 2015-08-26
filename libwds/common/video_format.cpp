@@ -205,7 +205,8 @@ void PopulateVideoFormatList(
 H264VideoFormat FindOptimalVideoFormat(
     const NativeVideoFormat& native,
     const std::vector<H264VideoCodec>& local_codecs,
-    const std::vector<H264VideoCodec>& remote_codecs) {
+    const std::vector<H264VideoCodec>& remote_codecs,
+    bool* success) {
   std::vector<H264VideoFormat> local_formats, remote_formats;
   for (const auto& codec : local_codecs)
     PopulateVideoFormatList(codec, local_formats);
@@ -237,8 +238,12 @@ H264VideoFormat FindOptimalVideoFormat(
   }
 
   // Should not happen, 640x480p60 should be always supported!
-  if (it == end)
-    assert(false);
+  if (it == end) {
+    WDS_ERROR("Failed to find compatible video format.");
+    if (success)
+      *success = false;
+    return format;
+  }
 
   // if remote device supports higher codec profile / level
   // downgrade them to what we support locally.
@@ -246,7 +251,8 @@ H264VideoFormat FindOptimalVideoFormat(
     format.profile = (*it).profile;
   if (format.level > (*it).level)
     format.level = (*it).level;
-
+  if (success)
+    *success = true;
   return format;
 }
 
