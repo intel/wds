@@ -99,7 +99,7 @@ class SourceStateMachine : public MessageSequenceHandler {
 
 class SourceImpl final : public Source, public RTSPInputHandler, public MessageHandler::Observer {
  public:
-  SourceImpl(Delegate* delegate, SourceMediaManager* mng);
+  SourceImpl(Delegate* delegate, SourceMediaManager* mng, Peer::Observer* observer);
 
  private:
   // Source implementation.
@@ -118,22 +118,25 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
 
   // RTSPInputHandler
   void MessageParsed(std::unique_ptr<Message> message) override;
+  void ParserErrorOccurred(const std::string& invalid_input) override;
 
   // Keep-alive function
   void SendKeepAlive();
   void ResetAndTeardownMedia();
 
-  std::shared_ptr<SourceStateMachine> state_machine_;
   uint keep_alive_timer_;
+  std::shared_ptr<SourceStateMachine> state_machine_;
   Delegate* delegate_;
   SourceMediaManager* media_manager_;
+  Peer::Observer* observer_;
 };
 
-SourceImpl::SourceImpl(Delegate* delegate, SourceMediaManager* mng)
-  : state_machine_(new SourceStateMachine({delegate, mng, this}, keep_alive_timer_)),
-    keep_alive_timer_(0),
+SourceImpl::SourceImpl(Delegate* delegate, SourceMediaManager* mng, Peer::Observer* observer)
+  : keep_alive_timer_(0),
+    state_machine_(new SourceStateMachine({delegate, mng, this}, keep_alive_timer_)),
     delegate_(delegate),
-    media_manager_(mng) {
+    media_manager_(mng),
+    observer_(observer) {
 }
 
 void SourceImpl::Start() {
@@ -146,14 +149,14 @@ void SourceImpl::Reset() {
 }
 
 void SourceImpl::RTSPDataReceived(const std::string& message) {
-  InputReceived(message);
+  AddInput(message);
 }
 
 void SourceImpl::OnTimerEvent(uint timer_id) {
   if (keep_alive_timer_ == timer_id)
     SendKeepAlive();
-  else if (state_machine_->HandleTimeoutEvent(timer_id))
-    ResetAndTeardownMedia();
+  else if (state_machine_->HandleTimeoutEvent(timer_id) && observer_)
+    observer_->ErrorOccurred(TimeoutError);
 }
 
 void SourceImpl::SendKeepAlive() {
@@ -163,19 +166,11 @@ void SourceImpl::SendKeepAlive() {
   get_param->header().set_cseq(state_machine_->GetNextCSeq());
   get_param->set_id(Request::M16);
 
-  if (state_machine_->CanSend(get_param.get())) {
-    state_machine_->Send(std::move(get_param));
-    keep_alive_timer_ =
-        delegate_->CreateTimer(kDefaultKeepAliveTimeout - kDefaultTimeoutValue);
-    assert(keep_alive_timer_);
-  } else {
-    ResetAndTeardownMedia();
-  }
-}
-
-void SourceImpl::ResetAndTeardownMedia() {
-  media_manager_->Teardown();
-  state_machine_->Reset();
+  assert(state_machine_->CanSend(get_param.get()));
+  state_machine_->Send(std::move(get_param));
+  keep_alive_timer_ =
+      delegate_->CreateTimer(kDefaultKeepAliveTimeout - kDefaultTimeoutValue);
+  assert(keep_alive_timer_);
 }
 
 namespace  {
@@ -224,28 +219,40 @@ bool SourceImpl::Pause() {
 
 void SourceImpl::OnCompleted(MessageHandlerPtr handler) {
   assert(handler == state_machine_);
-  ResetAndTeardownMedia();
+  if (observer_)
+    observer_->SessionCompleted();
 }
 
 void SourceImpl::OnError(MessageHandlerPtr handler) {
-   assert(handler == state_machine_);
-   ResetAndTeardownMedia();
+  assert(handler == state_machine_);
+  if (observer_)
+    observer_->ErrorOccurred(UnexpectedMessageError);
 }
 
 void SourceImpl::MessageParsed(std::unique_ptr<Message> message) {
   if (message->is_request() && !InitializeRequestId(ToRequest(message.get()))) {
     WDS_ERROR("Cannot identify the received message");
+    if (observer_)
+      observer_->ErrorOccurred(UnexpectedMessageError);
     return;
   }
   if (!state_machine_->CanHandle(message.get())) {
     WDS_ERROR("Cannot handle the received message with Id: %d", ToRequest(message.get())->id());
+    if (observer_)
+      observer_->ErrorOccurred(UnexpectedMessageError);
     return;
   }
   state_machine_->Handle(std::move(message));
 }
 
-WDS_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng) {
-  return new SourceImpl(delegate, mng);
+void SourceImpl::ParserErrorOccurred(const std::string& invalid_input) {
+  WDS_ERROR("Failed to parse: %s", invalid_input.c_str());
+  if (observer_)
+    observer_->ErrorOccurred(MessageParseError);
+}
+
+WDS_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng, Peer::Observer* observer) {
+  return new SourceImpl(delegate, mng, observer);
 }
 
 }  // namespace wds

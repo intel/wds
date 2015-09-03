@@ -94,20 +94,10 @@ M7Handler::M7Handler(const InitParams& init_params)
 std::unique_ptr<Reply> M7Handler::HandleMessage(
     Message* message) {
   if (!manager_->IsPaused())
-    return nullptr; // FIXME : Shouldn't we just send error code?
+    return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_NotAcceptable));
   manager_->Play();
   return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
-
-M8Handler::M8Handler(const InitParams& init_params)
-  : MessageReceiver<Request::M8>(init_params) {
-}
-
-std::unique_ptr<Reply> M8Handler::HandleMessage(Message* message) {
-  manager_->Teardown(); // FIXME : make proper reset.
-  return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
-}
-
 
 M16Sender::M16Sender(const InitParams& init_params)
   : OptionalMessageSender<Request::M16>(init_params) {
@@ -124,7 +114,6 @@ SessionState::SessionState(const InitParams& init_params, uint& timer_id,
   AddSequencedHandler(make_ptr(new M6Handler(init_params, timer_id)));
   AddSequencedHandler(make_ptr(new M7Handler(init_params)));
 
-  AddOptionalHandler(make_ptr(new M8Handler(init_params)));
   AddOptionalHandler(m16_sender);
 }
 

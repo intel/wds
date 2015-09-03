@@ -141,7 +141,7 @@ void SinkImpl::Reset() {
 }
 
 void SinkImpl::RTSPDataReceived(const std::string& message) {
-  InputReceived(message);
+  AddInput(message);
 }
 
 template <class WfdMessage, Request::ID id>

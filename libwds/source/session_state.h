@@ -36,15 +36,6 @@ class SessionState : public MessageSequenceWithOptionalSetHandler {
   ~SessionState() override;
 };
 
-class M8Handler final : public MessageReceiver<rtsp::Request::M8> {
- public:
-  M8Handler(const InitParams& init_params);
-
- private:
-  std::unique_ptr<rtsp::Reply> HandleMessage(
-      rtsp::Message* message) override;
-};
-
 class M7Handler final : public MessageReceiver<rtsp::Request::M7> {
  public:
   M7Handler(const InitParams& init_params);

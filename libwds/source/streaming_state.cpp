@@ -34,6 +34,20 @@ using rtsp::Reply;
 
 namespace source {
 
+class M8Handler final : public MessageReceiver<rtsp::Request::M8> {
+ public:
+  M8Handler(const InitParams& init_params)
+    : MessageReceiver<Request::M8>(init_params) {
+  }
+
+ private:
+  std::unique_ptr<rtsp::Reply> HandleMessage(
+      rtsp::Message* message) override {
+    manager_->Teardown();
+    return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
+  }
+};
+
 class M9Handler final : public MessageReceiver<Request::M9> {
  public:
   M9Handler(const InitParams& init_params)
