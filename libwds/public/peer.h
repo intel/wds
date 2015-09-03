@@ -26,6 +26,16 @@
 
 namespace wds {
 
+enum ErrorType {
+  /// Arrived message cannot be handled by the state machine at the time.
+  UnexpectedMessageError,
+  /// RTSP message cannot be created form the given input.
+  MessageParseError,
+  /// The connected peer became unresponsive.
+  TimeoutError
+};
+
+
 /**
  * Peer interface.
  *
@@ -36,8 +46,8 @@ class Peer {
   /**
    * Delegate interface.
    *
-   * Implementation of Delegate interface is responsible for networking
-   * and timers management.
+   * Implementation of Delegate interface is used by the state machine
+   * to obtain necessary context from the client.
    */
   class Delegate {
    public:
@@ -66,6 +76,35 @@ class Peer {
    protected:
     virtual ~Delegate() {}
   };
+
+  /**
+   * Observer interface.
+   *
+   * This interface can be used by the client in order to get notifications
+   * from the state machine.
+   */
+  class Observer {
+   public:
+    /**
+     * This method is called by the state machine if an error has occurred.
+     * State machine is not reset.
+     *
+     * @param error type of the error
+     *
+     * @see ErrorType
+     */
+    virtual void ErrorOccurred(ErrorType error) {}
+    /**
+     * This method is called by the state machine if the session has been
+     * completed normally (with 'teardown' message).
+     * State machine is not reset.
+     */
+    virtual void SessionCompleted() {}
+
+   protected:
+    virtual ~Observer() {}
+  };
+
   virtual ~Peer() {}
 
   /**
@@ -80,7 +119,7 @@ class Peer {
 
   /**
    * Whenever RTSP data is received, this method should be called, so that
-   * the state machine could decide action based on current state.
+   * the state machine could take action based on current state.
    */
   virtual void RTSPDataReceived(const std::string& data) = 0;
 

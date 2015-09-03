@@ -27,21 +27,24 @@
 
 namespace wds {
 
-// An aux class to handle input buffer.
+// An aux class used to obtain Message object from the given raw input.
 class RTSPInputHandler {
  protected:
   RTSPInputHandler() = default;
   virtual ~RTSPInputHandler();
 
-  void InputReceived(const std::string& input);
+  void AddInput(const std::string& input);
+
+  // To be overridden.
   virtual void MessageParsed(std::unique_ptr<rtsp::Message> message) = 0;
+  virtual void ParserErrorOccurred(const std::string& invalid_input) {}
 
  private:
   bool ParseHeader();
   bool ParsePayload();
 
   rtsp::Driver driver_;
-  std::string rtsp_recieve_buffer_;
+  std::string rtsp_input_buffer_;
   std::unique_ptr<rtsp::Message> message_;
 };
 

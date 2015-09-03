@@ -30,8 +30,8 @@ using rtsp::Message;
 RTSPInputHandler::~RTSPInputHandler() {
 }
 
-void RTSPInputHandler::InputReceived(const std::string& input) {
-  rtsp_recieve_buffer_ += input;
+void RTSPInputHandler::AddInput(const std::string& input) {
+  rtsp_input_buffer_ += input;
 
   // First trying to get payload for the message obtained
   // from the previous input.
@@ -46,16 +46,19 @@ void RTSPInputHandler::InputReceived(const std::string& input) {
 
 bool RTSPInputHandler::ParseHeader() {
   assert(!message_);
-  size_t eom = rtsp_recieve_buffer_.find("\r\n\r\n");
+  static const char delimiter[] = "\r\n\r\n";
+  static const int delimiter_length = 4;
+  size_t eom = rtsp_input_buffer_.find(delimiter);
   if (eom == std::string::npos) {
     return false;
   }
 
-  const std::string& header = rtsp_recieve_buffer_.substr(0, eom + 4);
-  rtsp_recieve_buffer_.erase(0, eom + 4);
+  const std::string& header = rtsp_input_buffer_.substr(0, eom + delimiter_length);
+  rtsp_input_buffer_.erase(0, eom + delimiter_length);
   driver_.Parse(header, message_);
   if (!message_) {
-    rtsp_recieve_buffer_.clear();
+    ParserErrorOccurred(rtsp_input_buffer_);
+    rtsp_input_buffer_.clear();
     return false;
   }
   return true;
@@ -69,11 +72,11 @@ bool RTSPInputHandler::ParsePayload() {
     return true;
   }
 
-  if (rtsp_recieve_buffer_.size() < content_length)
+  if (rtsp_input_buffer_.size() < content_length)
     return false;
 
-  const std::string& payload = rtsp_recieve_buffer_.substr(0, content_length);
-  rtsp_recieve_buffer_.erase(0, content_length);
+  const std::string& payload = rtsp_input_buffer_.substr(0, content_length);
+  rtsp_input_buffer_.erase(0, content_length);
   driver_.Parse(payload, message_);
   MessageParsed(std::move(message_));
   return true;

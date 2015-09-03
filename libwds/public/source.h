@@ -37,9 +37,12 @@ class Source : public Peer {
    * Factory method that creates Source state machine.
    * @param delegate that is used for networking
    * @param media manger that is used for media stream management
+   * @param observer
    * @return newly created Source instance
    */
-  static Source* Create(Peer::Delegate* delegate, SourceMediaManager* mng);
+  static Source* Create(Peer::Delegate* delegate,
+                        SourceMediaManager* mng,
+                        Peer::Observer* observer = nullptr);
 };
 
 }
