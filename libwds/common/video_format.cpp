@@ -118,20 +118,17 @@ static QualityInfo hh_info_table[] = {
 #define HH_TABLE_LENGTH  sizeof(hh_info_table) / sizeof(QualityInfo)
 
 QualityInfo get_cea_info(const H264VideoFormat& format) {
-  if (format.rate_resolution > CEA_TABLE_LENGTH)
-    assert(false);
+  assert(format.rate_resolution < CEA_TABLE_LENGTH);
   return cea_info_table[format.rate_resolution];
 }
 
 QualityInfo get_vesa_info(const H264VideoFormat& format) {
-  if (format.rate_resolution > VESA_TABLE_LENGTH)
-    assert(false);
+  assert(format.rate_resolution < VESA_TABLE_LENGTH);
   return vesa_info_table[format.rate_resolution];
 }
 
 QualityInfo get_hh_info(const H264VideoFormat& format) {
-  if (format.rate_resolution > HH_TABLE_LENGTH)
-    assert(false);
+  assert(format.rate_resolution < HH_TABLE_LENGTH);
   return hh_info_table[format.rate_resolution];
 }
 
@@ -221,8 +218,7 @@ H264VideoFormat FindOptimalVideoFormat(
   auto it = local_formats.begin();
   auto end = local_formats.end();
 
-  H264VideoFormat format(CBP,
-      k3_1, CEA640x480p60);
+  H264VideoFormat format;
 
   while(it != end) {
     auto match = std::find(
