@@ -135,13 +135,19 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
   set_param->payload().add_property(
       std::shared_ptr<Property>(new rtsp::PresentationUrl(presentation_Url_1, "")));
-  set_param->payload().add_property(
-      std::shared_ptr<VideoFormats>(new VideoFormats(
-          NativeVideoFormat(),  // Should be all zeros.
-          false,
-          {source_manager->GetOptimalVideoFormat()})));
-  set_param->payload().add_property(
-      std::shared_ptr<AudioCodecs>(new AudioCodecs({source_manager->GetOptimalAudioFormat()})));
+
+  if (source_manager->GetSessionType() & VideoSession) {
+    set_param->payload().add_property(
+        std::shared_ptr<VideoFormats>(new VideoFormats(
+            NativeVideoFormat(),  // Should be all zeros.
+            false,
+            {source_manager->GetOptimalVideoFormat()})));
+  }
+
+  if (source_manager->GetSessionType() & AudioSession) {
+    set_param->payload().add_property(
+        std::shared_ptr<AudioCodecs>(new AudioCodecs({source_manager->GetOptimalAudioFormat()})));
+  }
 
   return std::unique_ptr<Message>(set_param);
 }
