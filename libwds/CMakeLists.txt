@@ -10,3 +10,16 @@ add_library(wds
 set_target_properties(wds PROPERTIES SOVERSION 1)
 
 install(TARGETS wds LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+set(PUBLIC_HEADERS
+    public/connector_type.h
+    public/peer.h
+    public/video_format.h
+    public/sink.h
+    public/wds_export.h
+    public/audio_codec.h
+    public/media_manager.h
+    public/source.h
+    public/logging.h)
+
+install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/wds)
