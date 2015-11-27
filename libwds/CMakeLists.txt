@@ -7,7 +7,9 @@ add_library(wds
            $<TARGET_OBJECTS:wdscommon>
            $<TARGET_OBJECTS:wdssink>
            $<TARGET_OBJECTS:wdssource>)
-set_target_properties(wds PROPERTIES SOVERSION 1)
+set_target_properties(wds PROPERTIES
+    VERSION ${WDS_VERSION_MAJOR}.${WDS_VERSION_MINOR}.${WDS_VERSION_PATCH}
+    SOVERSION ${WDS_VERSION_MAJOR})
 
 install(TARGETS wds LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
