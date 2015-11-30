@@ -3,17 +3,27 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fvisibility=hidden -fPIC")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -Wall")
 
-include_directories ("${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+# Make directory for generated parser files
+set(PARSER_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/gen")
+file(MAKE_DIRECTORY ${PARSER_GEN_DIR})
+
+include_directories ("${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" "${PARSER_GEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(BISON REQUIRED)
-BISON_TARGET(Parser parser.ypp ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp COMPILE_FLAGS "-d -v -t -r all --debug")
+BISON_TARGET(Parser parser.ypp ${PARSER_GEN_DIR}/parser.tab.cpp)
+
+add_custom_target(remove_exceptions
+    COMMAND ./remove_exceptions.sh ${PARSER_GEN_DIR}/parser.tab.cpp
+    DEPENDS ${BISON_Parser_OUTPUTS}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Removing exceptions")
 
 find_package(FLEX REQUIRED)
-FLEX_TARGET(MessageLexer messagelexer.l  ${CMAKE_CURRENT_BINARY_DIR}/messagescanner.cpp)
+FLEX_TARGET(MessageLexer messagelexer.l  ${PARSER_GEN_DIR}/messagescanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(MessageLexer Parser)
-FLEX_TARGET(HeaderLexer headerlexer.l  ${CMAKE_CURRENT_BINARY_DIR}/headerscanner.cpp)
+FLEX_TARGET(HeaderLexer headerlexer.l  ${PARSER_GEN_DIR}/headerscanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(HeaderLexer Parser)
-FLEX_TARGET(ErrorLexer errorlexer.l  ${CMAKE_CURRENT_BINARY_DIR}/errorscanner.cpp)
+FLEX_TARGET(ErrorLexer errorlexer.l  ${PARSER_GEN_DIR}/errorscanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(ErrorLexer Parser)
 
 add_library(wdsrtsp OBJECT
@@ -31,6 +41,8 @@ add_library(wdsrtsp OBJECT
     standbyresumecapability.cpp standby.cpp idrrequest.cpp connectortype.cpp
     preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp scanner.cpp
 )
+
+add_dependencies( wdsrtsp remove_exceptions )
 
 add_executable(test-wds tests.cpp $<TARGET_OBJECTS:wdsrtsp> $<TARGET_OBJECTS:wdscommon>)
 set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")

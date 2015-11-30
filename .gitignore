@@ -9,18 +9,11 @@ cmake_install.cmake
 install_manifest.txt
 Testing/
 
-# generated source
-libwds/parser/errorscanner.cpp
-libwds/parser/headerscanner.cpp
-libwds/parser/messagescanner.cpp
-libwds/parser/parser.output
-libwds/parser/parser.tab.cpp
-libwds/parser/parser.tab.hpp
-libwds/parser/stack.hh
+# generated rtsp parser sources
+libwds/rtsp/gen
 
 # generated binaries
-libwds/parser/wds
-libwds/parser/test-wds
+libwds/rtsp/test-wds
 sink/sink-test
 p2p/test-ie
 p2p/register-peer-service

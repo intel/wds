@@ -29,7 +29,7 @@
 #include "scanner.h"
 #include "message.h"
 #include "payload.h"
-#include "parser.tab.hpp"
+#include "gen/parser.tab.hpp"
 
 namespace wds {
 namespace rtsp {

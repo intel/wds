@@ -25,7 +25,7 @@
 #include <memory>
 
 #include "driver.h"
-#include "parser.tab.hpp"
+#include "gen/parser.tab.hpp"
 
 class yyFlexLexer;
 
