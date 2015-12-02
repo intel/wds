@@ -30,12 +30,12 @@ namespace rtsp {
 
 CoupledSink::CoupledSink(unsigned char status,
     unsigned long long int sink_address)
-    : Property(WFD_COUPLED_SINK),
+    : Property(CoupledSinkPropertyType),
       status_(status),
       sink_address_(sink_address) {
 }
 
-CoupledSink::CoupledSink(): Property(WFD_COUPLED_SINK, true){
+CoupledSink::CoupledSink(): Property(CoupledSinkPropertyType, true){
 }
 
 CoupledSink::~CoupledSink(){

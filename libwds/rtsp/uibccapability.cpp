@@ -73,7 +73,7 @@ const char* kInputPaths[] =
 }
 
 UIBCCapability::UIBCCapability()
-  : Property(WFD_UIBC_CAPABILITY, true) {
+  : Property(UIBCCapabilityPropertyType, true) {
 }
 
 UIBCCapability::UIBCCapability(
@@ -81,7 +81,7 @@ UIBCCapability::UIBCCapability(
     const std::vector<InputType>& generic_capabilities,
     const std::vector<DetailedCapability> hidc_capabilities,
     int tcp_port)
-  : Property(WFD_UIBC_CAPABILITY),
+  : Property(UIBCCapabilityPropertyType),
     input_categories_(input_categories),
     generic_capabilities_(generic_capabilities),
     hidc_capabilities_(hidc_capabilities),

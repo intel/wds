@@ -31,6 +31,7 @@
 #include "libwds/public/wds_export.h"
 #include "libwds/rtsp/getparameter.h"
 #include "libwds/rtsp/setparameter.h"
+#include "libwds/rtsp/triggermethod.h"
 #include "libwds/public/media_manager.h"
 
 namespace wds {
@@ -60,17 +61,17 @@ bool InitializeRequestId(Request* request) {
     id = Request::M9;
     break;
   case Request::MethodSetParameter:
-    if (request->payload().has_property(rtsp::WFD_ROUTE))
+    if (request->payload().has_property(rtsp::RoutePropertyType))
       id = Request::M10;
-    else if (request->payload().has_property(rtsp::WFD_CONNECTOR_TYPE))
+    else if (request->payload().has_property(rtsp::ConnectorTypePropertyType))
       id = Request::M11;
-    else if (request->payload().has_property(rtsp::WFD_STANDBY))
+    else if (request->payload().has_property(rtsp::StandbyPropertyType))
       id = Request::M12;
-    else if (request->payload().has_property(rtsp::WFD_IDR_REQUEST))
+    else if (request->payload().has_property(rtsp::IDRRequestPropertyType))
       id = Request::M13;
-    else if (request->payload().has_property(rtsp::WFD_UIBC_CAPABILITY))
+    else if (request->payload().has_property(rtsp::UIBCCapabilityPropertyType))
       id = Request::M14;
-    else if (request->payload().has_property(rtsp::WFD_UIBC_SETTING))
+    else if (request->payload().has_property(rtsp::UIBCSettingPropertyType))
       id = Request::M15;
     break;
   default:

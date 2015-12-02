@@ -26,27 +26,23 @@
 #include <string>
 #include <memory>
 
-#include "scanner.h"
-#include "message.h"
-#include "payload.h"
-#include "gen/parser.tab.hpp"
+#include "gen/parser.h"
 
 namespace wds {
 namespace rtsp {
 
+class Message;
+
 class Driver {
  public:
-  Driver() = default;
-  ~Driver();
-
-  void Parse(const std::string& input, std::unique_ptr<Message>& message /*out*/);
-
- private:
-  std::unique_ptr<Parser> parser_;
-  std::unique_ptr<Scanner> scanner_;
+  static void Parse(const std::string& input, std::unique_ptr<Message>& message /*out*/);
 };
 
 }  // namespace rtsp
 }  // namespace wds
+
+// Required by bison.
+int wds_lex(YYSTYPE* yylval, void* scanner, std::unique_ptr<wds::rtsp::Message>& message);
+void wds_error (void* scanner, std::unique_ptr<wds::rtsp::Message>& message, const char* error_message);
 
 #endif  // DRIVER_H_

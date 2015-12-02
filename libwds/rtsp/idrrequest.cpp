@@ -25,7 +25,7 @@
 namespace wds {
 namespace rtsp {
 
-IDRRequest::IDRRequest() : Property(WFD_IDR_REQUEST) {
+IDRRequest::IDRRequest() : Property(IDRRequestPropertyType) {
 }
 
 IDRRequest::~IDRRequest() {

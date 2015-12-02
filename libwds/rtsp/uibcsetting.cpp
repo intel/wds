@@ -31,7 +31,7 @@ const char disable[] = "disable";
 }
 
 UIBCSetting::UIBCSetting(bool is_enabled)
-  : Property(WFD_UIBC_SETTING),
+  : Property(UIBCSettingPropertyType),
     is_enabled_(is_enabled) {
 
 }

@@ -85,7 +85,7 @@ bool M3Handler::HandleReply(Reply* reply) {
     return false;
 
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
-  auto prop = reply->payload().get_property(rtsp::WFD_CLIENT_RTP_PORTS);
+  auto prop = reply->payload().get_property(rtsp::ClientRTPPortsPropertyType);
   auto ports = static_cast<ClientRtpPorts*>(prop.get());
   if (!ports){
     WDS_ERROR("Failed to obtain RTP ports from source.");
@@ -94,10 +94,10 @@ bool M3Handler::HandleReply(Reply* reply) {
   source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
 
   auto video_formats = static_cast<VideoFormats*>(
-      reply->payload().get_property(rtsp::WFD_VIDEO_FORMATS).get());
+      reply->payload().get_property(rtsp::VideoFormatsPropertyType).get());
 
   auto audio_codecs = static_cast<AudioCodecs*>(
-      reply->payload().get_property(rtsp::WFD_AUDIO_CODECS).get());
+      reply->payload().get_property(rtsp::AudioCodecsPropertyType).get());
 
   if (!video_formats && (source_manager->GetSessionType() & VideoSession)) {
     WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");

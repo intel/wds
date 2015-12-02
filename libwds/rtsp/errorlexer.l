@@ -1,10 +1,9 @@
-%option debug
-%option nodefault
-%option c++
-%option yyclass="wds::rtsp::ErrorScanner"
-%option nounput nomain noyywrap
-%option warn stack noyy_top_state
+%option nodefault nounput nomain
+%option bison-bridge reentrant noyywrap
+%option never-interactive
+%option warn stack noyy_top_state noyy_pop_state noyy_push_state
 %option case-insensitive
+%option outfile="gen/errorscanner.cpp" header-file="gen/errorscanner.h"
 
 %{
 /*
@@ -30,9 +29,8 @@
 
 
 #include <string>
-#include "errorscanner.h"
-using token = wds::rtsp::Parser::token;
-#define yyterminate() return(token::END)
+#include "parser.h"
+#define yyterminate() return(END)
 %}
 
 DIGIT [0-9]
@@ -51,87 +49,87 @@ CRLF {CR}{LF}
 ","  { return ','; }
 ":"  { return ':'; }
 
-{SP}+ return token::WFD_SP;
+{SP}+ return WFD_SP;
 
 ^"wfd_audio_codecs" {
-    return token::WFD_AUDIO_CODECS_ERROR;
+    return WFD_AUDIO_CODECS_ERROR;
   }
 
 ^"wfd_video_formats" {
-    return token::WFD_VIDEO_FORMATS_ERROR;
+    return WFD_VIDEO_FORMATS_ERROR;
   }
 
 ^"wfd_3d_video_formats" {
-    return token::WFD_3D_FORMATS_ERROR;
+    return WFD_3D_FORMATS_ERROR;
   }
 
 ^"wfd_content_protection" {
-    return token::WFD_CONTENT_PROTECTION_ERROR;
+    return WFD_CONTENT_PROTECTION_ERROR;
   }
 
 ^"wfd_display_edid" {
-    return token::WFD_DISPLAY_EDID_ERROR;
+    return WFD_DISPLAY_EDID_ERROR;
   }
 
 ^"wfd_coupled_sink" {
-    return token::WFD_COUPLED_SINK_ERROR;
+    return WFD_COUPLED_SINK_ERROR;
   }
 
 ^"wfd_trigger_method" {
-    return token::WFD_TRIGGER_METHOD_ERROR;
+    return WFD_TRIGGER_METHOD_ERROR;
   }
 
 ^"wfd_presentation_url" {
-    return token::WFD_PRESENTATION_URL_ERROR;
+    return WFD_PRESENTATION_URL_ERROR;
   }
 
 ^"wfd_client_rtp_ports" {
-    return token::WFD_CLIENT_RTP_PORTS_ERROR;
+    return WFD_CLIENT_RTP_PORTS_ERROR;
   }
 
 ^"wfd_route" {
-    return token::WFD_ROUTE_ERROR;
+    return WFD_ROUTE_ERROR;
   }
 
 ^"wfd_I2C" {
-    return token::WFD_I2C_ERROR;
+    return WFD_I2C_ERROR;
   }
 
 ^"wfd_av_format_change_timing" {
-    return token::WFD_AV_FORMAT_CHANGE_TIMING_ERROR;
+    return WFD_AV_FORMAT_CHANGE_TIMING_ERROR;
   }
 
 ^"wfd_preferred_display_mode" {
-    return token::WFD_PREFERRED_DISPLAY_MODE_ERROR;
+    return WFD_PREFERRED_DISPLAY_MODE_ERROR;
   }
 
 ^"wfd_uibc_capability" {
-    return token::WFD_UIBC_CAPABILITY_ERROR;
+    return WFD_UIBC_CAPABILITY_ERROR;
   }
 
 ^"wfd_uibc_setting" {
-    return token::WFD_UIBC_SETTING_ERROR;
+    return WFD_UIBC_SETTING_ERROR;
   }
 
 ^"wfd_standby_resume_capability" {
-    return token::WFD_STANDBY_RESUME_CAPABILITY_ERROR;
+    return WFD_STANDBY_RESUME_CAPABILITY_ERROR;
   }
 
 ^"wfd_standby" {
-    return token::WFD_STANDBY_ERROR;
+    return WFD_STANDBY_ERROR;
   }
 
 ^"wfd_connector_type" {
-    return token::WFD_CONNECTOR_TYPE_ERROR;
+    return WFD_CONNECTOR_TYPE_ERROR;
   }
 
 ^"wfd_idr_request" {
-    return token::WFD_IDR_REQUEST_ERROR;
+    return WFD_IDR_REQUEST_ERROR;
   }
 
 ^[[:alpha:]][[:alnum:]\-\_]* {
     yylval->sval = new std::string(yytext, yyleng);
-    return token::WFD_GENERIC_PROPERTY_ERROR;
+    return WFD_GENERIC_PROPERTY_ERROR;
   }
 
 {DIGITS} {
@@ -141,7 +139,7 @@ CRLF {CR}{LF}
     if (errno == ERANGE) {
       // todo: handle error
     }
-    return token::WFD_NUM;
+    return WFD_NUM;
   }
 
  /* all unmatched */

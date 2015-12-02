@@ -20,11 +20,13 @@
  */
 
 
-#include <list>
 #include <algorithm>
+#include <iostream>
+#include <list>
 #include "constants.h"
 #include "driver.h"
 #include "reply.h"
+#include "route.h"
 #include "audiocodecs.h"
 #include "avformatchangetiming.h"
 #include "clientrtpports.h"
@@ -38,6 +40,8 @@
 #include "uibcsetting.h"
 #include "videoformats.h"
 #include "propertyerrors.h"
+
+using wds::rtsp::Driver;
 
 typedef bool (*TestFunc)(void);
 
@@ -84,7 +88,7 @@ static bool property_type_exists (std::vector<std::string> properties,
 {
   return std::find (properties.begin(),
                     properties.end(),
-                    wds::rtsp::PropertyName::name[type]) != properties.end();
+                    wds::rtsp::GetPropertyName(type)) != properties.end();
 }
 
 static bool test_audio_codec (wds::AudioCodec codec, wds::AudioFormats format,
@@ -117,13 +121,11 @@ static bool test_h264_codec_3d (wds::rtsp::H264Codec3d codec,
 
 static bool test_valid_options ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("OPTIONS * RTSP/1.0\r\n"
                      "CSeq: 0\r\n"
                      "Require: org.wfa.wfd1.0\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
@@ -138,13 +140,11 @@ static bool test_valid_options ()
 
 static bool test_valid_options_reply ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 1\r\n"
                      "Public: org.wfa.wfd1.0, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
 
@@ -176,15 +176,13 @@ static bool test_valid_options_reply ()
 
 static bool test_valid_extra_properties ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 72\r\n"
                      "My-Header: 123 testing testing\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
 
@@ -196,13 +194,13 @@ static bool test_valid_extra_properties ()
 
   std::string payload_buffer("nonstandard_property: 1!!1! non standard value\r\n"
                       "wfd_audio_codecs: none\r\n");
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
 
   auto payload = message->payload();
   std::shared_ptr<wds::rtsp::Property> property;
 
   ASSERT_NO_EXCEPTION (property =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property(wds::rtsp::AudioCodecsPropertyType));
   ASSERT(property->is_none());
 
   ASSERT_NO_EXCEPTION (property =
@@ -217,21 +215,19 @@ static bool test_valid_extra_properties ()
 
 static bool test_valid_extra_errors ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("RTSP/1.0 303 OK\r\n"
                      "CSeq: 0\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 55\r\n\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
 
   std::string payload_buffer("wfd_audio_codecs: 103\r\n"
                       "nonstandard_property: 101, 102\r\n");
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
 
   auto payload = message->payload();
@@ -240,7 +236,7 @@ static bool test_valid_extra_errors ()
   ASSERT_EQUAL (payload.property_errors().size(), 2);
 
   ASSERT_NO_EXCEPTION(error =
-      payload.get_property_error(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property_error(wds::rtsp::AudioCodecsPropertyType));
   ASSERT_EQUAL(error->error_codes().size(), 1);
   ASSERT_EQUAL(error->error_codes()[0], 103);
 
@@ -257,15 +253,13 @@ static bool test_valid_extra_errors ()
 
 static bool test_valid_extra_properties_in_get ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("GET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
                      "Content-Length: 40\r\n\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
@@ -273,10 +267,10 @@ static bool test_valid_extra_properties_in_get ()
 
   std::string payload_buffer("nonstandard_property\r\n"
                       "wfd_audio_codecs\r\n");
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
 
   auto properties = message->payload().get_parameter_properties();
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+  ASSERT(property_type_exists (properties, wds::rtsp::AudioCodecsPropertyType));
   ASSERT_EQUAL(properties.size(), 2);
   ASSERT_EQUAL(properties[0], "nonstandard_property");
   ASSERT_EQUAL(properties[1], "wfd_audio_codecs");
@@ -288,8 +282,6 @@ static bool test_valid_extra_properties_in_get ()
 
 static bool test_valid_get_parameter ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("GET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -306,10 +298,10 @@ static bool test_valid_get_parameter ()
                       "wfd_content_protection\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
   ASSERT_EQUAL(request->method(), wds::rtsp::Request::MethodGetParameter);
@@ -320,17 +312,17 @@ static bool test_valid_get_parameter ()
   ASSERT_EQUAL(message->header().require_wfd_support(), false);
 
   std::vector<std::string> properties = message->payload().get_parameter_properties();
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_CLIENT_RTP_PORTS));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_CLIENT_RTP_PORTS));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_VIDEO_FORMATS));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_3D_FORMATS));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_COUPLED_SINK));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_DISPLAY_EDID));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_CONNECTOR_TYPE));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_UIBC_CAPABILITY));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
-  ASSERT(property_type_exists (properties, wds::rtsp::PropertyType::WFD_CONTENT_PROTECTION));
+  ASSERT(property_type_exists (properties, wds::rtsp::ClientRTPPortsPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::ClientRTPPortsPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::AudioCodecsPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::VideoFormatsPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::Video3DFormatsPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::CoupledSinkPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::DisplayEdidPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::ConnectorTypePropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::UIBCCapabilityPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::StandbyResumeCapabilityPropertyType));
+  ASSERT(property_type_exists (properties, wds::rtsp::ContentProtectionPropertyType));
 
   ASSERT_EQUAL (message->ToString(), header + payload_buffer)
 
@@ -339,7 +331,6 @@ static bool test_valid_get_parameter ()
 
 static bool test_valid_get_parameter_reply_with_all_none ()
 {
-  wds::rtsp::Driver driver;
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -363,10 +354,10 @@ static bool test_valid_get_parameter_reply_with_all_none ()
                       "wfd_video_formats: none\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
 
   wds::rtsp::Reply* reply = static_cast<wds::rtsp::Reply*>(message.get());
@@ -381,68 +372,68 @@ static bool test_valid_get_parameter_reply_with_all_none ()
   std::shared_ptr<wds::rtsp::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property(wds::rtsp::AudioCodecsPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_VIDEO_FORMATS));
+      payload.get_property(wds::rtsp::VideoFormatsPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_3D_FORMATS));
+      payload.get_property(wds::rtsp::Video3DFormatsPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CONTENT_PROTECTION));
+      payload.get_property(wds::rtsp::ContentProtectionPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_DISPLAY_EDID));
+      payload.get_property(wds::rtsp::DisplayEdidPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_COUPLED_SINK));
+      payload.get_property(wds::rtsp::CoupledSinkPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_UIBC_CAPABILITY));
+      payload.get_property(wds::rtsp::UIBCCapabilityPropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CONNECTOR_TYPE));
+      payload.get_property(wds::rtsp::ConnectorTypePropertyType));
   ASSERT(prop->is_none());
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
+      payload.get_property(wds::rtsp::StandbyResumeCapabilityPropertyType));
   ASSERT(prop->is_none());
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AV_FORMAT_CHANGE_TIMING));
+      payload.get_property(wds::rtsp::AVFormatChangeTimingPropertyType));
   auto av_format_change_timing = std::static_pointer_cast<wds::rtsp::AVFormatChangeTiming> (prop);
   ASSERT_EQUAL(av_format_change_timing->pts(), 0x000000000F);
   ASSERT_EQUAL(av_format_change_timing->dts(), 0x00000000FF);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CLIENT_RTP_PORTS));
+      payload.get_property(wds::rtsp::ClientRTPPortsPropertyType));
   auto client_rtp_ports = std::static_pointer_cast<wds::rtsp::ClientRtpPorts> (prop);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_0(), 19000);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_1(), 0);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_TRIGGER_METHOD));
+      payload.get_property(wds::rtsp::TriggerMethodPropertyType));
   auto trigger_method = std::static_pointer_cast<wds::rtsp::TriggerMethod> (prop);
   ASSERT_EQUAL(trigger_method->method(), wds::rtsp::TriggerMethod::TEARDOWN);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_PRESENTATION_URL));
+      payload.get_property(wds::rtsp::PresentationURLPropertyType));
   auto presentation_url = std::static_pointer_cast<wds::rtsp::PresentationUrl> (prop);
   ASSERT_EQUAL(presentation_url->presentation_url_1(), "");
   ASSERT_EQUAL(presentation_url->presentation_url_2(), "");
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_ROUTE));
+      payload.get_property(wds::rtsp::RoutePropertyType));
   auto route = std::static_pointer_cast<wds::rtsp::Route> (prop);
   ASSERT_EQUAL(route->destination(), wds::rtsp::Route::PRIMARY);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_I2C));
+      payload.get_property(wds::rtsp::I2CPropertyType));
   auto i2c = std::static_pointer_cast<wds::rtsp::I2C> (prop);
   ASSERT_EQUAL(i2c->is_supported(), false);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_UIBC_SETTING));
+      payload.get_property(wds::rtsp::UIBCSettingPropertyType));
   auto uibc_setting = std::static_pointer_cast<wds::rtsp::UIBCSetting> (prop);
   ASSERT_EQUAL(uibc_setting->is_enabled(), false);
 
@@ -453,7 +444,6 @@ static bool test_valid_get_parameter_reply_with_all_none ()
 
 static bool test_valid_get_parameter_reply ()
 {
-  wds::rtsp::Driver driver;
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -470,10 +460,10 @@ static bool test_valid_get_parameter_reply ()
                       "wfd_uibc_capability: none\r\n"
                       "wfd_video_formats: 40 01 02 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 0400 0300, 01 04 0001DEFF 053C7FFF 00000FFF 00 0000 0000 11 0400 0300\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
 
   wds::rtsp::Reply* reply = static_cast<wds::rtsp::Reply*>(message.get());
@@ -488,11 +478,11 @@ static bool test_valid_get_parameter_reply ()
   std::shared_ptr<wds::rtsp::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property(wds::rtsp::AudioCodecsPropertyType));
 
   // Test that all properties exist
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property(wds::rtsp::AudioCodecsPropertyType));
   std::shared_ptr<wds::rtsp::AudioCodecs> audio_codecs = std::static_pointer_cast<wds::rtsp::AudioCodecs> (prop);
   ASSERT_EQUAL(audio_codecs->audio_codecs().size(), 2);
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[0],
@@ -500,14 +490,14 @@ static bool test_valid_get_parameter_reply ()
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[1],
                            wds::AAC, 1, 0));
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_VIDEO_FORMATS));
+      payload.get_property(wds::rtsp::VideoFormatsPropertyType));
   std::shared_ptr<wds::rtsp::VideoFormats> video_formats = std::static_pointer_cast<wds::rtsp::VideoFormats> (prop);
   ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 8);
   ASSERT_EQUAL(video_formats->GetNativeFormat().type, 0);
   ASSERT_EQUAL(video_formats->GetH264Formats().size(), 96);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_3D_FORMATS));
+      payload.get_property(wds::rtsp::Video3DFormatsPropertyType));
   std::shared_ptr<wds::rtsp::Formats3d> formats_3d = std::static_pointer_cast<wds::rtsp::Formats3d> (prop);
 
   ASSERT_EQUAL(formats_3d->native_resolution(), 0x80);
@@ -517,42 +507,42 @@ static bool test_valid_get_parameter_reply ()
                              0x03, 0x0F, 0x0000000000000005, 0, 0x0001, 0x1401, 0x13, 0, 0));
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CONTENT_PROTECTION));
+      payload.get_property(wds::rtsp::ContentProtectionPropertyType));
   std::shared_ptr<wds::rtsp::ContentProtection> content_protection = std::static_pointer_cast<wds::rtsp::ContentProtection> (prop);
   ASSERT_EQUAL(content_protection->hdcp_spec(), wds::rtsp::ContentProtection::HDCP_SPEC_2_1);
   ASSERT_EQUAL(content_protection->port(), 1189);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_DISPLAY_EDID));
+      payload.get_property(wds::rtsp::DisplayEdidPropertyType));
   ASSERT(prop->is_none());
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_COUPLED_SINK));
+      payload.get_property(wds::rtsp::CoupledSinkPropertyType));
   ASSERT(prop->is_none());
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CLIENT_RTP_PORTS));
+      payload.get_property(wds::rtsp::ClientRTPPortsPropertyType));
   std::shared_ptr<wds::rtsp::ClientRtpPorts> client_rtp_ports = std::static_pointer_cast<wds::rtsp::ClientRtpPorts> (prop);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_0(), 19000);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_1(), 0);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_UIBC_CAPABILITY));
+      payload.get_property(wds::rtsp::UIBCCapabilityPropertyType));
   ASSERT(prop->is_none());
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CONNECTOR_TYPE));
+      payload.get_property(wds::rtsp::ConnectorTypePropertyType));
   std::shared_ptr<wds::rtsp::ConnectorType> connector_type = std::static_pointer_cast<wds::rtsp::ConnectorType> (prop);
   ASSERT_EQUAL(connector_type->connector_type(), 5);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_I2C));
+      payload.get_property(wds::rtsp::I2CPropertyType));
   auto i2c = std::static_pointer_cast<wds::rtsp::I2C> (prop);
   ASSERT_EQUAL(i2c->is_supported(), true);
   ASSERT_EQUAL(i2c->port(), 404);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_STANDBY_RESUME_CAPABILITY));
+      payload.get_property(wds::rtsp::StandbyResumeCapabilityPropertyType));
   ASSERT(!prop->is_none());
 
   ASSERT_EQUAL(message->ToString(), header + payload_buffer);
@@ -562,7 +552,6 @@ static bool test_valid_get_parameter_reply ()
 
 static bool test_invalid_property_value ()
 {
-  wds::rtsp::Driver driver;
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -570,11 +559,11 @@ static bool test_invalid_property_value ()
   std::string payload_buffer("wfd_uibc_capability: none and something completely different\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
 
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message == NULL);
 
   return true;
@@ -582,13 +571,11 @@ static bool test_invalid_property_value ()
 
 static bool test_case_insensitivity ()
 {
-  wds::rtsp::Driver driver;
-
   std::string invalid_header("OptionS * RTSP/1.0\r\n"
                              "CSeq: 0\r\n"
                              "Require: org.wfa.wfd1.0\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(invalid_header, message);
+  Driver::Parse(invalid_header, message);
   ASSERT(message == NULL);
 
   std::string header("RTSP/1.0 200 OK\r\n"
@@ -597,10 +584,10 @@ static bool test_case_insensitivity ()
                      "Content-LENGTH: 1187\r\n");
   std::string payload_buffer("wfd_uibc_capABILITY: noNE\r\n\r\n");
 
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
 
   ASSERT_EQUAL(message->header().cseq(), 2);
@@ -611,7 +598,7 @@ static bool test_case_insensitivity ()
   std::shared_ptr<wds::rtsp::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_UIBC_CAPABILITY));
+      payload.get_property(wds::rtsp::UIBCCapabilityPropertyType));
   ASSERT(prop->is_none());
 
   // TODO test insensitivity of triggers and method list
@@ -621,7 +608,6 @@ static bool test_case_insensitivity ()
 
 static bool test_valid_get_parameter_reply_with_errors ()
 {
-  wds::rtsp::Driver driver;
   std::string header("RTSP/1.0 303 OK\r\n"
                      "CSeq: 2\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -630,10 +616,10 @@ static bool test_valid_get_parameter_reply_with_errors ()
                       "wfd_I2C: 404\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
 
   wds::rtsp::Reply* reply = static_cast<wds::rtsp::Reply*>(message.get());
@@ -644,13 +630,13 @@ static bool test_valid_get_parameter_reply_with_errors ()
   std::shared_ptr<wds::rtsp::PropertyErrors> error;
   ASSERT_EQUAL (payload.property_errors().size(), 2);
   ASSERT_NO_EXCEPTION(error =
-      payload.get_property_error(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property_error(wds::rtsp::AudioCodecsPropertyType));
   ASSERT_EQUAL(error->error_codes().size(), 2);
   ASSERT_EQUAL(error->error_codes()[0], 415);
   ASSERT_EQUAL(error->error_codes()[1], 457);
 
   ASSERT_NO_EXCEPTION(error =
-      payload.get_property_error(wds::rtsp::PropertyType::WFD_I2C));
+      payload.get_property_error(wds::rtsp::I2CPropertyType));
   ASSERT_EQUAL(error->error_codes().size(), 1);
   ASSERT_EQUAL(error->error_codes()[0], 404);
 
@@ -661,8 +647,6 @@ static bool test_valid_get_parameter_reply_with_errors ()
 
 static bool test_valid_set_parameter ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("SET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n"
                      "CSeq: 3\r\n"
                      "Content-Type: text/parameters\r\n"
@@ -674,10 +658,10 @@ static bool test_valid_set_parameter ()
                       "wfd_video_formats: 5A 00 02 04 00000020 00000000 00000000 00 0000 0000 11 none none\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
-  driver.Parse(payload_buffer, message);
+  Driver::Parse(payload_buffer, message);
   ASSERT(message != NULL);
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
   ASSERT_EQUAL(request->method(), wds::rtsp::Request::MethodSetParameter);
@@ -690,32 +674,32 @@ static bool test_valid_set_parameter ()
   std::shared_ptr<wds::rtsp::Property> prop;
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_AUDIO_CODECS));
+      payload.get_property(wds::rtsp::AudioCodecsPropertyType));
   std::shared_ptr<wds::rtsp::AudioCodecs> audio_codecs = std::static_pointer_cast<wds::rtsp::AudioCodecs> (prop);
   ASSERT_EQUAL(audio_codecs->audio_codecs().size(), 1);
   ASSERT(test_audio_codec (audio_codecs->audio_codecs()[0],
                            wds::AAC, 1, 0));
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_VIDEO_FORMATS));
+      payload.get_property(wds::rtsp::VideoFormatsPropertyType));
   std::shared_ptr<wds::rtsp::VideoFormats> video_formats = std::static_pointer_cast<wds::rtsp::VideoFormats> (prop);
   ASSERT_EQUAL(video_formats->GetNativeFormat().rate_resolution, 11);
   ASSERT_EQUAL(video_formats->GetNativeFormat().type, 2);
   ASSERT_EQUAL(video_formats->GetH264Formats().size(), 1);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_CLIENT_RTP_PORTS));
+      payload.get_property(wds::rtsp::ClientRTPPortsPropertyType));
   std::shared_ptr<wds::rtsp::ClientRtpPorts> client_rtp_ports = std::static_pointer_cast<wds::rtsp::ClientRtpPorts> (prop);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_0(), 19000);
   ASSERT_EQUAL(client_rtp_ports->rtp_port_1(), 0);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_TRIGGER_METHOD));
+      payload.get_property(wds::rtsp::TriggerMethodPropertyType));
   std::shared_ptr<wds::rtsp::TriggerMethod> trigger_method = std::static_pointer_cast<wds::rtsp::TriggerMethod> (prop);
   ASSERT_EQUAL(trigger_method->method(), wds::rtsp::TriggerMethod::SETUP);
 
   ASSERT_NO_EXCEPTION (prop =
-      payload.get_property(wds::rtsp::PropertyType::WFD_PRESENTATION_URL));
+      payload.get_property(wds::rtsp::PresentationURLPropertyType));
 
   ASSERT_EQUAL(request->ToString(), header + payload_buffer);
 
@@ -724,8 +708,6 @@ static bool test_valid_set_parameter ()
 
 static bool test_valid_setup ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("SETUP rtsp://10.82.24.140/wfd1.0/streamid=0 RTSP/1.0\r\n"
                       "CSeq: 4\r\n"
                       "Transport: RTP/AVP/UDP;unicast;client_port=19000\r\n"
@@ -733,7 +715,7 @@ static bool test_valid_setup ()
                       "\r\n");
 
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
@@ -755,14 +737,12 @@ static bool test_valid_setup ()
 
 static bool test_valid_setup_reply ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("RTSP/1.0 200 OK\r\n"
                      "CSeq: 4\r\n"
                      "Session: 6B8B4567;timeout=30\r\n"
                      "Transport: RTP/AVP/UDP;unicast;client_port=19000;server_port=5000-5001\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_reply());
 
@@ -787,14 +767,12 @@ static bool test_valid_setup_reply ()
 
 static bool test_valid_play ()
 {
-  wds::rtsp::Driver driver;
-
   std::string header("PLAY rtsp://localhost/wfd1.0 RTSP/1.0\r\n"
                      "CSeq: 5\r\n"
                      "Session: 6B8B4567\r\n"
                      "User-Agent: SEC-WDH/ME29\r\n\r\n");
   std::unique_ptr<wds::rtsp::Message> message;
-  driver.Parse(header, message);
+  Driver::Parse(header, message);
   ASSERT(message != NULL);
   ASSERT(message->is_request());
   wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());

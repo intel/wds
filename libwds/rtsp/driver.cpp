@@ -27,25 +27,74 @@
 #include <cctype>
 #include <sstream>
 
+#include "gen/messagescanner.h"
+#include "gen/errorscanner.h"
+#include "gen/headerscanner.h"
+
+#include "libwds/public/logging.h"
+
+int wds_lex(YYSTYPE* yylval, void* scanner,
+    std::unique_ptr<wds::rtsp::Message>& message) {
+  if (!message) {
+    return header_lex(yylval, scanner);
+  } else if (message->is_reply()) {
+    wds::rtsp::Reply* reply = static_cast<wds::rtsp::Reply*>(message.get());
+    if (reply->response_code() == wds::rtsp::STATUS_SeeOther)
+      return error_lex(yylval, scanner);
+
+    return message_lex(yylval, scanner);
+  }
+
+  return message_lex(yylval, scanner);
+}
+
+void wds_error(void* scanner, std::unique_ptr<wds::rtsp::Message>& message,
+    const char* error_message) {
+  WDS_ERROR("Parser error: %s", error_message);
+  message.reset(nullptr);
+}
+
 namespace wds {
 namespace rtsp {
 
-Driver::~Driver() {
-}
-
 void Driver::Parse(const std::string& input, std::unique_ptr<Message>& message) {
-  std::istringstream in(input);
-  if (!in.good())
-    return;
+  void* scanner = nullptr;
+#if YYDEBUG
+  bool enable_debug = true;
+  wds_debug = 1;
+#else
+  bool enable_debug = false;
+#endif
 
-  scanner_.reset(new Scanner(&in, message));
-  parser_.reset(new Parser(*scanner_, message));
-
-  // todo: remove, just for testing
-  //scanner_->set_debug(1);
-  //parser_->set_debug_level(1);
-
-  parser_->parse();
+  if (!message) {
+    header_lex_init(&scanner);
+    header_set_debug(enable_debug, scanner);
+    header__scan_string(input.c_str(), scanner);
+    wds_parse(scanner, message);
+    header_lex_destroy(scanner);
+  } else if (message->is_reply()) {
+    Reply* reply = static_cast<Reply*>(message.get());
+    if (reply->response_code() == STATUS_SeeOther) {
+      error_lex_init(&scanner);
+      error_set_debug(enable_debug, scanner);
+      error__scan_string(input.c_str(), scanner);
+      wds_parse(scanner, message);
+      error_lex_destroy(scanner);
+    } else {
+      message_lex_init(&scanner);
+      message_set_debug(enable_debug, scanner);
+      message_set_extra(message->is_reply(), scanner);
+      message__scan_string(input.c_str(), scanner);
+      wds_parse(scanner, message);
+      message_lex_destroy(scanner);
+    }
+  } else {
+    message_lex_init(&scanner);
+    message_set_debug(enable_debug, scanner);
+    message__scan_string(input.c_str(), scanner);
+    wds_parse(scanner, message);
+    message_lex_destroy(scanner);
+  }
 }
 
 } // namespace rtsp

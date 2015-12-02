@@ -27,7 +27,7 @@ namespace rtsp {
 
 PresentationUrl::PresentationUrl(const std::string& presentation_url_1,
     const std::string presentation_url_2)
-  : Property(WFD_PRESENTATION_URL),
+  : Property(PresentationURLPropertyType),
     presentation_url_1_(presentation_url_1),
     presentation_url_2_(presentation_url_2) {
 }

@@ -9,25 +9,23 @@ file(MAKE_DIRECTORY ${PARSER_GEN_DIR})
 
 include_directories ("${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" "${PARSER_GEN_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
-find_package(BISON REQUIRED)
-BISON_TARGET(Parser parser.ypp ${PARSER_GEN_DIR}/parser.tab.cpp)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(PARSER_DEBUG_OPTIONS "--debug -v")
+endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-add_custom_target(remove_exceptions
-    COMMAND ./remove_exceptions.sh ${PARSER_GEN_DIR}/parser.tab.cpp
-    DEPENDS ${BISON_Parser_OUTPUTS}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Removing exceptions")
+find_package(BISON REQUIRED)
+BISON_TARGET(Parser parser.ypp ${PARSER_GEN_DIR}/parser.cpp COMPILE_FLAGS "-l -p wds_ ${PARSER_DEBUG_OPTIONS}")
 
 find_package(FLEX REQUIRED)
-FLEX_TARGET(MessageLexer messagelexer.l  ${PARSER_GEN_DIR}/messagescanner.cpp)
+FLEX_TARGET(MessageLexer messagelexer.l ${PARSER_GEN_DIR}/messagescanner.cpp COMPILE_FLAGS "-L -P message_ ${PARSER_DEBUG_OPTIONS}")
 ADD_FLEX_BISON_DEPENDENCY(MessageLexer Parser)
-FLEX_TARGET(HeaderLexer headerlexer.l  ${PARSER_GEN_DIR}/headerscanner.cpp)
+FLEX_TARGET(HeaderLexer headerlexer.l ${PARSER_GEN_DIR}/headerscanner.cpp COMPILE_FLAGS "-L -P header_ ${PARSER_DEBUG_OPTIONS}")
 ADD_FLEX_BISON_DEPENDENCY(HeaderLexer Parser)
-FLEX_TARGET(ErrorLexer errorlexer.l  ${PARSER_GEN_DIR}/errorscanner.cpp)
+FLEX_TARGET(ErrorLexer errorlexer.l ${PARSER_GEN_DIR}/errorscanner.cpp COMPILE_FLAGS "-L -P error_ ${PARSER_DEBUG_OPTIONS}")
 ADD_FLEX_BISON_DEPENDENCY(ErrorLexer Parser)
 
 add_library(wdsrtsp OBJECT
-    ${BISON_Parser_OUTPUTS}
+    ${BISON_Parser_OUTPUT_SOURCE}
     ${FLEX_MessageLexer_OUTPUTS}
     ${FLEX_ErrorLexer_OUTPUTS}
     ${FLEX_HeaderLexer_OUTPUTS}
@@ -39,10 +37,8 @@ add_library(wdsrtsp OBJECT
     presentationurl.cpp route.cpp triggermethod.cpp
     videoformats.cpp i2c.cpp avformatchangetiming.cpp uibcsetting.cpp
     standbyresumecapability.cpp standby.cpp idrrequest.cpp connectortype.cpp
-    preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp scanner.cpp
+    preferreddisplaymode.cpp uibccapability.cpp propertyerrors.cpp
 )
-
-add_dependencies( wdsrtsp remove_exceptions )
 
 add_executable(test-wds tests.cpp $<TARGET_OBJECTS:wdsrtsp> $<TARGET_OBJECTS:wdscommon>)
 set(LINK_FLAGS ${LINK_FLAGS} "-Wl,-whole-archive")

@@ -21,23 +21,24 @@
 
 
 #include "propertyerrors.h"
+#include "property.h"
 
 #include <assert.h>
 
 namespace wds {
 namespace rtsp {
 
-PropertyErrors::PropertyErrors(PropertyType type, std::vector<unsigned short> error_codes) :
-     type_(type),
-     error_codes_(error_codes) {
-
+PropertyErrors::PropertyErrors(PropertyType type,
+                               const std::vector<unsigned short>& error_codes)
+    : type_(type),
+      error_codes_(error_codes) {
 }
 
-PropertyErrors::PropertyErrors(const std::string& generic_property_name, std::vector<unsigned short> error_codes) :
-     type_(WFD_GENERIC),
-     generic_property_name_(generic_property_name),
-     error_codes_(error_codes) {
-         
+PropertyErrors::PropertyErrors(const std::string& generic_property_name,
+                               const std::vector<unsigned short>& error_codes)
+    : type_(GenericPropertyType),
+      generic_property_name_(generic_property_name),
+      error_codes_(error_codes) {
 }
 
 PropertyErrors::~PropertyErrors() {
@@ -46,10 +47,10 @@ PropertyErrors::~PropertyErrors() {
 std::string PropertyErrors::ToString() const {
   std::string ret;
 
-  if (type_ == WFD_GENERIC)
+  if (type_ == GenericPropertyType)
     ret += generic_property_name_;
   else
-    ret += PropertyName::name[type_];
+    ret += GetPropertyName(type_);
 
   ret += std::string(SEMICOLON) + std::string(SPACE);
 

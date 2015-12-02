@@ -21,11 +21,15 @@
 
 #include "rtsp_input_handler.h"
 
+#include "libwds/rtsp/driver.h"
+#include "libwds/rtsp/message.h"
+
 #include <cassert>
 
 namespace wds {
 
 using rtsp::Message;
+using rtsp::Driver;
 
 RTSPInputHandler::~RTSPInputHandler() {
 }
@@ -55,7 +59,7 @@ bool RTSPInputHandler::ParseHeader() {
 
   const std::string& header = rtsp_input_buffer_.substr(0, eom + delimiter_length);
   rtsp_input_buffer_.erase(0, eom + delimiter_length);
-  driver_.Parse(header, message_);
+  Driver::Parse(header, message_);
   if (!message_) {
     ParserErrorOccurred(rtsp_input_buffer_);
     rtsp_input_buffer_.clear();
@@ -77,7 +81,7 @@ bool RTSPInputHandler::ParsePayload() {
 
   const std::string& payload = rtsp_input_buffer_.substr(0, content_length);
   rtsp_input_buffer_.erase(0, content_length);
-  driver_.Parse(payload, message_);
+  Driver::Parse(payload, message_);
   MessageParsed(std::move(message_));
   return true;
 }

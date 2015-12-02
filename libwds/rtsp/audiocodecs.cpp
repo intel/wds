@@ -45,11 +45,11 @@ std::string ToString(const wds::AudioCodec& codec) {
 }
 
 AudioCodecs::AudioCodecs()
-  : Property(WFD_AUDIO_CODECS, true) {
+  : Property(AudioCodecsPropertyType, true) {
 }
 
 AudioCodecs::AudioCodecs(const std::vector<wds::AudioCodec>& audio_codecs)
-  : Property(WFD_AUDIO_CODECS),
+  : Property(AudioCodecsPropertyType),
     audio_codecs_(audio_codecs) {
 }
 

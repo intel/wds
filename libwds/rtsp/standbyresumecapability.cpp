@@ -30,7 +30,7 @@ const char supported[] = "supported";
 }
 
 StandbyResumeCapability::StandbyResumeCapability(bool is_supported)
-  : Property(WFD_STANDBY_RESUME_CAPABILITY, !is_supported) {
+  : Property(StandbyResumeCapabilityPropertyType, !is_supported) {
 }
 
 StandbyResumeCapability::~StandbyResumeCapability() {

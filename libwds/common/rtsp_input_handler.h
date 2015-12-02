@@ -22,10 +22,14 @@
 #ifndef RTSP_INPUT_HANDLER_H_
 #define RTSP_INPUT_HANDLER_H_
 
+#include <memory>
 #include <string>
-#include "libwds/rtsp/driver.h"
 
 namespace wds {
+
+namespace rtsp {
+class Message;
+}  // namespace rtsp
 
 // An aux class used to obtain Message object from the given raw input.
 class RTSPInputHandler {
@@ -43,7 +47,6 @@ class RTSPInputHandler {
   bool ParseHeader();
   bool ParsePayload();
 
-  rtsp::Driver driver_;
   std::string rtsp_input_buffer_;
   std::unique_ptr<rtsp::Message> message_;
 };

@@ -27,12 +27,12 @@
 namespace wds {
 namespace rtsp {
 
-DisplayEdid::DisplayEdid(): Property(WFD_DISPLAY_EDID, true) {
+DisplayEdid::DisplayEdid(): Property(DisplayEdidPropertyType, true) {
 }
 
 DisplayEdid::DisplayEdid(unsigned short edid_block_count,
     const std::string& edid_payload)
-  : Property(WFD_DISPLAY_EDID),
+  : Property(DisplayEdidPropertyType),
     edid_block_count_(edid_block_count),
     edid_payload_(edid_payload.length() ? edid_payload : NONE) {
 }

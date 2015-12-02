@@ -33,7 +33,7 @@ PreferredDisplayMode::PreferredDisplayMode(
     unsigned short v, unsigned short vb, unsigned short vspol_vsoff,
     unsigned short vsw, unsigned char vbs3d, unsigned char modes_2d_s3d,
     unsigned char p_depth, const H264Codec& h264_codec)
-  : Property(WFD_PREFERRED_DISPLAY_MODE),
+  : Property(PreferredDisplayModePropertyType),
     p_clock_(p_clock),
     h_(h),
     hb_(hb),

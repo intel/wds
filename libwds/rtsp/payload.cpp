@@ -44,32 +44,32 @@ Payload::Payload(const PropertyErrorMap& property_errors)
 Payload::~Payload() {
 }
 
-std::shared_ptr<Property> Payload::get_property(std::string name) const
+std::shared_ptr<Property> Payload::get_property(const std::string& name) const
 {
   auto property = properties_.find(name);
   if (property != properties_.end())
-    return (*property).second;
+    return property->second;
   return nullptr;
 }
 
 std::shared_ptr<Property> Payload::get_property(PropertyType type) const
 {
-  if (type == WFD_GENERIC)
+  if (type == GenericPropertyType)
     return nullptr;
 
-  return get_property(PropertyName::name[type]);
+  return get_property(GetPropertyName(type));
 }
 
 bool Payload::has_property(PropertyType type) const {
-  return properties_.find(PropertyName::name[type]) != properties_.end();
+  return properties_.find(GetPropertyName(type)) != properties_.end();
 }
 
 void Payload::add_property(const std::shared_ptr<Property>& property) {
-  if (property->type() == WFD_GENERIC) {
+  if (property->type() == GenericPropertyType) {
     auto gen_prop = std::static_pointer_cast<GenericProperty>(property);
     properties_[gen_prop->key()] = property;
   } else {
-    properties_[PropertyName::name[property->type()]] = property;
+    properties_[GetPropertyName(property->type())] = property;
   }
 }
 
@@ -77,7 +77,7 @@ const PropertyMap& Payload::properties() const {
   return properties_;
 }
 
-std::shared_ptr<PropertyErrors> Payload::get_property_error(std::string name) const
+std::shared_ptr<PropertyErrors> Payload::get_property_error(const std::string& name) const
 {
   auto property_error = property_errors_.find(name);
   if (property_error != property_errors_.end())
@@ -87,17 +87,17 @@ std::shared_ptr<PropertyErrors> Payload::get_property_error(std::string name) co
 
 std::shared_ptr<PropertyErrors> Payload::get_property_error(PropertyType type) const
 {
-  if (type == WFD_GENERIC)
+  if (type == GenericPropertyType)
     return nullptr;
 
-  return get_property_error(PropertyName::name[type]);
+  return get_property_error(GetPropertyName(type));
 }
 
 void Payload::add_property_error(const std::shared_ptr<PropertyErrors>& errors) {
-  if (errors->type() == WFD_GENERIC) {
+  if (errors->type() == GenericPropertyType) {
     property_errors_[errors->generic_property_name()] = errors;
   } else {
-    property_errors_[PropertyName::name[errors->type()]] = errors;
+    property_errors_[GetPropertyName(errors->type())] = errors;
   }
 }
 
@@ -106,7 +106,7 @@ const PropertyErrorMap& Payload::property_errors() const {
 }
 
 void Payload::add_get_parameter_property(const PropertyType& type) {
-  request_properties_.push_back(PropertyName::name[type]);
+  request_properties_.push_back(GetPropertyName(type));
 }
 
 void Payload::add_get_parameter_property(const std::string& generic_property) {
