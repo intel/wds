@@ -20,8 +20,8 @@
  */
 
 
-#ifndef UIBCCAPABILITY_H_
-#define UIBCCAPABILITY_H_
+#ifndef LIBWDS_RTSP_UIBCCAPABILITY_H_
+#define LIBWDS_RTSP_UIBCCAPABILITY_H_
 
 #include "property.h"
 
@@ -82,4 +82,4 @@ class UIBCCapability: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // UIBCCAPABILITY_H_
+#endif  // LIBWDS_RTSP_UIBCCAPABILITY_H_

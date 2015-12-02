@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef CAP_NEGOTIATION_STATE_H_
-#define CAP_NEGOTIATION_STATE_H_
+#ifndef LIBWDS_SOURCE_CAP_NEGOTIATION_STATE_H_
+#define LIBWDS_SOURCE_CAP_NEGOTIATION_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -38,4 +38,4 @@ class CapNegotiationState : public MessageSequenceHandler {
 }  // source
 }  // wds
 
-#endif // CAP_NEGOTIATION_STATE_H_
+#endif // LIBWDS_SOURCE_CAP_NEGOTIATION_STATE_H_

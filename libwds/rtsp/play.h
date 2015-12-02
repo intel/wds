@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PLAY_H_
-#define PLAY_H_
+#ifndef LIBWDS_RTSP_PLAY_H_
+#define LIBWDS_RTSP_PLAY_H_
 
 #include "message.h"
 
@@ -37,4 +37,4 @@ class Play : public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // PLAY_H_
+#endif // LIBWDS_RTSP_PLAY_H_

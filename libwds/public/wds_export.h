@@ -19,9 +19,9 @@
  * 02110-1301 USA
  */
 
-#ifndef WDS_EXPORT_H_
-#define WDS_EXPORT_H_
+#ifndef LIBWDS_PUBLIC_WDS_EXPORT_H_
+#define LIBWDS_PUBLIC_WDS_EXPORT_H_
 
 #define WDS_EXPORT __attribute__((visibility("default")))
 
-#endif  // WDS_EXPORT_H_
+#endif  // LIBWDS_PUBLIC_WDS_EXPORT_H_

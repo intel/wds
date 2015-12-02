@@ -20,8 +20,8 @@
  */
 
 
-#ifndef I2C_H_
-#define I2C_H_
+#ifndef LIBWDS_RTSP_I2C_H_
+#define LIBWDS_RTSP_I2C_H_
 
 #include "property.h"
 
@@ -44,4 +44,4 @@ class I2C: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // I2C_H_
+#endif  // LIBWDS_RTSP_I2C_H_

@@ -20,8 +20,8 @@
  */
 
 
-#ifndef SETUP_H_
-#define SETUP_H_
+#ifndef LIBWDS_RTSP_SETUP_H_
+#define LIBWDS_RTSP_SETUP_H_
 
 #include "message.h"
 
@@ -38,4 +38,4 @@ class Setup : public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // SETUP_H_
+#endif // LIBWDS_RTSP_SETUP_H_

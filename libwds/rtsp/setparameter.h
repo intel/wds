@@ -20,8 +20,8 @@
  */
 
 
-#ifndef SETPARAMETER_H_
-#define SETPARAMETER_H_
+#ifndef LIBWDS_RTSP_SETPARAMETER_H_
+#define LIBWDS_RTSP_SETPARAMETER_H_
 
 #include "message.h"
 
@@ -37,4 +37,4 @@ class SetParameter : public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // SETPARAMETER_H_
+#endif // LIBWDS_RTSP_SETPARAMETER_H_

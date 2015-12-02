@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef LOGGING_H_
-#define LOGGING_H_
+#ifndef LIBWDS_PUBLIC_LOGGING_H_
+#define LIBWDS_PUBLIC_LOGGING_H_
 
 #include <cstdarg>
 
@@ -96,4 +96,4 @@ class WDS_EXPORT LogSystem {
 #define WDS_WARNING(...) (*wds::LogSystem::warning_func())(__VA_ARGS__);
 #define WDS_ERROR(...) (*wds::LogSystem::error_func())(__VA_ARGS__);
 
-#endif // LOGGING_H_
+#endif // LIBWDS_PUBLIC_LOGGING_H_

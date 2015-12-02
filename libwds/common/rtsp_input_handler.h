@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef RTSP_INPUT_HANDLER_H_
-#define RTSP_INPUT_HANDLER_H_
+#ifndef LIBWDS_COMMON_RTSP_INPUT_HANDLER_H_
+#define LIBWDS_COMMON_RTSP_INPUT_HANDLER_H_
 
 #include <memory>
 #include <string>
@@ -53,4 +53,4 @@ class RTSPInputHandler {
 
 }
 
-#endif // RTSP_INPUT_HANDLER_H_
+#endif // LIBWDS_COMMON_RTSP_INPUT_HANDLER_H_

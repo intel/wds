@@ -20,8 +20,8 @@
  */
 
 
-#ifndef DRIVER_H_
-#define DRIVER_H_
+#ifndef LIBWDS_RTSP_DRIVER_H_
+#define LIBWDS_RTSP_DRIVER_H_
 
 #include <string>
 #include <memory>
@@ -45,4 +45,4 @@ class Driver {
 int wds_lex(YYSTYPE* yylval, void* scanner, std::unique_ptr<wds::rtsp::Message>& message);
 void wds_error (void* scanner, std::unique_ptr<wds::rtsp::Message>& message, const char* error_message);
 
-#endif  // DRIVER_H_
+#endif  // LIBWDS_RTSP_DRIVER_H_

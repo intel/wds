@@ -20,8 +20,8 @@
  */
 
 
-#ifndef HEADER_H_
-#define HEADER_H_
+#ifndef LIBWDS_RTSP_HEADER_H_
+#define LIBWDS_RTSP_HEADER_H_
 
 #include <string>
 #include <vector>
@@ -86,4 +86,4 @@ class Header {
 } // namespace rtsp
 } // namespace wds
 
-#endif // HEADER_H_
+#endif // LIBWDS_RTSP_HEADER_H_

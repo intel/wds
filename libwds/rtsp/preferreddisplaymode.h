@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PREFERREDDISPLAYMODE_H_
-#define PREFERREDDISPLAYMODE_H_
+#ifndef LIBWDS_RTSP_PREFERREDDISPLAYMODE_H_
+#define LIBWDS_RTSP_PREFERREDDISPLAYMODE_H_
 
 #include "property.h"
 
@@ -75,4 +75,4 @@ class PreferredDisplayMode: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // PREFERREDDISPLAYMODE_H_
+#endif  // LIBWDS_RTSP_PREFERREDDISPLAYMODE_H_

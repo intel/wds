@@ -20,8 +20,8 @@
  */
 
 
-#ifndef DISPLAYEDID_H_
-#define DISPLAYEDID_H_
+#ifndef LIBWDS_RTSP_DISPLAYEDID_H_
+#define LIBWDS_RTSP_DISPLAYEDID_H_
 
 #include "property.h"
 
@@ -46,4 +46,4 @@ class DisplayEdid: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // DISPLAYEDID_H_
+#endif  // LIBWDS_RTSP_DISPLAYEDID_H_

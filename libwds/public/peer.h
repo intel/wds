@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef PEER_H_
-#define PEER_H_
+#ifndef LIBWDS_PUBLIC_PEER_H_
+#define LIBWDS_PUBLIC_PEER_H_
 
 #include <string>
 
@@ -161,4 +161,4 @@ class Peer {
 
 }
 
-#endif // PEER_H_
+#endif // LIBWDS_PUBLIC_PEER_H_

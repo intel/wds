@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PAUSE_H_
-#define PAUSE_H_
+#ifndef LIBWDS_RTSP_PAUSE_H_
+#define LIBWDS_RTSP_PAUSE_H_
 
 #include "message.h"
 
@@ -38,4 +38,4 @@ class Pause : public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // PAUSE_H_
+#endif // LIBWDS_RTSP_PAUSE_H_

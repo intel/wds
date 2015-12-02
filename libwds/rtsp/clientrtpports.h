@@ -20,8 +20,8 @@
  */
 
 
-#ifndef CLIENTRTPPORTS_H_
-#define CLIENTRTPPORTS_H_
+#ifndef LIBWDS_RTSP_CLIENTRTPPORTS_H_
+#define LIBWDS_RTSP_CLIENTRTPPORTS_H_
 
 #include "property.h"
 
@@ -45,4 +45,4 @@ class ClientRtpPorts: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // CLIENTRTPPORTS_H_
+#endif  // LIBWDS_RTSP_CLIENTRTPPORTS_H_

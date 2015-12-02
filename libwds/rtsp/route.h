@@ -20,8 +20,8 @@
  */
 
 
-#ifndef ROUTE_H_
-#define ROUTE_H_
+#ifndef LIBWDS_RTSP_ROUTE_H_
+#define LIBWDS_RTSP_ROUTE_H_
 
 #include "property.h"
 
@@ -49,4 +49,4 @@ class Route: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // ROUTE_H_
+#endif  // LIBWDS_RTSP_ROUTE_H_

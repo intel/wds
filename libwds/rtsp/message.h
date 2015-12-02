@@ -20,8 +20,8 @@
  */
 
 
-#ifndef MESSAGE_H_
-#define MESSAGE_H_
+#ifndef LIBWDS_RTSP_MESSAGE_H_
+#define LIBWDS_RTSP_MESSAGE_H_
 
 #include <memory>
 
@@ -112,4 +112,4 @@ inline Request* ToRequest(Message* message) {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // MESSAGE_H_
+#endif  // LIBWDS_RTSP_MESSAGE_H_

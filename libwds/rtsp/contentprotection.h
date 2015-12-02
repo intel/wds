@@ -20,8 +20,8 @@
  */
 
 
-#ifndef CONTENTPROTECTION_H_
-#define CONTENTPROTECTION_H_
+#ifndef LIBWDS_RTSP_CONTENTPROTECTION_H_
+#define LIBWDS_RTSP_CONTENTPROTECTION_H_
 
 #include "property.h"
 
@@ -52,4 +52,4 @@ class ContentProtection: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // CONTENTPROTECTION_H_
+#endif  // LIBWDS_RTSP_CONTENTPROTECTION_H_

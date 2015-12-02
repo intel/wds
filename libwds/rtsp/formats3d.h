@@ -20,8 +20,8 @@
  */
 
 
-#ifndef FORMATS3D_H_
-#define FORMATS3D_H_
+#ifndef LIBWDS_RTSP_FORMATS3D_H_
+#define LIBWDS_RTSP_FORMATS3D_H_
 
 #include "property.h"
 
@@ -87,4 +87,4 @@ class Formats3d: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // FORMATS3D_H_
+#endif  // LIBWDS_RTSP_FORMATS3D_H_

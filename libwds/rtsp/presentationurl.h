@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PRESENTATIONURL_H_
-#define PRESENTATIONURL_H_
+#ifndef LIBWDS_RTSP_PRESENTATIONURL_H_
+#define LIBWDS_RTSP_PRESENTATIONURL_H_
 
 #include "property.h"
 
@@ -46,4 +46,4 @@ class PresentationUrl: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // PRESENTATIONURL_H_
+#endif  // LIBWDS_RTSP_PRESENTATIONURL_H_

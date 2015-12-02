@@ -20,8 +20,8 @@
  */
 
 
-#ifndef OPTIONS_H_
-#define OPTIONS_H_
+#ifndef LIBWDS_RTSP_OPTIONS_H_
+#define LIBWDS_RTSP_OPTIONS_H_
 
 #include "message.h"
 
@@ -38,4 +38,4 @@ class Options: public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // OPTIONS_H_
+#endif // LIBWDS_RTSP_OPTIONS_H_

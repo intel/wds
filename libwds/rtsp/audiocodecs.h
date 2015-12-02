@@ -20,8 +20,8 @@
  */
 
 
-#ifndef AUDIOCODECS_H_
-#define AUDIOCODECS_H_
+#ifndef LIBWDS_RTSP_AUDIOCODECS_H_
+#define LIBWDS_RTSP_AUDIOCODECS_H_
 
 #include "property.h"
 #include "libwds/public/audio_codec.h"
@@ -47,4 +47,4 @@ class AudioCodecs: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // AUDIOCODECS_H_
+#endif  // LIBWDS_RTSP_AUDIOCODECS_H_

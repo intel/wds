@@ -20,8 +20,8 @@
  */
 
 
-#ifndef VIDEOFORMATS_H_
-#define VIDEOFORMATS_H_
+#ifndef LIBWDS_RTSP_VIDEOFORMATS_H_
+#define LIBWDS_RTSP_VIDEOFORMATS_H_
 
 #include "property.h"
 #include "libwds/public/video_format.h"
@@ -92,4 +92,4 @@ class VideoFormats: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // VIDEOFORMATS_H_
+#endif  // LIBWDS_RTSP_VIDEOFORMATS_H_

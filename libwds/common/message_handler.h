@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef MESSAGE_HANDLER_H_
-#define MESSAGE_HANDLER_H_
+#ifndef LIBWDS_COMMON_MESSAGE_HANDLER_H_
+#define LIBWDS_COMMON_MESSAGE_HANDLER_H_
 
 #include <cassert>
 #include <list>
@@ -248,4 +248,4 @@ class SequencedMessageSender : public MessageSenderBase {
 };
 
 }  // namespace wds
-#endif // MESSAGE_HANDLER_H_
+#endif // LIBWDS_COMMON_MESSAGE_HANDLER_H_

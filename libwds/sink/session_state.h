@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef SESSION_STATE_H_
-#define SESSION_STATE_H_
+#ifndef LIBWDS_SINK_SESSION_STATE_H_
+#define LIBWDS_SINK_SESSION_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -59,4 +59,4 @@ class SessionState : public MessageSequenceWithOptionalSetHandler {
 }  // sink
 }  // wds
 
-#endif // SESSION_STATE_H_
+#endif // LIBWDS_SINK_SESSION_STATE_H_

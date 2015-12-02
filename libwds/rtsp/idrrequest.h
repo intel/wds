@@ -20,8 +20,8 @@
  */
 
 
-#ifndef IDRREQUEST_H_
-#define IDRREQUEST_H_
+#ifndef LIBWDS_RTSP_IDRREQUEST_H_
+#define LIBWDS_RTSP_IDRREQUEST_H_
 
 #include "property.h"
 
@@ -39,4 +39,4 @@ public:
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // IDRREQUEST_H_
+#endif  // LIBWDS_RTSP_IDRREQUEST_H_

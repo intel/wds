@@ -20,8 +20,8 @@
  */
 
 
-#ifndef REPLY_H_
-#define REPLY_H_
+#ifndef LIBWDS_RTSP_REPLY_H_
+#define LIBWDS_RTSP_REPLY_H_
 
 #include "message.h"
 
@@ -45,4 +45,4 @@ class Reply: public Message {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // REPLY_H_
+#endif  // LIBWDS_RTSP_REPLY_H_

@@ -20,8 +20,8 @@
  */
 
 
-#ifndef COUPLEDSINK_H_
-#define COUPLEDSINK_H_
+#ifndef LIBWDS_RTSP_COUPLEDSINK_H_
+#define LIBWDS_RTSP_COUPLEDSINK_H_
 
 #include "property.h"
 
@@ -46,4 +46,4 @@ class CoupledSink: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // COUPLEDSINK_H_
+#endif  // LIBWDS_RTSP_COUPLEDSINK_H_

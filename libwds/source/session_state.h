@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef SESSION_STATE_H_
-#define SESSION_STATE_H_
+#ifndef LIBWDS_SOURCE_SESSION_STATE_H_
+#define LIBWDS_SOURCE_SESSION_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -56,4 +56,4 @@ class M16Sender final : public OptionalMessageSender<rtsp::Request::M16> {
 }  // source
 }  // wds
 
-#endif // SESSION_STATE_H_
+#endif // LIBWDS_SOURCE_SESSION_STATE_H_

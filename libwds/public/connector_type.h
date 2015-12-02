@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef CONNECTOR_TYPE_H_
-#define CONNECTOR_TYPE_H_
+#ifndef LIBWDS_PUBLIC_CONNECTOR_TYPE_H_
+#define LIBWDS_PUBLIC_CONNECTOR_TYPE_H_
 
 namespace wds {
 
@@ -33,4 +33,4 @@ enum ConnectorType {
 
 }  // namespace wds
 
-#endif  // CONNECTOR_TYPE_H_
+#endif  // LIBWDS_PUBLIC_CONNECTOR_TYPE_H_

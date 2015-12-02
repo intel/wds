@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef SOURCE_H_
-#define SOURCE_H_
+#ifndef LIBWDS_PUBLIC_SOURCE_H_
+#define LIBWDS_PUBLIC_SOURCE_H_
 
 #include "peer.h"
 
@@ -47,4 +47,4 @@ class Source : public Peer {
 
 }
 
-#endif // SOURCE_H_
+#endif // LIBWDS_PUBLIC_SOURCE_H_
