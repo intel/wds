@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PROPERTY_H_
-#define PROPERTY_H_
+#ifndef LIBWDS_RTSP_PROPERTY_H_
+#define LIBWDS_RTSP_PROPERTY_H_
 
 #include <string>
 #include <map>
@@ -53,4 +53,4 @@ std::string GetPropertyName(PropertyType type);
 }  // namespace wds
 }  // namespace rtsp
 
-#endif  // PROPERTY_H_
+#endif  // LIBWDS_RTSP_PROPERTY_H_

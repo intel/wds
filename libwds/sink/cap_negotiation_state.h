@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef CAP_NEGOTIATION_STATE_H_
-#define CAP_NEGOTIATION_STATE_H_
+#ifndef LIBWDS_SINK_CAP_NEGOTIATION_STATE_H_
+#define LIBWDS_SINK_CAP_NEGOTIATION_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -49,4 +49,4 @@ class M3Handler final : public MessageReceiver<rtsp::Request::M3> {
 }  // namespace sink
 }  // namespace wds
 
-#endif // CAP_NEGOTIATION_STATE_H_
+#endif // LIBWDS_SINK_CAP_NEGOTIATION_STATE_H_

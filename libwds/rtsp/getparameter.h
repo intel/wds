@@ -20,8 +20,8 @@
  */
 
 
-#ifndef GETPARAMETER_H_
-#define GETPARAMETER_H_
+#ifndef LIBWDS_RTSP_GETPARAMETER_H_
+#define LIBWDS_RTSP_GETPARAMETER_H_
 
 #include "message.h"
 
@@ -38,4 +38,4 @@ class GetParameter : public Request {
 } // namespace rtsp
 } // namespace wds
 
-#endif // GETPARAMETER_H_
+#endif // LIBWDS_RTSP_GETPARAMETER_H_

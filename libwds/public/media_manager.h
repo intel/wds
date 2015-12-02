@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef MEDIA_MANAGER_H_
-#define MEDIA_MANAGER_H_
+#ifndef LIBWDS_PUBLIC_MEDIA_MANAGER_H_
+#define LIBWDS_PUBLIC_MEDIA_MANAGER_H_
 
 #include <string>
 #include <vector>
@@ -252,5 +252,5 @@ inline SinkMediaManager* ToSinkMediaManager(MediaManager* mng) {
 
 }  // namespace wds
 
-#endif // MEDIA_MANAGER_H_
+#endif // LIBWDS_PUBLIC_MEDIA_MANAGER_H_
 

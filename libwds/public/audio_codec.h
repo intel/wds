@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef AUDIO_CODEC_H_
-#define AUDIO_CODEC_H_
+#ifndef LIBWDS_PUBLIC_AUDIO_CODEC_H_
+#define LIBWDS_PUBLIC_AUDIO_CODEC_H_
 
 #include <bitset>
 
@@ -70,4 +70,4 @@ struct AudioCodec {
 
 }  // namespace wds
 
-#endif  // AUDIO_CODEC_H_
+#endif  // LIBWDS_PUBLIC_AUDIO_CODEC_H_

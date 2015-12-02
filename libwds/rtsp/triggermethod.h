@@ -20,8 +20,8 @@
  */
 
 
-#ifndef TRIGGERMETHOD_H_
-#define TRIGGERMETHOD_H_
+#ifndef LIBWDS_RTSP_TRIGGERMETHOD_H_
+#define LIBWDS_RTSP_TRIGGERMETHOD_H_
 
 #include "property.h"
 
@@ -51,4 +51,4 @@ class TriggerMethod : public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // TRIGGERMETHOD_H_
+#endif  // LIBWDS_RTSP_TRIGGERMETHOD_H_

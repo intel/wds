@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef VIDEO_FORMAT_H_
-#define VIDEO_FORMAT_H_
+#ifndef LIBWDS_PUBLIC_VIDEO_FORMAT_H_
+#define LIBWDS_PUBLIC_VIDEO_FORMAT_H_
 
 #include <bitset>
 #include <vector>
@@ -215,4 +215,4 @@ WDS_EXPORT H264VideoFormat FindOptimalVideoFormat(
 
 }  // namespace wds
 
-#endif  // VIDEO_FORMAT_H_
+#endif  // LIBWDS_PUBLIC_VIDEO_FORMAT_H_

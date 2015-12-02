@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PAYLOAD_H_
-#define PAYLOAD_H_
+#ifndef LIBWDS_RTSP_PAYLOAD_H_
+#define LIBWDS_RTSP_PAYLOAD_H_
 
 #include <map>
 #include <memory>
@@ -72,4 +72,4 @@ class Payload {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // PAYLOAD_H_
+#endif // LIBWDS_RTSP_PAYLOAD_H_

@@ -20,8 +20,8 @@
  */
 
 
-#ifndef PROPERTYERRORS_H_
-#define PROPERTYERRORS_H_
+#ifndef LIBWDS_RTSP_PROPERTYERRORS_H_
+#define LIBWDS_RTSP_PROPERTYERRORS_H_
 
 #include <string>
 #include <vector>
@@ -51,4 +51,4 @@ class PropertyErrors {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // PROPERTYERRORS_H_
+#endif  // LIBWDS_RTSP_PROPERTYERRORS_H_

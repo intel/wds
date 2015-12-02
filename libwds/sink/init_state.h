@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef INIT_STATE_H_
-#define INIT_STATE_H_
+#ifndef LIBWDS_SINK_INIT_STATE_H_
+#define LIBWDS_SINK_INIT_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -37,4 +37,4 @@ class InitState : public MessageSequenceHandler {
 }  // sink
 }  // wds
 
-#endif // INIT_STATE_H_
+#endif // LIBWDS_SINK_INIT_STATE_H_

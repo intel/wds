@@ -20,8 +20,8 @@
  */
 
 
-#ifndef MACROS_H_
-#define MACROS_H_
+#ifndef LIBWDS_RTSP_MACROS_H_
+#define LIBWDS_RTSP_MACROS_H_
 
 #include <stdio.h>
 
@@ -53,5 +53,5 @@
   char NAME[17]; \
   std::snprintf(NAME, sizeof(NAME), "%016llX", PROPERTY) \
 
-#endif  // MACROS_H_
+#endif  // LIBWDS_RTSP_MACROS_H_
 

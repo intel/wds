@@ -20,8 +20,8 @@
  */
 
 
-#ifndef CONSTANTS_H_
-#define CONSTANTS_H_
+#ifndef LIBWDS_RTSP_CONSTANTS_H_
+#define LIBWDS_RTSP_CONSTANTS_H_
 
 namespace wds {
 namespace rtsp {
@@ -119,4 +119,4 @@ enum RTSPStatusCode {
 } // namespace rtsp
 } // namespace wds
 
-#endif // CONSTANTS_H_
+#endif // LIBWDS_RTSP_CONSTANTS_H_

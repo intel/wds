@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef STREAMING_STATE_H_
-#define STREAMING_STATE_H_
+#ifndef LIBWDS_SOURCE_STREAMING_STATE_H_
+#define LIBWDS_SOURCE_STREAMING_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -38,4 +38,4 @@ class StreamingState : public MessageSequenceWithOptionalSetHandler {
 }  // source
 }  // wds
 
-#endif // STREAMING_STATE_H_
+#endif // LIBWDS_SOURCE_STREAMING_STATE_H_

@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef SINK_H_
-#define SINK_H_
+#ifndef LIBWDS_PUBLIC_SINK_H_
+#define LIBWDS_PUBLIC_SINK_H_
 
 #include "peer.h"
 
@@ -46,4 +46,4 @@ class Sink : public Peer {
 
 }
 
-#endif // SINK_H_
+#endif // LIBWDS_PUBLIC_SINK_H_

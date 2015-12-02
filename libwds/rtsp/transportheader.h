@@ -20,8 +20,8 @@
  */
 
 
-#ifndef TRANSPORT_HEADER_H_
-#define TRANSPORT_HEADER_H_
+#ifndef LIBWDS_RTSP_TRANSPORT_HEADER_H_
+#define LIBWDS_RTSP_TRANSPORT_HEADER_H_
 
 #include <string>
 
@@ -57,4 +57,4 @@ class TransportHeader {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // TRANSPORT_HEADER_H_
+#endif // LIBWDS_RTSP_TRANSPORT_HEADER_H_

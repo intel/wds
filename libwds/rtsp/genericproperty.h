@@ -20,8 +20,8 @@
  */
 
 
-#ifndef GENERIC_PROPERTY_H_
-#define GENERIC_PROPERTY_H_
+#ifndef LIBWDS_RTSP_GENERIC_PROPERTY_H_
+#define LIBWDS_RTSP_GENERIC_PROPERTY_H_
 
 #include "property.h"
 
@@ -47,4 +47,4 @@ class GenericProperty: public Property {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // GENERIC_PROPERTY_H_
+#endif  // LIBWDS_RTSP_GENERIC_PROPERTY_H_

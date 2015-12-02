@@ -20,8 +20,8 @@
  */
 
 
-#ifndef TEARDOWN_H_
-#define TEARDOWN_H_
+#ifndef LIBWDS_RTSP_TEARDOWN_H_
+#define LIBWDS_RTSP_TEARDOWN_H_
 
 #include "message.h"
 
@@ -38,4 +38,4 @@ class Teardown : public Request {
 }  // namespace rtsp
 }  // namespace wds
 
-#endif // TEARDOWN_H_
+#endif // LIBWDS_RTSP_TEARDOWN_H_

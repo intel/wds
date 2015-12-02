@@ -20,8 +20,8 @@
  */
 
 
-#ifndef STANDBY_H_
-#define STANDBY_H_
+#ifndef LIBWDS_RTSP_STANDBY_H_
+#define LIBWDS_RTSP_STANDBY_H_
 
 #include "property.h"
 
@@ -38,4 +38,4 @@ public:
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // STANDBY_H_
+#endif  // LIBWDS_RTSP_STANDBY_H_

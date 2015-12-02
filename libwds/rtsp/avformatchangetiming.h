@@ -20,8 +20,8 @@
  */
 
 
-#ifndef AVFORMATCHANGETIMING_H_
-#define AVFORMATCHANGETIMING_H_
+#ifndef LIBWDS_RTSP_AVFORMATCHANGETIMING_H_
+#define LIBWDS_RTSP_AVFORMATCHANGETIMING_H_
 
 #include "property.h"
 
@@ -46,4 +46,4 @@ public:
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // AVFORMATCHANGETIMING_H_
+#endif  // LIBWDS_RTSP_AVFORMATCHANGETIMING_H_

@@ -20,8 +20,8 @@
  */
 
 
-#ifndef STANDBYRESUMECAPABILITY_H_
-#define STANDBYRESUMECAPABILITY_H_
+#ifndef LIBWDS_RTSP_STANDBYRESUMECAPABILITY_H_
+#define LIBWDS_RTSP_STANDBYRESUMECAPABILITY_H_
 
 #include "property.h"
 
@@ -39,4 +39,4 @@ public:
 }  // namespace rtsp
 }  // namespace wds
 
-#endif  // STANDBYRESUMECAPABILITY_H_
+#endif  // LIBWDS_RTSP_STANDBYRESUMECAPABILITY_H_

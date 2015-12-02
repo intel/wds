@@ -19,8 +19,8 @@
  * 02110-1301 USA
  */
 
-#ifndef STREAMING_STATE_H_
-#define STREAMING_STATE_H_
+#ifndef LIBWDS_SINK_STREAMING_STATE_H_
+#define LIBWDS_SINK_STREAMING_STATE_H_
 
 #include "libwds/common/message_handler.h"
 
@@ -42,4 +42,4 @@ class TeardownHandler : public MessageSequenceHandler {
 }  // sink
 }  // wds
 
-#endif // STREAMING_STATE_H_
+#endif // LIBWDS_SINK_STREAMING_STATE_H_
