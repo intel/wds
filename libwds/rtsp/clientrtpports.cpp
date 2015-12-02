@@ -32,7 +32,7 @@ const char mode[] = "mode=play";
 
 ClientRtpPorts::ClientRtpPorts(unsigned short rtp_port_0,
     unsigned short rtp_port_1)
-  : Property(WFD_CLIENT_RTP_PORTS),
+  : Property(ClientRTPPortsPropertyType),
     rtp_port_0_(rtp_port_0),
     rtp_port_1_(rtp_port_1) {
 }

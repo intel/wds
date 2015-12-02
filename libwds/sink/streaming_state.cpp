@@ -51,7 +51,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
       return false;
 
     auto property =
-      static_cast<TriggerMethod*>(message->payload().get_property(rtsp::WFD_TRIGGER_METHOD).get());
+      static_cast<TriggerMethod*>(message->payload().get_property(rtsp::TriggerMethodPropertyType).get());
     return  method == property->method();
   }
 

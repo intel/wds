@@ -31,7 +31,7 @@ const char* name[] = {MethodName::SETUP, MethodName::PAUSE,
 }
 
 TriggerMethod::TriggerMethod(TriggerMethod::Method method)
-: Property(WFD_TRIGGER_METHOD),
+: Property(TriggerMethodPropertyType),
   method_(method) {
 }
 

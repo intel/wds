@@ -32,13 +32,13 @@ namespace rtsp {
 
 class PropertyErrors {
  public:
-  PropertyErrors(PropertyType type, std::vector<unsigned short> error_codes);
-  PropertyErrors(const std::string& generic_property_name, std::vector<unsigned short> error_codes);
+  PropertyErrors(PropertyType type, const std::vector<unsigned short>& error_codes);
+  PropertyErrors(const std::string& generic_property_name, const std::vector<unsigned short>& error_codes);
   ~PropertyErrors();
 
   PropertyType type() const { return type_; }
   const std::vector<unsigned short>& error_codes() const { return error_codes_; }
-  const std::string& generic_property_name() const {return generic_property_name_; }
+  const std::string& generic_property_name() const { return generic_property_name_; }
 
   std::string ToString() const;
 

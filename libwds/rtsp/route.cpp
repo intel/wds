@@ -31,7 +31,7 @@ const char secondary[] = "secondary";
 }
 
 Route::Route(const Route::Destination& destination)
-  : Property(WFD_ROUTE), destination_(destination) {
+  : Property(RoutePropertyType), destination_(destination) {
 
 }
 

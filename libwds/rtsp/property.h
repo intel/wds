@@ -48,6 +48,8 @@ class Property {
   bool is_none_;
 };
 
+std::string GetPropertyName(PropertyType type);
+
 }  // namespace wds
 }  // namespace rtsp
 

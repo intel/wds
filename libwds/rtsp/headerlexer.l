@@ -1,11 +1,9 @@
-%option debug
-%option nodefault
-%option c++
-%option yyclass="wds::rtsp::HeaderScanner"
-%option prefix="Hdr_"
-%option nounput nomain noyywrap
-%option warn stack noyy_top_state
+%option nodefault nounput nomain
+%option bison-bridge reentrant noyywrap
+%option never-interactive
+%option warn stack noyy_top_state noyy_pop_state noyy_push_state
 %option case-insensitive
+%option outfile="gen/headerscanner.cpp" header-file="gen/headerscanner.h"
 
 %{
 /*
@@ -32,9 +30,8 @@
 
 
 #include <string>
-#include "headerscanner.h"
-using token = wds::rtsp::Parser::token;
-#define yyterminate() return(token::END)
+#include "parser.h"
+#define yyterminate() return(END)
 %}
 
 %x MATCH_STRING_STATE
@@ -72,156 +69,156 @@ ERROR ({DIGIT}){3}
 ":"  { return ':'; }
 "/"  { return '/'; }
 
-{SP}+ return token::WFD_SP;
+{SP}+ return WFD_SP;
 
-";timeout=" return token::WFD_TIMEOUT;
-";server_port=" return token::WFD_SERVER_PORT;
+";timeout=" return WFD_TIMEOUT;
+";server_port=" return WFD_SERVER_PORT;
 
 ^(?-i:"OPTIONS") {
     BEGIN(INITIAL);
-    return token::WFD_OPTIONS;
+    return WFD_OPTIONS;
   }
 
 ^(?-i:"SET_PARAMETER") {
     BEGIN(INITIAL);
-    return token::WFD_SET_PARAMETER;
+    return WFD_SET_PARAMETER;
   }
 
 ^(?-i:"GET_PARAMETER") {
     BEGIN(INITIAL);
-    return token::WFD_GET_PARAMETER;
+    return WFD_GET_PARAMETER;
   }
 
 ^(?-i:"SETUP") {
     BEGIN(INITIAL);
-    return token::WFD_SETUP;
+    return WFD_SETUP;
   }
 
 ^(?-i:"PLAY") {
     BEGIN(INITIAL);
-    return token::WFD_PLAY;
+    return WFD_PLAY;
   }
 
 ^(?-i:"TEARDOWN") {
     BEGIN(INITIAL);
-    return token::WFD_TEARDOWN;
+    return WFD_TEARDOWN;
   }
 
 ^(?-i:"PAUSE") {
     BEGIN(INITIAL);
-    return token::WFD_PAUSE;
+    return WFD_PAUSE;
   }
 
   /* RTSP response, get reply code, RTSP/1.0 200 OK */
 ^"RTSP/"{DIGIT}"."{DIGIT}{SP}+ {
     BEGIN(MATCH_RESPONSE_CODE_STATE);
-    return token::WFD_RESPONSE;
+    return WFD_RESPONSE;
   }
 
   /* CSeq: i */
 ^"CSeq:" {
     BEGIN(INITIAL);
-    return token::WFD_CSEQ;
+    return WFD_CSEQ;
   }
 
 ^"Public:" {
     BEGIN(SUPPORTED_METHODS_STATE);
-    return token::WFD_RESPONSE_METHODS;
+    return WFD_RESPONSE_METHODS;
   }
 
 ^"Require: org.wfa.wfd1.0" {
-    return token::WFD_SUPPORT_CHECK;
+    return WFD_SUPPORT_CHECK;
   }
 
 ^"Content-Type:" {
     BEGIN(CONTENT_TYPE_STATE);
-    return token::WFD_CONTENT_TYPE;
+    return WFD_CONTENT_TYPE;
   }
 
 ^"Content-Length:" {
     BEGIN(INITIAL);
-    return token::WFD_CONTENT_LENGTH;
+    return WFD_CONTENT_LENGTH;
   }
 
 ^"Session:" {
     BEGIN(SESSION_STATE);
-    return token::WFD_SESSION;
+    return WFD_SESSION;
   }
 
 ^"Transport: RTP/AVP/UDP;unicast;client_port=" {
-    return token::WFD_TRANSPORT;
+    return WFD_TRANSPORT;
   }
 
 ^[[:alpha:]][[:alnum:]\-\_]*":" {
     BEGIN(MATCH_STRING_STATE);
     yylval->sval = new std::string(yytext, yyleng - 1);
-    return token::WFD_HEADER;
+    return WFD_HEADER;
   }
 
 <SESSION_STATE>[^ ;\t\r\n]+ {
     BEGIN(INITIAL);
     yylval->sval = new std::string(yytext, yyleng);
-    return token::WFD_SESSION_ID;
+    return WFD_SESSION_ID;
   }
 
 <MATCH_RESPONSE_CODE_STATE>{DIGITS} {
     BEGIN(MATCH_STRING_STATE);
     yylval->nval = atoi(yytext);
-    return token::WFD_RESPONSE_CODE;
+    return WFD_RESPONSE_CODE;
   }
 
 <MATCH_STRING_STATE>[^ \r\n][^\r\n]+/"\r\n" {
     BEGIN(INITIAL);
     yylval->sval = new std::string(yytext);
-    return token::WFD_STRING;
+    return WFD_STRING;
   }
 
 <SUPPORTED_METHODS_STATE>"OPTIONS" {
-    return token::WFD_OPTIONS;
+    return WFD_OPTIONS;
   }
 
 <SUPPORTED_METHODS_STATE>"SET_PARAMETER" {
-    return token::WFD_SET_PARAMETER;
+    return WFD_SET_PARAMETER;
   }
 
 <SUPPORTED_METHODS_STATE>"GET_PARAMETER" {
-    return token::WFD_GET_PARAMETER;
+    return WFD_GET_PARAMETER;
   }
 
 <SUPPORTED_METHODS_STATE>"SETUP" {
-    return token::WFD_SETUP;
+    return WFD_SETUP;
   }
 
 <SUPPORTED_METHODS_STATE>"PLAY" {
-    return token::WFD_PLAY;
+    return WFD_PLAY;
   }
 
 <SUPPORTED_METHODS_STATE>"TEARDOWN" {
-    return token::WFD_TEARDOWN;
+    return WFD_TEARDOWN;
   }
 
 <SUPPORTED_METHODS_STATE>"PAUSE" {
-    return token::WFD_PAUSE;
+    return WFD_PAUSE;
   }
 
 <SUPPORTED_METHODS_STATE>"org.wfa.wfd1.0" {
-  return token::WFD_TAG;
+  return WFD_TAG;
   }
 
 <MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=0" {
     yylval->sval = new std::string(yytext);
-    return token::WFD_PRESENTATION_URL_0;
+    return WFD_PRESENTATION_URL_0;
   }
 
 <MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=1" {
     yylval->sval = new std::string(yytext);
-    return token::WFD_PRESENTATION_URL_1;
+    return WFD_PRESENTATION_URL_1;
   }
 
 <CONTENT_TYPE_STATE>[-[:alnum:]]+\/[-[:alnum:]]+ {
     BEGIN(INITIAL);
     yylval->sval = new std::string(yytext);
-    return token::WFD_MIME;
+    return WFD_MIME;
   }
 
 {DIGITS} {
@@ -231,18 +228,18 @@ ERROR ({DIGIT}){3}
     if (errno == ERANGE) {
       // todo: handle error
     }
-    return token::WFD_NUM;
+    return WFD_NUM;
   }
 
   /* RTSP request rule,  e.g., OPTIONS * RTSP/1.0 */
 "RTSP/"{DIGIT}"."{DIGIT} {
-    return token::WFD_END;
+    return WFD_END;
   }
 
   /* GET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0 */
 "rtsp://"[^ \t\n]+ {
     yylval->sval = new std::string(yytext);
-    return token::WFD_REQUEST_URI;
+    return WFD_REQUEST_URI;
   }
 
  /* all unmatched */

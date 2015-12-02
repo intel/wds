@@ -25,7 +25,7 @@
 namespace wds {
 namespace rtsp {
 
-Standby::Standby() : Property(WFD_STANDBY) {
+Standby::Standby() : Property(StandbyPropertyType) {
 }
 
 Standby::~Standby() {

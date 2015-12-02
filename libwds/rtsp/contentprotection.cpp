@@ -33,12 +33,12 @@ namespace {
 }
 
 ContentProtection::ContentProtection(HDCPSpec hdcp_spec, unsigned int port)
-  : Property (WFD_CONTENT_PROTECTION),
+  : Property (ContentProtectionPropertyType),
     hdcp_spec_(hdcp_spec),
     port_(port) {
 }
 
-ContentProtection::ContentProtection(): Property (WFD_CONTENT_PROTECTION, true) {
+ContentProtection::ContentProtection(): Property (ContentProtectionPropertyType, true) {
 }
 
 ContentProtection::~ContentProtection() {

@@ -41,12 +41,12 @@ using PropertyErrorMap = std::map<std::string, std::shared_ptr<PropertyErrors>>;
 class Payload {
  public:
   Payload();
-  explicit Payload(const std::vector<std::string>& properties);
+  explicit Payload(const std::vector<std::string>& request_properties);
   explicit Payload(const PropertyMap& properties);
   explicit Payload(const PropertyErrorMap& property_errors);
   virtual ~Payload();
 
-  std::shared_ptr<Property> get_property(std::string name) const;
+  std::shared_ptr<Property> get_property(const std::string& name) const;
   std::shared_ptr<Property> get_property(PropertyType type) const;
   bool has_property(PropertyType type) const;
   void add_property(const std::shared_ptr<Property>& property);
@@ -56,7 +56,7 @@ class Payload {
   void add_get_parameter_property(const std::string& generic_property);
   const std::vector<std::string>& get_parameter_properties() const;
 
-  std::shared_ptr<PropertyErrors> get_property_error(std::string name) const;
+  std::shared_ptr<PropertyErrors> get_property_error(const std::string& name) const;
   std::shared_ptr<PropertyErrors> get_property_error(PropertyType type) const;
   void add_property_error(const std::shared_ptr<PropertyErrors>& errors);
   const PropertyErrorMap& property_errors() const;

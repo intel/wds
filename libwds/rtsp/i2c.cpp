@@ -25,7 +25,7 @@
 namespace wds {
 namespace rtsp {
 
-I2C::I2C(int port) : Property(WFD_I2C), port_(port) {
+I2C::I2C(int port) : Property(I2CPropertyType), port_(port) {
 }
 
 I2C::~I2C() {

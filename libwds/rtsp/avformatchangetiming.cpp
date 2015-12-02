@@ -29,7 +29,7 @@ namespace rtsp {
 
 AVFormatChangeTiming::AVFormatChangeTiming(unsigned long long int pts,
     unsigned long long int dts)
-  : Property(WFD_AV_FORMAT_CHANGE_TIMING),
+  : Property(AVFormatChangeTimingPropertyType),
     pts_(pts),
     dts_(dts) {
 
