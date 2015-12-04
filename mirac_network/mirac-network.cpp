@@ -255,6 +255,8 @@ bool MiracNetwork::Receive (std::string &message)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
                 break;
+            if (errno == ECONNRESET)
+                throw MiracConnectionLostException( __FUNCTION__);
             throw MiracException(errno, "recv()", __FUNCTION__);
         }
         else  // ec == 0
@@ -278,6 +280,8 @@ bool MiracNetwork::Receive (std::string &message, size_t length)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
                 break;
+            if (errno == ECONNRESET)
+                throw MiracConnectionLostException( __FUNCTION__);
             throw MiracException(errno, "recv()", __FUNCTION__);
         }
         else  // ec == 0
