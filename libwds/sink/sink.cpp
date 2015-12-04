@@ -49,21 +49,25 @@ bool InitializeRequestId(Request* request) {
     id = Request::M1;
     break;
   case Request::MethodGetParameter:
-    if (request->payload().get_parameter_properties().empty())
-      id = Request::M16;
-    else
-      id = Request::M3;
-    break;
+    if (auto payload = rtsp::ToGetParameterPayload(request->payload())) {
+      if (payload->properties().empty())
+        id = Request::M16;
+      else
+        id = Request::M3;
+      break;
+    }
   case Request::MethodSetParameter:
-    if (request->payload().has_property(rtsp::PresentationURLPropertyType))
-      id = Request::M4;
-    else if (request->payload().has_property(rtsp::AVFormatChangeTimingPropertyType))
-      id = Request::M4;
-    else if (request->payload().has_property(rtsp::TriggerMethodPropertyType))
-      id = Request::M5;
-    break;
+    if (auto payload = rtsp::ToPropertyMapPayload(request->payload())) {
+      if (payload->HasProperty(rtsp::PresentationURLPropertyType))
+        id = Request::M4;
+      else if (payload->HasProperty(rtsp::AVFormatChangeTimingPropertyType))
+        id = Request::M4;
+      else if (payload->HasProperty(rtsp::TriggerMethodPropertyType))
+        id = Request::M5;
+      break;
+    }
   default:
-    // TODO: warning.
+    WDS_ERROR("Failed to identify the received message");
     return false;
   }
 

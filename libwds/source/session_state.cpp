@@ -31,6 +31,7 @@
 namespace wds {
 
 using rtsp::Message;
+using rtsp::Payload;
 using rtsp::Request;
 using rtsp::Reply;
 
@@ -44,8 +45,10 @@ class M5Handler final : public SequencedMessageSender {
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::SetParameter* set_param = new rtsp::SetParameter("rtsp://localhost/wfd1.0");
     set_param->header().set_cseq(send_cseq_++);
-    set_param->payload().add_property(
+    auto payload = new rtsp::PropertyMapPayload();
+    payload->AddProperty(
         std::shared_ptr<rtsp::Property>(new rtsp::TriggerMethod(rtsp::TriggerMethod::SETUP)));
+    set_param->set_payload(std::unique_ptr<Payload>(payload));
     return std::unique_ptr<Message>(set_param);
   }
 

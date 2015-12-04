@@ -29,19 +29,21 @@ namespace wds {
 namespace rtsp {
 
 class GenericProperty: public Property {
-  public:
-    GenericProperty();
-    GenericProperty(const std::string& key, const std::string& value);
+ public:
+  GenericProperty();
+  GenericProperty(const std::string& key, const std::string& value);
 
-    ~GenericProperty() override;
+  ~GenericProperty() override;
 
-    const std::string& key () const { return key_; }
-    const std::string& value () const { return value_; }
+  const std::string& key() const { return key_; }
+  const std::string& value() const { return value_; }
 
-    std::string ToString() const override;
-  private:
-    std::string key_;
-    std::string value_;
+  std::string ToString() const override;
+  std::string GetName() const override;
+
+ private:
+  std::string key_;
+  std::string value_;
 };
 
 }  // namespace rtsp

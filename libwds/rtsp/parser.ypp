@@ -545,20 +545,26 @@ payload: {
 wfd_parameter_list:
     wfd_parameter_list wfd_parameter {
       UNUSED_TOKEN($$);
-      $1->add_get_parameter_property($2);
+      if (auto payload = ToGetParameterPayload($1))
+        payload->AddRequestProperty($2);
+      else
+        YYERROR;
     }
   | wfd_parameter {
-      $$ = new wds::rtsp::Payload();
-      $$->add_get_parameter_property($1);
+      $$ = new wds::rtsp::GetParameterPayload();
+      wds::rtsp::ToGetParameterPayload($$)->AddRequestProperty($1);
     }
   | wfd_parameter_list WFD_GENERIC_PROPERTY {
       UNUSED_TOKEN($$);
-      $1->add_get_parameter_property(*$2);
+      if (auto payload = ToGetParameterPayload($1))
+        payload->AddRequestProperty(*$2);
+      else
+        YYERROR;
       DELETE_TOKEN($2);
     }
   | WFD_GENERIC_PROPERTY {
-      $$ = new wds::rtsp::Payload();
-      $$->add_get_parameter_property(*$1);
+      $$ = new wds::rtsp::GetParameterPayload();
+      wds::rtsp::ToGetParameterPayload($$)->AddRequestProperty(*$1);
       DELETE_TOKEN($1);
     }
   ;
@@ -675,21 +681,27 @@ wfd_property_errors:
 
 wfd_property_error_map:
     wfd_property_errors {
-      $$ = new wds::rtsp::Payload();
-      $$->add_property_error(std::shared_ptr<wds::rtsp::PropertyErrors>($1));
+      $$ = new wds::rtsp::PropertyErrorPayload();
+      ToPropertyErrorPayload($$)->AddPropertyError(std::shared_ptr<wds::rtsp::PropertyErrors>($1));
     }
   | wfd_property_error_map wfd_property_errors {
-      $1->add_property_error(std::shared_ptr<wds::rtsp::PropertyErrors>($2));
+      if (auto payload = ToPropertyErrorPayload($1))
+        payload->AddPropertyError(std::shared_ptr<wds::rtsp::PropertyErrors>($2));
+      else
+        YYERROR;
     }
   ;
 
 wdf_property_map:
     wfd_property {
-      $$ = new wds::rtsp::Payload();
-      $$->add_property(std::shared_ptr<wds::rtsp::Property>($1));
+      $$ = new wds::rtsp::PropertyMapPayload();
+      ToPropertyMapPayload($$)->AddProperty(std::shared_ptr<wds::rtsp::Property>($1));
     }
   | wdf_property_map wfd_property {
-      $1->add_property(std::shared_ptr<wds::rtsp::Property>($2));
+      if (auto payload = ToPropertyMapPayload($1))
+        payload->AddProperty(std::shared_ptr<wds::rtsp::Property>($2));
+      else
+        YYERROR;
     } 
   ;
 

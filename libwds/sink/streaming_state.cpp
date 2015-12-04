@@ -49,10 +49,15 @@ class M5Handler final : public MessageReceiver<Request::M5> {
   bool CanHandle(Message* message) const override {
     if (!MessageReceiver<Request::M5>::CanHandle(message))
       return false;
-
+    auto payload = ToPropertyMapPayload(message->payload());
+    if (!payload) {
+      WDS_ERROR("Failed to obtain payload in M5 handler.");
+      return false;
+    }
     auto property =
-      static_cast<TriggerMethod*>(message->payload().get_property(rtsp::TriggerMethodPropertyType).get());
-    return  method == property->method();
+        static_cast<TriggerMethod*>(
+            payload->GetProperty(rtsp::TriggerMethodPropertyType).get());
+    return method == property->method();
   }
 
   std::unique_ptr<Reply> HandleMessage(Message* message) override {

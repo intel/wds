@@ -40,6 +40,8 @@ class Property {
   PropertyType type() { return type_; }
   bool is_none() const { return is_none_; }
 
+  virtual std::string GetName() const;
+
  protected:
   Property(PropertyType type, bool is_none_);
 

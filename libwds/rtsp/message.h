@@ -56,7 +56,7 @@ class Message {
     payload_ = std::move(payload);
   }
 
-  Payload& payload();
+  Payload* payload() { return payload_.get(); }
 
   virtual std::string ToString() const;
 

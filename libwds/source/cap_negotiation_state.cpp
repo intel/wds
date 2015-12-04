@@ -76,7 +76,8 @@ std::unique_ptr<Message> M3Handler::CreateMessage() {
     props.push_back("wfd_audio_codecs");
 
   props.push_back("wfd_client_rtp_ports");
-  get_param->set_payload(std::unique_ptr<Payload>(new Payload(props)));
+  get_param->set_payload(
+      std::unique_ptr<Payload>(new rtsp::GetParameterPayload(props)));
   return std::unique_ptr<Message>(get_param);
 }
 
@@ -85,8 +86,13 @@ bool M3Handler::HandleReply(Reply* reply) {
     return false;
 
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
-  auto prop = reply->payload().get_property(rtsp::ClientRTPPortsPropertyType);
-  auto ports = static_cast<ClientRtpPorts*>(prop.get());
+  auto payload = ToPropertyMapPayload(reply->payload());
+  if (!payload){
+    WDS_ERROR("Failed to obtain payload from reply.");
+    return false;
+  }
+  auto property = payload->GetProperty(rtsp::ClientRTPPortsPropertyType);
+  auto ports = static_cast<ClientRtpPorts*>(property.get());
   if (!ports){
     WDS_ERROR("Failed to obtain RTP ports from source.");
     return false;
@@ -94,10 +100,10 @@ bool M3Handler::HandleReply(Reply* reply) {
   source_manager->SetSinkRtpPorts(ports->rtp_port_0(), ports->rtp_port_1());
 
   auto video_formats = static_cast<VideoFormats*>(
-      reply->payload().get_property(rtsp::VideoFormatsPropertyType).get());
+      payload->GetProperty(rtsp::VideoFormatsPropertyType).get());
 
   auto audio_codecs = static_cast<AudioCodecs*>(
-      reply->payload().get_property(rtsp::AudioCodecsPropertyType).get());
+      payload->GetProperty(rtsp::AudioCodecsPropertyType).get());
 
   if (!video_formats && (source_manager->GetSessionType() & VideoSession)) {
     WDS_ERROR("Failed to obtain WFD_VIDEO_FORMATS property");
@@ -130,14 +136,16 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   set_param->header().set_cseq(send_cseq_++);
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   const auto& ports = source_manager->GetSinkRtpPorts();
-  set_param->payload().add_property(
+  auto payload = new rtsp::PropertyMapPayload();
+
+  payload->AddProperty(
       std::shared_ptr<Property>(new ClientRtpPorts(ports.first, ports.second)));
   std::string presentation_Url_1 = "rtsp://" + sender_->GetLocalIPAddress() + "/wfd1.0/streamid=0";
-  set_param->payload().add_property(
+  payload->AddProperty(
       std::shared_ptr<Property>(new rtsp::PresentationUrl(presentation_Url_1, "")));
 
   if (source_manager->GetSessionType() & VideoSession) {
-    set_param->payload().add_property(
+    payload->AddProperty(
         std::shared_ptr<VideoFormats>(new VideoFormats(
             NativeVideoFormat(),  // Should be all zeros.
             false,
@@ -145,9 +153,11 @@ std::unique_ptr<Message> M4Handler::CreateMessage() {
   }
 
   if (source_manager->GetSessionType() & AudioSession) {
-    set_param->payload().add_property(
+    payload->AddProperty(
         std::shared_ptr<AudioCodecs>(new AudioCodecs({source_manager->GetOptimalAudioFormat()})));
   }
+
+  set_param->set_payload(std::unique_ptr<Payload>(payload));
 
   return std::unique_ptr<Message>(set_param);
 }
