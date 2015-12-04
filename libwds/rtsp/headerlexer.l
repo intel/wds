@@ -3,6 +3,7 @@
 %option never-interactive
 %option warn stack noyy_top_state noyy_pop_state noyy_push_state
 %option case-insensitive
+%option extra-type="bool"
 %option outfile="gen/headerscanner.cpp" header-file="gen/headerscanner.h"
 
 %{
