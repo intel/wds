@@ -20,9 +20,9 @@
  */
 
 
-#include "displayedid.h"
+#include "libwds/rtsp/displayedid.h"
 
-#include "macros.h"
+#include "libwds/rtsp/macros.h"
 
 namespace wds {
 namespace rtsp {

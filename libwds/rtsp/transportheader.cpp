@@ -20,8 +20,8 @@
  */
 
 
-#include "transportheader.h"
-#include "constants.h"
+#include "libwds/rtsp/transportheader.h"
+#include "libwds/rtsp/constants.h"
 
 namespace wds {
 namespace rtsp {

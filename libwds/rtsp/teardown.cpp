@@ -20,7 +20,7 @@
  */
 
 
-#include "teardown.h"
+#include "libwds/rtsp/teardown.h"
 
 namespace wds {
 namespace rtsp {

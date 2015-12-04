@@ -28,8 +28,8 @@
 #include <map>
 #include <memory>
 
-#include "constants.h"
-#include "transportheader.h"
+#include "libwds/rtsp/constants.h"
+#include "libwds/rtsp/transportheader.h"
 
 typedef std::map<std::string, std::string> GenericHeaderMap;
 

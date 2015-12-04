@@ -20,7 +20,7 @@
  */
 
 
-#include "contentprotection.h"
+#include "libwds/rtsp/contentprotection.h"
 
 #include <assert.h>
 

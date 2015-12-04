@@ -23,7 +23,7 @@
 #ifndef LIBWDS_RTSP_FORMATS3D_H_
 #define LIBWDS_RTSP_FORMATS3D_H_
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 
 #include <vector>
 

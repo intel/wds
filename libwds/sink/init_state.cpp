@@ -19,7 +19,7 @@
  * 02110-1301 USA
  */
 
-#include "init_state.h"
+#include "libwds/sink/init_state.h"
 
 #include "libwds/rtsp/options.h"
 #include "libwds/rtsp/reply.h"

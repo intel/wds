@@ -26,7 +26,7 @@
 #include <string>
 #include <map>
 
-#include "constants.h"
+#include "libwds/rtsp/constants.h"
 
 namespace wds {
 namespace rtsp {

@@ -30,9 +30,9 @@
 
 #include "libwds/public/logging.h"
 
-#include "property.h"
-#include "genericproperty.h"
-#include "propertyerrors.h"
+#include "libwds/rtsp/property.h"
+#include "libwds/rtsp/genericproperty.h"
+#include "libwds/rtsp/propertyerrors.h"
 
 namespace wds {
 namespace rtsp {

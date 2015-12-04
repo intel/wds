@@ -25,8 +25,8 @@
 
 #include <memory>
 
-#include "header.h"
-#include "payload.h"
+#include "libwds/rtsp/header.h"
+#include "libwds/rtsp/payload.h"
 
 namespace wds {
 namespace rtsp {

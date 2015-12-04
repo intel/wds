@@ -23,23 +23,24 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
-#include "constants.h"
-#include "driver.h"
-#include "reply.h"
-#include "route.h"
-#include "audiocodecs.h"
-#include "avformatchangetiming.h"
-#include "clientrtpports.h"
-#include "connectortype.h"
-#include "contentprotection.h"
-#include "displayedid.h"
-#include "formats3d.h"
-#include "i2c.h"
-#include "presentationurl.h"
-#include "triggermethod.h"
-#include "uibcsetting.h"
-#include "videoformats.h"
-#include "propertyerrors.h"
+
+#include "libwds/rtsp/audiocodecs.h"
+#include "libwds/rtsp/avformatchangetiming.h"
+#include "libwds/rtsp/clientrtpports.h"
+#include "libwds/rtsp/connectortype.h"
+#include "libwds/rtsp/constants.h"
+#include "libwds/rtsp/contentprotection.h"
+#include "libwds/rtsp/displayedid.h"
+#include "libwds/rtsp/driver.h"
+#include "libwds/rtsp/formats3d.h"
+#include "libwds/rtsp/i2c.h"
+#include "libwds/rtsp/presentationurl.h"
+#include "libwds/rtsp/propertyerrors.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/route.h"
+#include "libwds/rtsp/triggermethod.h"
+#include "libwds/rtsp/uibcsetting.h"
+#include "libwds/rtsp/videoformats.h"
 
 using wds::rtsp::Driver;
 

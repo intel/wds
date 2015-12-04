@@ -20,7 +20,7 @@
  */
 
 
-#include "setup.h"
+#include "libwds/rtsp/setup.h"
 
 namespace wds {
 namespace rtsp {

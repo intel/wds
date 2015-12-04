@@ -21,10 +21,10 @@
 
 #include "libwds/public/media_manager.h"
 
-#include "libwds/public/logging.h"
-
 #include <algorithm>
 #include <assert.h>
+
+#include "libwds/public/logging.h"
 
 namespace wds {
 

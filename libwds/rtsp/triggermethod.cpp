@@ -20,7 +20,7 @@
  */
 
 
-#include "triggermethod.h"
+#include "libwds/rtsp/triggermethod.h"
 
 namespace wds {
 namespace rtsp {

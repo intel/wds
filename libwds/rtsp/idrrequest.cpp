@@ -20,7 +20,7 @@
  */
 
 
-#include "idrrequest.h"
+#include "libwds/rtsp/idrrequest.h"
 
 namespace wds {
 namespace rtsp {

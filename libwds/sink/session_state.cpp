@@ -19,16 +19,16 @@
  * 02110-1301 USA
  */
 
-#include "session_state.h"
+#include "libwds/sink/session_state.h"
 
 #include "libwds/public/media_manager.h"
 
-#include "cap_negotiation_state.h"
-#include "streaming_state.h"
 #include "libwds/rtsp/play.h"
 #include "libwds/rtsp/reply.h"
 #include "libwds/rtsp/setup.h"
 #include "libwds/rtsp/transportheader.h"
+#include "libwds/sink/cap_negotiation_state.h"
+#include "libwds/sink/streaming_state.h"
 
 namespace wds {
 using rtsp::Message;

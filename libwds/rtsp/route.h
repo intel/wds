@@ -23,7 +23,7 @@
 #ifndef LIBWDS_RTSP_ROUTE_H_
 #define LIBWDS_RTSP_ROUTE_H_
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 
 namespace wds {
 namespace rtsp {

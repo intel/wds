@@ -20,7 +20,7 @@
  */
 
 
-#include "standbyresumecapability.h"
+#include "libwds/rtsp/standbyresumecapability.h"
 
 namespace wds {
 namespace rtsp {

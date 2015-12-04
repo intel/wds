@@ -20,7 +20,7 @@
  */
 
 
-#include "getparameter.h"
+#include "libwds/rtsp/getparameter.h"
 
 namespace wds {
 namespace rtsp {

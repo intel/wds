@@ -20,7 +20,7 @@
  */
 
 
-#include "pause.h"
+#include "libwds/rtsp/pause.h"
 
 namespace wds {
 namespace rtsp {

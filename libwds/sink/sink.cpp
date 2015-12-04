@@ -21,8 +21,6 @@
 
 #include "libwds/public/sink.h"
 
-#include "cap_negotiation_state.h"
-#include "init_state.h"
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
 #include "libwds/public/wds_export.h"
@@ -31,8 +29,10 @@
 #include "libwds/rtsp/teardown.h"
 #include "libwds/rtsp/triggermethod.h"
 #include "libwds/public/media_manager.h"
-#include "streaming_state.h"
-#include "session_state.h"
+#include "libwds/sink/cap_negotiation_state.h"
+#include "libwds/sink/init_state.h"
+#include "libwds/sink/session_state.h"
+#include "libwds/sink/streaming_state.h"
 
 namespace wds {
 using rtsp::Message;

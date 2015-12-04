@@ -23,8 +23,8 @@
 #ifndef LIBWDS_RTSP_CONNECTORTYPE_H_
 #define LIBWDS_RTSP_CONNECTORTYPE_H_
 
-#include "property.h"
 #include "libwds/public/connector_type.h"
+#include "libwds/rtsp/property.h"
 
 namespace wds {
 namespace rtsp {

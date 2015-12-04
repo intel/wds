@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "genericproperty.h"
+#include "libwds/rtsp/genericproperty.h"
 
 namespace wds {
 namespace rtsp {
