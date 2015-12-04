@@ -43,6 +43,12 @@ std::string Property::ToString() const {
   return std::string();
 }
 
+std::string Property::GetName() const {
+  if (type_ == GenericPropertyType)
+    return std::string();
+  return GetPropertyName(type_);
+}
+
 std::string GetPropertyName(PropertyType type) {
   switch(type) {
     case AVFormatChangeTimingPropertyType:

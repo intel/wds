@@ -39,8 +39,12 @@ GenericProperty::GenericProperty(const std::string& key, const std::string& valu
 GenericProperty::~GenericProperty() {
 }
 
-std::string GenericProperty::ToString() const{
+std::string GenericProperty::ToString() const {
   return key_ + ": " + value_;
+}
+
+std::string GenericProperty::GetName() const {
+  return key_;
 }
 
 }  // namespace rtsp

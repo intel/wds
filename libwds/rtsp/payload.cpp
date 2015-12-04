@@ -25,75 +25,95 @@
 namespace wds {
 namespace rtsp {
 
-Payload::Payload() {
-}
-
-Payload::Payload(const std::vector<std::string>& properties)
-  : request_properties_(properties) {
-
-}
-
-Payload::Payload(const PropertyMap& properties)
-  : properties_(properties) {
-}
-
-Payload::Payload(const PropertyErrorMap& property_errors)
-  : property_errors_(property_errors) {
-}
-
 Payload::~Payload() {
 }
 
-std::shared_ptr<Property> Payload::get_property(const std::string& name) const
-{
+PropertyMapPayload::~PropertyMapPayload() {
+}
+
+std::shared_ptr<Property> PropertyMapPayload::GetProperty(
+    const std::string& name) const {
   auto property = properties_.find(name);
   if (property != properties_.end())
     return property->second;
   return nullptr;
 }
 
-std::shared_ptr<Property> Payload::get_property(PropertyType type) const
-{
+std::shared_ptr<Property> PropertyMapPayload::GetProperty(
+    PropertyType type) const {
   if (type == GenericPropertyType)
     return nullptr;
 
-  return get_property(GetPropertyName(type));
+  return GetProperty(GetPropertyName(type));
 }
 
-bool Payload::has_property(PropertyType type) const {
+bool PropertyMapPayload::HasProperty(PropertyType type) const {
   return properties_.find(GetPropertyName(type)) != properties_.end();
 }
 
-void Payload::add_property(const std::shared_ptr<Property>& property) {
-  if (property->type() == GenericPropertyType) {
-    auto gen_prop = std::static_pointer_cast<GenericProperty>(property);
-    properties_[gen_prop->key()] = property;
-  } else {
-    properties_[GetPropertyName(property->type())] = property;
+void PropertyMapPayload::AddProperty(
+    const std::shared_ptr<Property>& property) {
+  properties_[property->GetName()] = property;
+}
+
+std::string PropertyMapPayload::ToString() const {
+  std::string ret;
+  for (auto it : properties_) {
+    if (auto property = it.second) {
+      ret += property->ToString();
+      ret += "\r\n";
+    }
   }
+
+  return ret;
 }
 
-const PropertyMap& Payload::properties() const {
-  return properties_;
+GetParameterPayload::GetParameterPayload(const std::vector<std::string>& properties)
+   : Payload(Payload::Requests),
+     properties_(properties) {
 }
 
-std::shared_ptr<PropertyErrors> Payload::get_property_error(const std::string& name) const
-{
-  auto property_error = property_errors_.find(name);
-  if (property_error != property_errors_.end())
-    return (*property_error).second;
+GetParameterPayload::~GetParameterPayload() {
+}
+
+void GetParameterPayload::AddRequestProperty(const PropertyType& type) {
+  properties_.push_back(GetPropertyName(type));
+}
+
+void GetParameterPayload::AddRequestProperty(
+    const std::string& generic_property) {
+  properties_.push_back(generic_property);
+}
+
+std::string GetParameterPayload::ToString() const {
+  std::string ret;
+  for (const std::string& property : properties_) {
+    ret += property;
+    ret += "\r\n";
+  }
+
+  return ret;
+}
+
+PropertyErrorPayload::~PropertyErrorPayload() {
+}
+
+std::shared_ptr<PropertyErrors> PropertyErrorPayload::GetPropertyError(
+    const std::string& name) const {
+  auto property = property_errors_.find(name);
+  if (property != property_errors_.end())
+    return property->second;
   return nullptr;
 }
 
-std::shared_ptr<PropertyErrors> Payload::get_property_error(PropertyType type) const
-{
+std::shared_ptr<PropertyErrors> PropertyErrorPayload::GetPropertyError(
+    PropertyType type) const {
   if (type == GenericPropertyType)
     return nullptr;
-
-  return get_property_error(GetPropertyName(type));
+  return GetPropertyError(GetPropertyName(type));
 }
 
-void Payload::add_property_error(const std::shared_ptr<PropertyErrors>& errors) {
+void PropertyErrorPayload::AddPropertyError(const std::shared_ptr<PropertyErrors>& errors) {
   if (errors->type() == GenericPropertyType) {
     property_errors_[errors->generic_property_name()] = errors;
   } else {
@@ -101,48 +121,12 @@ void Payload::add_property_error(const std::shared_ptr<PropertyErrors>& errors) 
   }
 }
 
-const PropertyErrorMap& Payload::property_errors() const {
-  return property_errors_;
-}
-
-void Payload::add_get_parameter_property(const PropertyType& type) {
-  request_properties_.push_back(GetPropertyName(type));
-}
-
-void Payload::add_get_parameter_property(const std::string& generic_property) {
-  request_properties_.push_back(generic_property);
-}
-
-const std::vector<std::string>& Payload::get_parameter_properties() const {
-  return request_properties_;
-}
-
-std::string Payload::ToString() const {
+std::string PropertyErrorPayload::ToString() const {
   std::string ret;
-  auto i = properties_.begin();
-  auto end = properties_.end();
-
-  while(i != end) {
-    if ((*i).second) {
-      ret += (*i).second->ToString();
-      ret += "\r\n";
-    }
-    ++i;
-  }
-
-  auto req_i = request_properties_.begin();
-  auto req_end = request_properties_.end();
-  while(req_i != req_end) {
-    ret += *req_i;
+  for (auto it = property_errors_.rbegin();
+       it != property_errors_.rend(); ++it) {
+    ret += it->second->ToString();
     ret += "\r\n";
-    ++req_i;
-  }
-
-  auto error_i = property_errors_.rbegin();
-  while(error_i != property_errors_.rend()) {
-    ret += error_i->second->ToString();
-    ret += "\r\n";
-    error_i++;
   }
 
   return ret;

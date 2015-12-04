@@ -49,12 +49,6 @@ Header& Message::header() {
   return *header_;
 }
 
-Payload& Message::payload() {
-  if (!payload_)
-    payload_.reset(new Payload());
-  return *payload_;
-}
-
 std::string Message::ToString() const {
   std::string ret;
   if (payload_)

@@ -61,23 +61,26 @@ bool InitializeRequestId(Request* request) {
     id = Request::M9;
     break;
   case Request::MethodSetParameter:
-    if (request->payload().has_property(rtsp::RoutePropertyType))
-      id = Request::M10;
-    else if (request->payload().has_property(rtsp::ConnectorTypePropertyType))
-      id = Request::M11;
-    else if (request->payload().has_property(rtsp::StandbyPropertyType))
-      id = Request::M12;
-    else if (request->payload().has_property(rtsp::IDRRequestPropertyType))
-      id = Request::M13;
-    else if (request->payload().has_property(rtsp::UIBCCapabilityPropertyType))
-      id = Request::M14;
-    else if (request->payload().has_property(rtsp::UIBCSettingPropertyType))
-      id = Request::M15;
-    break;
+    if (auto payload = rtsp::ToPropertyMapPayload(request->payload())) {
+      if (payload->HasProperty(rtsp::RoutePropertyType))
+        id = Request::M10;
+      else if (payload->HasProperty(rtsp::ConnectorTypePropertyType))
+        id = Request::M11;
+      else if (payload->HasProperty(rtsp::StandbyPropertyType))
+        id = Request::M12;
+      else if (payload->HasProperty(rtsp::IDRRequestPropertyType))
+        id = Request::M13;
+      else if (payload->HasProperty(rtsp::UIBCCapabilityPropertyType))
+        id = Request::M14;
+      else if (payload->HasProperty(rtsp::UIBCSettingPropertyType))
+        id = Request::M15;
+      break;
+    }
   default:
-    // TODO: warning.
+    WDS_ERROR("Failed to identify the received message");
     return false;
   }
+
   request->set_id(id);
   return true;
 }
@@ -180,8 +183,10 @@ std::unique_ptr<Message> CreateM5(int send_cseq, rtsp::TriggerMethod::Method met
   auto set_param = std::unique_ptr<Request>(
       new rtsp::SetParameter("rtsp://localhost/wfd1.0"));
   set_param->header().set_cseq(send_cseq);
-  set_param->payload().add_property(
+  auto payload = new rtsp::PropertyMapPayload();
+  payload->AddProperty(
       std::shared_ptr<rtsp::Property>(new rtsp::TriggerMethod(method)));
+  set_param->set_payload(std::unique_ptr<rtsp::Payload>(payload));
   set_param->set_id(Request::M5);
   return std::move(set_param);
 }
