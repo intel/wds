@@ -19,7 +19,7 @@
  * 02110-1301 USA
  */
 
-#include "cap_negotiation_state.h"
+#include "libwds/source/cap_negotiation_state.h"
 
 #include "libwds/rtsp/audiocodecs.h"
 #include "libwds/rtsp/clientrtpports.h"

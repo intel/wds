@@ -23,10 +23,10 @@
 #ifndef LIBWDS_RTSP_AUDIOCODECS_H_
 #define LIBWDS_RTSP_AUDIOCODECS_H_
 
-#include "property.h"
-#include "libwds/public/audio_codec.h"
-
 #include <vector>
+
+#include "libwds/public/audio_codec.h"
+#include "libwds/rtsp/property.h"
 
 namespace wds {
 namespace rtsp {

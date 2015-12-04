@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-#include "message_handler.h"
+#include "libwds/common/message_handler.h"
 #include "libwds/public/media_manager.h"
 
 namespace wds {

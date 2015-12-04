@@ -20,10 +20,10 @@
  */
 
 
-#include "coupledsink.h"
+#include "libwds/rtsp/coupledsink.h"
 
 #include <climits>
-#include "macros.h"
+#include "libwds/rtsp/macros.h"
 
 namespace wds {
 namespace rtsp {

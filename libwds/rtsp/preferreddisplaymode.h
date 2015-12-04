@@ -23,9 +23,9 @@
 #ifndef LIBWDS_RTSP_PREFERREDDISPLAYMODE_H_
 #define LIBWDS_RTSP_PREFERREDDISPLAYMODE_H_
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 
-#include "videoformats.h"
+#include "libwds/rtsp/videoformats.h"
 
 namespace wds {
 namespace rtsp {

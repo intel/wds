@@ -19,7 +19,7 @@
  * 02110-1301 USA
  */
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 
 #include <cassert>
 

@@ -21,11 +21,10 @@
 
 #include "libwds/public/source.h"
 
-
-#include "cap_negotiation_state.h"
-#include "init_state.h"
-#include "streaming_state.h"
-#include "session_state.h"
+#include "libwds/source/cap_negotiation_state.h"
+#include "libwds/source/init_state.h"
+#include "libwds/source/streaming_state.h"
+#include "libwds/source/session_state.h"
 #include "libwds/common/message_handler.h"
 #include "libwds/common/rtsp_input_handler.h"
 #include "libwds/public/wds_export.h"

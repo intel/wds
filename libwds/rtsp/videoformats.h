@@ -23,7 +23,7 @@
 #ifndef LIBWDS_RTSP_VIDEOFORMATS_H_
 #define LIBWDS_RTSP_VIDEOFORMATS_H_
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 #include "libwds/public/video_format.h"
 
 #include <vector>

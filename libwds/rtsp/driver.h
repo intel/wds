@@ -26,7 +26,7 @@
 #include <string>
 #include <memory>
 
-#include "gen/parser.h"
+#include "parser.h"
 
 namespace wds {
 namespace rtsp {

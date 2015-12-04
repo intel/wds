@@ -20,9 +20,9 @@
  */
 
 
-#include "formats3d.h"
+#include "libwds/rtsp/formats3d.h"
 
-#include "macros.h"
+#include "libwds/rtsp/macros.h"
 
 namespace wds {
 namespace rtsp {

@@ -20,7 +20,7 @@
  */
 
 
-#include "message.h"
+#include "libwds/rtsp/message.h"
 
 #include <cassert>
 

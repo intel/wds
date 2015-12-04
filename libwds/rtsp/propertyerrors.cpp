@@ -20,8 +20,8 @@
  */
 
 
-#include "propertyerrors.h"
-#include "property.h"
+#include "libwds/rtsp/propertyerrors.h"
+#include "libwds/rtsp/property.h"
 
 #include <assert.h>
 

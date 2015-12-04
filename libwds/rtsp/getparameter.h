@@ -23,7 +23,7 @@
 #ifndef LIBWDS_RTSP_GETPARAMETER_H_
 #define LIBWDS_RTSP_GETPARAMETER_H_
 
-#include "message.h"
+#include "libwds/rtsp/message.h"
 
 namespace wds {
 namespace rtsp {

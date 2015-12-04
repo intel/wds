@@ -20,9 +20,9 @@
  */
 
 
-#include "avformatchangetiming.h"
+#include "libwds/rtsp/avformatchangetiming.h"
 
-#include "macros.h"
+#include "libwds/rtsp/macros.h"
 
 namespace wds {
 namespace rtsp {

@@ -20,8 +20,8 @@
  */
 
 
-#include "setparameter.h"
-#include "triggermethod.h"
+#include "libwds/rtsp/setparameter.h"
+#include "libwds/rtsp/triggermethod.h"
 
 namespace wds {
 namespace rtsp {

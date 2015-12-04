@@ -20,18 +20,18 @@
  */
 
 
-#include "driver.h"
-#include "message.h"
-#include "reply.h"
+#include "libwds/rtsp/driver.h"
 
 #include <cctype>
 #include <sstream>
 
-#include "gen/messagescanner.h"
-#include "gen/errorscanner.h"
-#include "gen/headerscanner.h"
-
 #include "libwds/public/logging.h"
+#include "libwds/rtsp/message.h"
+#include "libwds/rtsp/reply.h"
+
+#include "errorscanner.h"
+#include "headerscanner.h"
+#include "messagescanner.h"
 
 int wds_lex(YYSTYPE* yylval, void* scanner,
     std::unique_ptr<wds::rtsp::Message>& message) {

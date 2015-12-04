@@ -19,20 +19,20 @@
  * 02110-1301 USA
  */
 
-#include "cap_negotiation_state.h"
+#include "libwds/sink/cap_negotiation_state.h"
 
 #include <iostream>
 
+#include "libwds/public/media_manager.h"
 #include "libwds/rtsp/audiocodecs.h"
 #include "libwds/rtsp/clientrtpports.h"
 #include "libwds/rtsp/connectortype.h"
 #include "libwds/rtsp/contentprotection.h"
 #include "libwds/rtsp/coupledsink.h"
 #include "libwds/rtsp/displayedid.h"
+#include "libwds/rtsp/getparameter.h"
 #include "libwds/rtsp/formats3d.h"
 #include "libwds/rtsp/i2c.h"
-#include "libwds/public/media_manager.h"
-#include "libwds/rtsp/getparameter.h"
 #include "libwds/rtsp/payload.h"
 #include "libwds/rtsp/presentationurl.h"
 #include "libwds/rtsp/propertyerrors.h"
@@ -50,7 +50,6 @@ using rtsp::Request;
 using rtsp::Reply;
 
 namespace sink {
-
 
 M3Handler::M3Handler(const InitParams& init_params)
   : MessageReceiver<Request::M3>(init_params) {

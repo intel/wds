@@ -19,11 +19,11 @@
  * 02110-1301 USA
  */
 
-#include "videoformats.h"
+#include "libwds/rtsp/videoformats.h"
 
 #include <cassert>
 
-#include "macros.h"
+#include "libwds/rtsp/macros.h"
 
 namespace wds {
 namespace rtsp {

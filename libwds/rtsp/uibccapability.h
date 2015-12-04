@@ -23,7 +23,7 @@
 #ifndef LIBWDS_RTSP_UIBCCAPABILITY_H_
 #define LIBWDS_RTSP_UIBCCAPABILITY_H_
 
-#include "property.h"
+#include "libwds/rtsp/property.h"
 
 #include <vector>
 #include <utility>

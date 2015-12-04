@@ -19,11 +19,10 @@
  * 02110-1301 USA
  */
 
-#include "session_state.h"
+#include "libwds/source/session_state.h"
 
 #include "libwds/public/media_manager.h"
-
-#include "cap_negotiation_state.h"
+#include "libwds/source/cap_negotiation_state.h"
 #include "libwds/rtsp/reply.h"
 #include "libwds/rtsp/setparameter.h"
 #include "libwds/rtsp/triggermethod.h"

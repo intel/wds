@@ -20,7 +20,7 @@
  */
 
 
-#include "i2c.h"
+#include "libwds/rtsp/i2c.h"
 
 namespace wds {
 namespace rtsp {

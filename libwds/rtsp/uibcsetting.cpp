@@ -20,7 +20,7 @@
  */
 
 
-#include "uibcsetting.h"
+#include "libwds/rtsp/uibcsetting.h"
 
 namespace wds {
 namespace rtsp {
