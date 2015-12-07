@@ -6,7 +6,7 @@
 %option extra-type="bool"
 %option outfile="gen/errorscanner.cpp" header-file="gen/errorscanner.h"
 
-%{
+%top{
 /*
  * This file is part of Wireless Display Software for Linux OS
  *
@@ -27,8 +27,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  */
+}
 
-
+%{
 #include <string>
 #include "parser.h"
 #define yyterminate() return(END)
