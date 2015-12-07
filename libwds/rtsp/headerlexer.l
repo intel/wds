@@ -6,7 +6,7 @@
 %option extra-type="bool"
 %option outfile="gen/headerscanner.cpp" header-file="gen/headerscanner.h"
 
-%{
+%top{
 /*
  * This file is part of Wireless Display Software for Linux OS
  *
@@ -27,9 +27,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  */
+}
 
-
-
+%{
 #include <string>
 #include "parser.h"
 #define yyterminate() return(END)
