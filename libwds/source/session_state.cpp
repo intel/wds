@@ -67,8 +67,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
   std::unique_ptr<Reply> HandleMessage(
       Message* message) override {
     auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
-    // todo: generate unique session id
-    reply->header().set_session("abcdefg123456");
+    reply->header().set_session(manager_->GetSessionId());
     reply->header().set_timeout(kDefaultKeepAliveTimeout);
 
     auto transport = new rtsp::TransportHeader();
