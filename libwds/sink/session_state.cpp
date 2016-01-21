@@ -87,7 +87,7 @@ class M7Handler final : public SequencedMessageSender {
  private:
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Play* play = new rtsp::Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
-    play->header().set_session(ToSinkMediaManager(manager_)->GetSessionId());
+    play->header().set_session(manager_->GetSessionId());
     play->header().set_cseq(send_cseq_++);
     play->header().set_require_wfd_support(true);
 

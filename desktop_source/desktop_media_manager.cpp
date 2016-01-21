@@ -46,6 +46,10 @@ bool DesktopMediaManager::IsPaused() const {
   return (gst_pipeline_->GetState() != GST_STATE_PLAYING);
 }
 
+std::string DesktopMediaManager::GetSessionId() const {
+  return "abcdefg123456";
+}
+
 wds::SessionType DesktopMediaManager::GetSessionType() const {
   return wds::VideoSession;
 }

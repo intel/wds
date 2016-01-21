@@ -33,6 +33,7 @@ class DesktopMediaManager : public wds::SourceMediaManager {
   void Pause() override;
   void Teardown() override;
   bool IsPaused() const override;
+  std::string GetSessionId() const override;
   void SetSinkRtpPorts(int port1, int port2) override;
   std::pair<int,int> GetSinkRtpPorts() const override;
   int GetLocalRtpPort() const override;
