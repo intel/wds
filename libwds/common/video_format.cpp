@@ -35,16 +35,16 @@ LogSystem::LogFunction LogSystem::vlog_func_ = &Dummy;
 LogSystem::LogFunction LogSystem::warning_func_ = &Dummy;
 LogSystem::LogFunction LogSystem::error_func_ = &Dummy;
 
+namespace {
 // Quality weight is calculated using following formula:
 // width * height * fps * 2 for progressive or 1 for interlaced frames
-
 struct QualityInfo {
   uint width;
   uint height;
   uint weight;
 };
 
-static QualityInfo cea_info_table[] = {
+const QualityInfo cea_info_table[] = {
   {640, 480, 640*480*60*2},     // CEA640x480p60
   {720, 480, 720*480*60*2},     // CEA720x480p60
   {720, 480, 720*480*60},       // CEA720x480i60
@@ -66,7 +66,7 @@ static QualityInfo cea_info_table[] = {
 
 #define CEA_TABLE_LENGTH  sizeof(cea_info_table) / sizeof(QualityInfo)
 
-static QualityInfo vesa_info_table[] = {
+const QualityInfo vesa_info_table[] = {
   {800, 600, 800*600*30*2},        // VESA800x600p30
   {800, 600, 800*600*60*2},        // VESA800x600p60
   {1024, 768, 1024*768*30*2},      // VESA1024x768p30
@@ -100,7 +100,7 @@ static QualityInfo vesa_info_table[] = {
 
 #define VESA_TABLE_LENGTH  sizeof(vesa_info_table) / sizeof(QualityInfo)
 
-static QualityInfo hh_info_table[] = {
+const QualityInfo hh_info_table[] = {
   {800, 480, 800*480*30*2},         // HH800x480p30
   {800, 480, 800*480*60*2},         // HH800x480p60
   {854, 480, 854*480*30*2},         // HH854x480p30
@@ -156,21 +156,12 @@ std::pair<uint, uint> get_resolution(const H264VideoFormat& format) {
   return std::pair<uint, uint>(info.width, info.height);
 }
 
-bool operator == (const H264VideoFormat& a, const H264VideoFormat& b) {
-  return (a.type == b.type)
-      && (get_resolution(a) == get_resolution(b));
-}
-
-bool operator < (const H264VideoFormat& a, const H264VideoFormat& b) {
+bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) {
   if (get_quality_info(a).weight != get_quality_info(b).weight)
     return get_quality_info(a).weight < get_quality_info(b).weight;
   if (a.profile != b.profile)
     return a.profile < b.profile;
   return a.level < b.level;
-}
-
-bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) {
-  return b < a;
 }
 
 template <typename RREnum>
@@ -188,6 +179,8 @@ void PopulateVideoFormatList(
       formats.push_back(H264VideoFormat(profile, level, static_cast<RREnum>(rr)));
   }
 }
+
+}  // namespace
 
 void PopulateVideoFormatList(
     const H264VideoCodec& codec, std::vector<H264VideoFormat>& formats) {
@@ -221,10 +214,13 @@ H264VideoFormat FindOptimalVideoFormat(
   H264VideoFormat format;
 
   while(it != end) {
-    auto match = std::find(
+    auto match = std::find_if(
         remote_formats.begin(),
         remote_formats.end(),
-        *it);
+        [&it] (const H264VideoFormat& format) {
+            return ((*it).type == format.type) &&
+                   (get_resolution(*it) == get_resolution(format));
+        });
 
     if (match != remote_formats.end()) {
       format = *match;
