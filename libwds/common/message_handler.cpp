@@ -272,7 +272,7 @@ void MessageSenderBase::Send(std::unique_ptr<Message> message) {
     observer_->OnError(shared_from_this());
     return;
   }
-  parcel_queue_.push_front(
+  parcel_queue_.push_back(
       {message->cseq(), sender_->CreateTimer(GetResponseTimeout())});
   sender_->SendRTSPData(message->ToString());
 }
