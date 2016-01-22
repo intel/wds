@@ -93,6 +93,8 @@ class SinkStateMachine : public MessageSequenceHandler {
    SinkStateMachine(Peer::Delegate* sender, SinkMediaManager* mng)
      : SinkStateMachine({sender, mng, this}) {}
 
+   int GetNextCSeq() { return send_cseq_++; }
+
  private:
    uint keep_alive_timer_;
 };
@@ -126,13 +128,11 @@ class SinkImpl final : public Sink, public RTSPInputHandler, public MessageHandl
   void ResetAndTeardownMedia();
 
   std::shared_ptr<SinkStateMachine> state_machine_;
-  Delegate* delegate_;
   SinkMediaManager* manager_;
 };
 
 SinkImpl::SinkImpl(Delegate* delegate, SinkMediaManager* mng)
   : state_machine_(new SinkStateMachine({delegate, mng, this})),
-    delegate_(delegate),
     manager_(mng) {
 }
 
@@ -152,7 +152,7 @@ template <class WfdMessage, Request::ID id>
 std::unique_ptr<Message> SinkImpl::CreateCommand() {
   auto message = new WfdMessage(manager_->GetPresentationUrl());
   message->header().set_session(manager_->GetSessionId());
-  message->header().set_cseq(delegate_->GetNextCSeq());
+  message->header().set_cseq(state_machine_->GetNextCSeq());
   message->set_id(id);
   return std::unique_ptr<Message>(message);
 }

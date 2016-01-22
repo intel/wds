@@ -32,12 +32,10 @@ using rtsp::Reply;
 
 class M1Handler final : public MessageReceiver<Request::M1> {
  public:
-  M1Handler(const InitParams& init_params, int& source_init_cseq)
-    : MessageReceiver<Request::M1>(init_params),
-      source_init_cseq_(source_init_cseq) {
+  M1Handler(const InitParams& init_params)
+    : MessageReceiver<Request::M1>(init_params) {
   }
   virtual std::unique_ptr<Reply> HandleMessage(Message* message) override {
-    source_init_cseq_ = message->cseq();
     auto reply = std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
     std::vector<rtsp::Method> supported_methods;
     supported_methods.push_back(rtsp::ORG_WFA_WFD_1_0);
@@ -46,21 +44,15 @@ class M1Handler final : public MessageReceiver<Request::M1> {
     reply->header().set_supported_methods(supported_methods);
     return std::move(reply);
   }
-
- private:
-  int& source_init_cseq_;
 };
 
 class M2Handler final : public SequencedMessageSender {
  public:
-  M2Handler(const InitParams& init_params, int& source_init_cseq)
-    : SequencedMessageSender(init_params),
-      source_init_cseq_(source_init_cseq) {
-  }
+    using SequencedMessageSender::SequencedMessageSender;
  private:
   virtual std::unique_ptr<Message> CreateMessage() override {
     auto options = new rtsp::Options("*");
-    options->header().set_cseq(sender_->GetNextCSeq(&source_init_cseq_));
+    options->header().set_cseq(send_cseq_++);
     options->header().set_require_wfd_support(true);
     return std::unique_ptr<Message>(options);
   }
@@ -81,14 +73,12 @@ class M2Handler final : public SequencedMessageSender {
 
     return false;
   }
-  int& source_init_cseq_;
 };
 
 InitState::InitState(const InitParams& init_params)
-  : MessageSequenceHandler(init_params),
-    source_init_cseq_(0) {
-  AddSequencedHandler(make_ptr(new M1Handler(init_params, source_init_cseq_)));
-  AddSequencedHandler(make_ptr(new M2Handler(init_params, source_init_cseq_)));
+  : MessageSequenceHandler(init_params) {
+  AddSequencedHandler(make_ptr(new M1Handler(init_params)));
+  AddSequencedHandler(make_ptr(new M2Handler(init_params)));
 }
 
 }  // sink

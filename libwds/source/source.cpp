@@ -96,6 +96,8 @@ class SourceStateMachine : public MessageSequenceHandler {
      AddSequencedHandler(make_ptr(new source::SessionState(init_params, timer_id, m16_sender)));
      AddSequencedHandler(make_ptr(new source::StreamingState(init_params, m16_sender)));
    }
+
+   int GetNextCSeq() { return send_cseq_++; }
 };
 
 class SourceImpl final : public Source, public RTSPInputHandler, public MessageHandler::Observer {
@@ -164,7 +166,7 @@ void SourceImpl::SendKeepAlive() {
   delegate_->ReleaseTimer(keep_alive_timer_);
   auto get_param = std::unique_ptr<Request>(
       new rtsp::GetParameter("rtsp://localhost/wfd1.0"));
-  get_param->header().set_cseq(delegate_->GetNextCSeq());
+  get_param->header().set_cseq(state_machine_->GetNextCSeq());
   get_param->set_id(Request::M16);
 
   assert(state_machine_->CanSend(get_param.get()));
@@ -191,7 +193,7 @@ std::unique_ptr<Message> CreateM5(int send_cseq, rtsp::TriggerMethod::Method met
 }
 
 bool SourceImpl::Teardown() {
-  auto m5 = CreateM5(delegate_->GetNextCSeq(),
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
                      rtsp::TriggerMethod::TEARDOWN);
 
   if (!state_machine_->CanSend(m5.get()))
@@ -201,7 +203,7 @@ bool SourceImpl::Teardown() {
 }
 
 bool SourceImpl::Play() {
-  auto m5 = CreateM5(delegate_->GetNextCSeq(),
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
                      rtsp::TriggerMethod::PLAY);
 
   if (!state_machine_->CanSend(m5.get()))
@@ -211,7 +213,7 @@ bool SourceImpl::Play() {
 }
 
 bool SourceImpl::Pause() {
-  auto m5 = CreateM5(delegate_->GetNextCSeq(),
+  auto m5 = CreateM5(state_machine_->GetNextCSeq(),
                      rtsp::TriggerMethod::PAUSE);
 
   if (!state_machine_->CanSend(m5.get()))

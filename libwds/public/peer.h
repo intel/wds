@@ -73,15 +73,6 @@ class Peer {
      */
     virtual void ReleaseTimer(uint timer_id) = 0;
 
-    /**
-     * Returns the sequence number for the following RTSP request-response pair
-     * @param initial_peer_cseq is provided for the WFD sink implementation at
-     * the first method's call during the WFD session and it contains the
-     * initial request sequence number obtained from the WFD source (the initial
-     * sequence numbers of connected peers may not be identical).
-     */
-    virtual int GetNextCSeq(int* initial_peer_cseq = nullptr) const = 0;
-
    protected:
     virtual ~Delegate() {}
   };

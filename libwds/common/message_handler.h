@@ -98,6 +98,8 @@ protected:
   Peer::Delegate* sender_;
   MediaManager* manager_;
   Observer* observer_;
+  // States should be handled within one thread. It's OK to have this static.
+  static int send_cseq_;
 };
 
 class MessageSequenceHandler : public MessageHandler,
