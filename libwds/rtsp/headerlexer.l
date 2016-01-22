@@ -41,8 +41,6 @@
 %s SUPPORTED_METHODS_STATE
 %s CONTENT_TYPE_STATE
 %s SESSION_STATE
-%s MATCH_PRESENTATION_URL
-%s NUM_AS_HEX_MODE
 
 DIGIT [0-9]
 DIGITS [0-9]+
@@ -52,14 +50,12 @@ SP [ \t]
 CR [\r]
 LF [\n]
 CRLF {CR}{LF}
-IPADDRESS (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
-IPPORT ({DIGIT}){1,5}
-ERROR ({DIGIT}){3}
 
 %%
-  /* skip these */
-<*>[\r] { BEGIN(INITIAL); }
-<*>[\n] { BEGIN(INITIAL); }
+
+<*>{CRLF} { BEGIN(INITIAL); }
+<*>{LF} { BEGIN(INITIAL); }
+<*>{CR} { BEGIN(INITIAL); }
 
  /* Convert these */
 "="  { return '='; }
@@ -206,16 +202,6 @@ ERROR ({DIGIT}){3}
   return WFD_TAG;
   }
 
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=0" {
-    yylval->sval = new std::string(yytext);
-    return WFD_PRESENTATION_URL_0;
-  }
-
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=1" {
-    yylval->sval = new std::string(yytext);
-    return WFD_PRESENTATION_URL_1;
-  }
-
 <CONTENT_TYPE_STATE>[-[:alnum:]]+\/[-[:alnum:]]+ {
     BEGIN(INITIAL);
     yylval->sval = new std::string(yytext);
@@ -225,10 +211,10 @@ ERROR ({DIGIT}){3}
 {DIGITS} {
     std::string str(yytext, yyleng);
     str += '\0';
+    errno = 0;
     yylval->nval = strtoull(str.c_str(), NULL, 10);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
+    if (errno)
+      yyterminate();
     return WFD_NUM;
   }
 
