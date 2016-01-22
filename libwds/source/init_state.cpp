@@ -38,7 +38,7 @@ class M1Handler final : public SequencedMessageSender {
  private:
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Options* options = new rtsp::Options("*");
-    options->header().set_cseq(send_cseq_++);
+    options->header().set_cseq(sender_->GetNextCSeq());
     options->header().set_require_wfd_support(true);
     return std::unique_ptr<Message>(options);
   }

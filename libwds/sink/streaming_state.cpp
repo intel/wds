@@ -72,7 +72,7 @@ class M7Sender final : public SequencedMessageSender {
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Play* play = new rtsp::Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
     play->header().set_session(manager_->GetSessionId());
-    play->header().set_cseq (send_cseq_++);
+    play->header().set_cseq (sender_->GetNextCSeq());
     return std::unique_ptr<Message>(play);
   }
 
@@ -101,7 +101,7 @@ class M8Sender final : public SequencedMessageSender {
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Teardown* teardown = new rtsp::Teardown(ToSinkMediaManager(manager_)->GetPresentationUrl());
     teardown->header().set_session(manager_->GetSessionId());
-    teardown->header().set_cseq(send_cseq_++);
+    teardown->header().set_cseq(sender_->GetNextCSeq());
     return std::unique_ptr<Message>(teardown);
   }
 
@@ -128,7 +128,7 @@ class M9Sender final : public SequencedMessageSender {
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Pause* pause = new rtsp::Pause(ToSinkMediaManager(manager_)->GetPresentationUrl());
     pause->header().set_session(manager_->GetSessionId());
-    pause->header().set_cseq(send_cseq_++);
+    pause->header().set_cseq(sender_->GetNextCSeq());
     return std::unique_ptr<Message>(pause);
   }
 

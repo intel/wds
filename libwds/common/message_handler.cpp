@@ -30,8 +30,6 @@ using rtsp::Message;
 using rtsp::Request;
 using rtsp::Reply;
 
-int MessageHandler::send_cseq_ = 1;
-
 bool MessageHandler::HandleTimeoutEvent(uint timer_id) const {
   return false;
 }

@@ -53,6 +53,7 @@ class MiracBroker : public wds::Peer::Delegate
         std::string GetLocalIPAddress() const override;
         uint CreateTimer(int seconds) override;
         void ReleaseTimer(uint timer_id) override;
+        int GetNextCSeq(int* initial_peer_cseq = nullptr) const override;
 
         virtual void got_message(const std::string& data) {}
         virtual void on_connected() {};
