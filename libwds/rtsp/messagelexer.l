@@ -43,6 +43,7 @@
 %s SESSION_STATE
 %s MATCH_PRESENTATION_URL
 %s NUM_AS_HEX_MODE
+%s MATCH_EDID_STATE
 
 DIGIT [0-9]
 DIGITS [0-9]+
@@ -52,14 +53,12 @@ SP [ \t]
 CR [\r]
 LF [\n]
 CRLF {CR}{LF}
-IPADDRESS [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}
-IPPORT ({DIGIT}){1,5}
-ERROR ({DIGIT}){3}
-
+IPADDRESS (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
 %%
-  /* skip these */
-<*>[\r] { BEGIN(INITIAL); }
-<*>[\n] { BEGIN(INITIAL); }
+
+<*>{CRLF} { BEGIN(INITIAL); }
+<*>{LF} { BEGIN(INITIAL); }
+<*>{CR} { BEGIN(INITIAL); }
 
  /* Convert these */
 "="  { return '='; }
@@ -107,33 +106,33 @@ ERROR ({DIGIT}){3}
 "supported" return WFD_SUPPORTED;
 
 <NUM_AS_HEX_MODE>{DIGITS} {
-    if (yyleng > 16) {
-      yylval->sval = new std::string(yytext);
-      return WFD_STRING;
-    }
-
     std::string str(yytext, yyleng);
     str += '\0';
+    errno = 0;
     yylval->nval = strtoull(str.c_str(), NULL, 16);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
+    if (errno)
+      yyterminate();
     return WFD_NUM;
   }
 
 <NUM_AS_HEX_MODE>{HEXDIGITS} {
-    if (yyleng > 16) {
-      yylval->sval = new std::string(yytext);
-      return WFD_STRING;
-    }
-
     std::string str(yytext, yyleng);
     str += '\0';
+    errno = 0;
     yylval->nval = strtoull(str.c_str(), NULL, 16);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
+    if (errno)
+      yyterminate();
     return WFD_NUM;
+  }
+
+<MATCH_EDID_STATE>{DIGITS} {
+    yylval->sval = new std::string(yytext);
+    return WFD_STRING;
+  }
+
+<MATCH_EDID_STATE>{HEXDIGITS} {
+    yylval->sval = new std::string(yytext);
+    return WFD_STRING;
   }
 
 ^"wfd_audio_codecs" {
@@ -156,7 +155,7 @@ ERROR ({DIGIT}){3}
   }
 
 ^"wfd_display_edid" {
-    BEGIN(NUM_AS_HEX_MODE);
+    BEGIN(MATCH_EDID_STATE);
     return WFD_DISPLAY_EDID;
   }
 
@@ -233,20 +232,10 @@ ERROR ({DIGIT}){3}
 {DIGITS} {
     std::string str(yytext, yyleng);
     str += '\0';
+    errno = 0;
     yylval->nval = strtoull(str.c_str(), NULL, 10);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
-    return WFD_NUM;
-  }
-
-{HEXDIGITS} {
-    std::string str(yytext, yyleng);
-    str += '\0';
-    yylval->nval = strtoull(str.c_str(), NULL, 16);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
+    if (errno)
+      yyterminate();
     return WFD_NUM;
   }
 

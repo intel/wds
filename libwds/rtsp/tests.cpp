@@ -799,6 +799,87 @@ static bool test_valid_play ()
   return true;
 }
 
+static bool test_number_conversion_header()
+{
+  std::string header("OPTIONS * RTSP/1.0\r\n"
+                     "CSeq: 92233720368547758079223372036854775807\r\n"
+                     "Require: org.wfa.wfd1.0\r\n\r\n");
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message == NULL);
+  return true;
+}
+
+static bool test_number_conversion_body()
+{
+  std::string header("RTSP/1.0 200 OK\r\n"
+                     "CSeq: 2\r\n"
+                     "Content-Type: text/parameters\r\n"
+                     "Content-Length: 101\r\n\r\n");
+  std::string payload_buffer("wfd_client_rtp_ports: RTP/AVP/UDP;unicast 92233720368547758079223372036854775807 0 mode=play\r\n");
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  Driver::Parse(payload_buffer, message);
+  ASSERT(message == NULL);
+
+  return true;
+}
+
+static bool test_hex_number_conversion_body()
+{
+  std::string header("RTSP/1.0 200 OK\r\n"
+                     "CSeq: 2\r\n"
+                     "Content-Type: text/parameters\r\n"
+                     "Content-Length: 101\r\n\r\n");
+  std::string payload_buffer("wfd_audio_codecs: AAC 92233720368547758079223372036854775807 00\r\n");
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  Driver::Parse(payload_buffer, message);
+  ASSERT(message == NULL);
+
+  return true;
+}
+
+static bool test_hex_number_conversion_body_2()
+{
+  std::string header("RTSP/1.0 200 OK\r\n"
+                     "CSeq: 2\r\n"
+                     "Content-Type: text/parameters\r\n"
+                     "Content-Length: 101\r\n\r\n");
+  std::string payload_buffer("wfd_audio_codecs: AAC FFFFFFFFFFFFFFFFF 00\r\n");
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+  Driver::Parse(payload_buffer, message);
+  ASSERT(message == NULL);
+
+  return true;
+}
+
+static bool test_number_conversion_in_errors ()
+{
+  std::string header("RTSP/1.0 303 OK\r\n"
+                     "CSeq: 0\r\n"
+                     "Content-Type: text/parameters\r\n"
+                     "Content-Length: 55\r\n\r\n");
+
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_reply());
+
+  std::string payload_buffer("wfd_audio_codecs: 92233720368547758079223372036854775807\r\n");
+  Driver::Parse(payload_buffer, message);
+  ASSERT(message == NULL);
+
+  return true;
+}
+
 int main(const int argc, const char **argv)
 {
   std::list<TestFunc> tests;
@@ -820,6 +901,11 @@ int main(const int argc, const char **argv)
   tests.push_back(test_valid_extra_properties);
   tests.push_back(test_valid_extra_errors);
   tests.push_back(test_valid_extra_properties_in_get);
+  tests.push_back(test_number_conversion_header);
+  tests.push_back(test_number_conversion_body);
+  tests.push_back(test_hex_number_conversion_body);
+  tests.push_back(test_hex_number_conversion_body_2);
+  tests.push_back(test_number_conversion_in_errors);
 
   // Run tests
   for (std::list<TestFunc>::iterator it=tests.begin(); it!=tests.end(); ++it) {

@@ -35,7 +35,6 @@
 #define yyterminate() return(END)
 %}
 
-DIGIT [0-9]
 DIGITS [0-9]+
 SP [ \t]
 CR [\r]
@@ -44,8 +43,9 @@ CRLF {CR}{LF}
 
 %%
   /* skip these */
-[\r]
-[\n]
+{CRLF} { }
+{LF} { }
+{CR} { }
 
  /* Convert these */
 ","  { return ','; }
@@ -137,10 +137,10 @@ CRLF {CR}{LF}
 {DIGITS} {
     std::string str(yytext, yyleng);
     str += '\0';
+    errno = 0;
     yylval->nval = strtoull(str.c_str(), NULL, 10);
-    if (errno == ERANGE) {
-      // todo: handle error
-    }
+    if (errno)
+      yyterminate();
     return WFD_NUM;
   }
 
