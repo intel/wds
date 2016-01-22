@@ -63,7 +63,7 @@ std::unique_ptr<Message> M6Handler::CreateMessage() {
   // we assume here that there is no coupled secondary sink
   transport->set_client_port(ToSinkMediaManager(manager_)->GetLocalRtpPorts().first);
   setup->header().set_transport(transport);
-  setup->header().set_cseq(send_cseq_++);
+  setup->header().set_cseq(sender_->GetNextCSeq());
   setup->header().set_require_wfd_support(true);
 
   return std::unique_ptr<Message>(setup);
@@ -88,7 +88,7 @@ class M7Handler final : public SequencedMessageSender {
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::Play* play = new rtsp::Play(ToSinkMediaManager(manager_)->GetPresentationUrl());
     play->header().set_session(manager_->GetSessionId());
-    play->header().set_cseq(send_cseq_++);
+    play->header().set_cseq(sender_->GetNextCSeq());
     play->header().set_require_wfd_support(true);
 
     return std::unique_ptr<Message>(play);

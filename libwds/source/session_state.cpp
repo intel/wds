@@ -43,7 +43,7 @@ class M5Handler final : public SequencedMessageSender {
  private:
   std::unique_ptr<Message> CreateMessage() override {
     rtsp::SetParameter* set_param = new rtsp::SetParameter("rtsp://localhost/wfd1.0");
-    set_param->header().set_cseq(send_cseq_++);
+    set_param->header().set_cseq(sender_->GetNextCSeq());
     auto payload = new rtsp::PropertyMapPayload();
     payload->AddProperty(
         std::shared_ptr<rtsp::Property>(new rtsp::TriggerMethod(rtsp::TriggerMethod::SETUP)));

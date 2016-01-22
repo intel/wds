@@ -66,7 +66,7 @@ class M4Handler final : public SequencedMessageSender {
 
 std::unique_ptr<Message> M3Handler::CreateMessage() {
   GetParameter* get_param = new GetParameter("rtsp://localhost/wfd1.0");
-  get_param->header().set_cseq(send_cseq_++);
+  get_param->header().set_cseq(sender_->GetNextCSeq());
   std::vector<std::string> props;
 
   SessionType media_type = ToSourceMediaManager(manager_)->GetSessionType();
@@ -133,7 +133,7 @@ bool M3Handler::HandleReply(Reply* reply) {
 
 std::unique_ptr<Message> M4Handler::CreateMessage() {
   SetParameter* set_param = new SetParameter("rtsp://localhost/wfd1.0");
-  set_param->header().set_cseq(send_cseq_++);
+  set_param->header().set_cseq(sender_->GetNextCSeq());
   SourceMediaManager* source_manager = ToSourceMediaManager(manager_);
   const auto& ports = source_manager->GetSinkRtpPorts();
   auto payload = new rtsp::PropertyMapPayload();

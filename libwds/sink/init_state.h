@@ -32,6 +32,9 @@ namespace sink {
 class InitState : public MessageSequenceHandler {
  public:
   InitState(const InitParams& init_params);
+
+ private:
+  int source_init_cseq_;
 };
 
 }  // sink

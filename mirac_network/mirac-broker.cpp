@@ -276,3 +276,12 @@ void MiracBroker::ReleaseTimer(uint timer_id) {
   }
 }
 
+int MiracBroker::GetNextCSeq(int* initial_peer_cseq) const {
+  static int send_cseq_;
+  ++send_cseq_;
+  if (initial_peer_cseq && send_cseq_ == *initial_peer_cseq)
+    send_cseq_ *= 2;
+
+  return send_cseq_;
+}
+
