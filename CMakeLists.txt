@@ -12,6 +12,7 @@ include(GNUInstallDirs)
 
 add_subdirectory(data)
 add_subdirectory(libwds/rtsp)
+add_subdirectory(libwds/rtsp/tests)
 add_subdirectory(libwds/common)
 add_subdirectory(libwds/source)
 add_subdirectory(libwds/sink)

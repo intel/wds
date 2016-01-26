@@ -13,7 +13,8 @@ Testing/
 libwds/rtsp/gen
 
 # generated binaries
-libwds/rtsp/test-wds
+libwds/rtsp/tests/test-wds
+libwds/rtsp/tests/wdsfuzzer
 sink/sink-test
 p2p/test-ie
 p2p/register-peer-service
