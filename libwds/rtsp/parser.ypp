@@ -314,11 +314,6 @@
 %destructor { DELETE_TOKEN($$); } wfd_parameter_list
 %destructor { DELETE_TOKEN($$); } wfd_audio_codec wfd_audio_codec_list
 
- /* check where we need destructors for discarded symbols
-    http://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
-  %destructor { if($$) delete $$; $$ = 0; } options set_parameter get_parameter setup play
-  %destructor { if($$) delete $$; $$ = 0; } teardown pause wfd_reply command headers */
-  
 %%
 
 start: message
@@ -330,9 +325,13 @@ message:
       $1->set_header(std::unique_ptr<wds::rtsp::Header>($2));
     }
   | payload {
-      message->set_payload(std::unique_ptr<wds::rtsp::Payload>($1));
+      if (message && $1)
+        message->set_payload(std::unique_ptr<wds::rtsp::Payload>($1));
+      else
+        YYERROR;
     }
   | error {
+      message.reset();
       std::cerr << "Unknown message" << std::endl;
     }
   ;
