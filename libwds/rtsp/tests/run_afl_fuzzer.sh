@@ -21,7 +21,7 @@
 
 BASEDIR=$(dirname $0)
 
-xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/header/ -x $BASEDIR/dict/wfd_header.dict -o $2 -M header $BASEDIR/wdsfuzzer --num-lines=6 --header" &
-sleep 1; xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_response/ -x $BASEDIR/dict/wfd_payload_response.dict -o $2 -S payload_response $BASEDIR/wdsfuzzer --num-lines=8 --payload" &
-sleep 1; xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_request/ -x $BASEDIR/dict/wfd_payload_request.dict -o $2 -S payload_request $BASEDIR/wdsfuzzer --num-lines=8 --payload" &
-sleep 1; xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_error/ -x $BASEDIR/dict/wfd_payload_response_error.dict -o $2 -S payload_response_error $BASEDIR/wdsfuzzer --num-lines=8 --error" &
+xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/header/ -x $BASEDIR/dict/wfd_header.dict -o $2_header -T header $BASEDIR/wdsfuzzer --num-lines 6 --header" &
+xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_reply/ -x $BASEDIR/dict/wfd_payload_reply.dict -o $2_payload_reply -T payload_reply $BASEDIR/wdsfuzzer --num-lines 8 --payload-reply" &
+xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_request/ -x $BASEDIR/dict/wfd_payload_request.dict -o $2_payload_request -T payload_request $BASEDIR/wdsfuzzer --num-lines 8 --payload-request" &
+xterm -geometry 80x25 -e "$1 -i $BASEDIR/seed/payload_error/ -x $BASEDIR/dict/wfd_payload_error.dict -o $2_payload_error -T payload_error $BASEDIR/wdsfuzzer --num-lines 8 --payload-error" &

@@ -25,31 +25,23 @@
 
 #include "libwds/rtsp/driver.h"
 #include "libwds/rtsp/message.h"
+#include "libwds/rtsp/reply.h"
+#include "libwds/rtsp/getparameter.h"
 
 using wds::rtsp::Driver;
 
 namespace {
 const char kTestHeaderCommand[] = "--header";
-const char kTestPayloadCommand[] = "--payload";
-const char kTestErrorCommand[] = "--error";
-const char kTestNumLinesCommand[] = "--num-lines=";
-const char kTestTestCaseCommand[] = "--test-case=";
-
-const char kDefaultReplyHeader[] = "RTSP/1.0 200 OK\r\n"
-                                   "CSeq: 2\r\n"
-                                   "Content-Type: text/parameters\r\n"
-                                   "Content-Length: 535\r\n\r\n";
-
-const char kDefaultReplyErrorHeader[] = "RTSP/1.0 303 OK\r\n"
-                                        "CSeq: 0\r\n"
-                                        "Content-Type: text/parameters\r\n"
-                                        "Content-Length: 55\r\n\r\n";
+const char kTestPayloadRequestCommand[] = "--payload-request";
+const char kTestPayloadReplyCommand[] = "--payload-reply";
+const char kTestPayloadErrorCommand[] = "--payload-error";
+const char kTestNumLinesCommand[] = "--num-lines";
+const char kTestTestCaseCommand[] = "--test-case";
 
 int PrintError(const char* program) {
-  std::cerr << "Usage: " << program << " --test-case=ABSOLUTE_PATH_FILE [--header, --payload, --error]" << std::endl;
-  std::cerr << "Usage: " << program << " --num-lines=NUM [--header, --payload, --error]" << std::endl;
-  std::cerr << "Example: " << program << " --num-lines=6 --header" << std::endl;
-  std::cerr << "Example: " << program << " --test-case=test-options-request.txt --header" << std::endl;
+  std::cerr << "Usage: " << program << " [--num-lines NUM | --test-case ABSOLUTE_PATH_FILE] [--header | --payload-request | --payload-reply | --payload-error]" << std::endl;
+  std::cerr << "Example: " << program << " --num-lines 6 --header" << std::endl;
+  std::cerr << "Example: " << program << " --test-case test-options-request.txt --header" << std::endl;
   return 1;
 }
 
@@ -58,6 +50,8 @@ std::string GetBufferFromStdin(int num_lines) {
   while(num_lines--) {
     getline(std::cin, input);
     buffer += input;
+    if (num_lines)
+      buffer += "\r\n";
   }
   return buffer;
 }
@@ -78,29 +72,29 @@ std::string GetBufferFromFile(const std::string& file) {
 int main(const int argc, const char **argv)
 {
   // Program name, number of lines to be read, type of message
-  if (argc < 3)
+  if (argc < 4)
     return PrintError(argv[0]);
 
   std::string buffer;
-  std::string filename;
-  std::string arg(argv[1]);
-
-  if (arg.compare(0, strlen(kTestNumLinesCommand), kTestNumLinesCommand) == 0)
-    buffer = GetBufferFromStdin(atoi(arg.substr(strlen(kTestNumLinesCommand)).c_str()));
-  else if (arg.compare(0, strlen(kTestTestCaseCommand), kTestTestCaseCommand) == 0)
-    buffer = GetBufferFromFile(arg.substr(strlen(kTestNumLinesCommand)));
+  if (strncmp(argv[1], kTestNumLinesCommand, strlen(kTestNumLinesCommand)) == 0)
+    buffer = GetBufferFromStdin(atoi(argv[2])) + "\r\n\r\n";
+  else if (strncmp(argv[1], kTestTestCaseCommand, strlen(kTestTestCaseCommand)) == 0)
+    buffer = GetBufferFromFile(argv[2]);
   else
     return PrintError(argv[0]);
 
   std::unique_ptr<wds::rtsp::Message> message;
 
-  if (std::string(argv[2]) == kTestHeaderCommand) {
+  if (strcmp(argv[3], kTestHeaderCommand) == 0) {
     Driver::Parse(buffer, message);
-  } else if (std::string(argv[2]) == kTestPayloadCommand) {
-    Driver::Parse(kDefaultReplyHeader, message);
+  } else if (strcmp(argv[3], kTestPayloadReplyCommand) == 0) {
+    message.reset(new wds::rtsp::Reply());
     Driver::Parse(buffer, message);
-  } else if (std::string(argv[2]) == kTestErrorCommand) {
-    Driver::Parse(kDefaultReplyErrorHeader, message);
+  } else if (strcmp(argv[3], kTestPayloadRequestCommand) == 0) {
+    message.reset(new wds::rtsp::GetParameter("rtsp://localhost/wfd1.0"));
+    Driver::Parse(buffer, message);
+  } else if (strcmp(argv[3], kTestPayloadErrorCommand) == 0) {
+    message.reset(new wds::rtsp::Reply(303));
     Driver::Parse(buffer, message);
   } else {
     return PrintError(argv[0]);
