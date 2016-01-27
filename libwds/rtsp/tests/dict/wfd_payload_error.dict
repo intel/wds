@@ -40,5 +40,3 @@ payload_wfd_connector_type="wfd-connector-type:"
 payload_wfd_idr_request="wfd-idr-request:"
 
 token_SEPARATOR=", "
-token_newline="0x0d0x0a"
-error_code="404"
