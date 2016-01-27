@@ -54,6 +54,8 @@ CR [\r]
 LF [\n]
 CRLF {CR}{LF}
 IPADDRESS (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+IPPORT [:]({DIGIT}){1,5}
+
 %%
 
 <*>{CRLF} { BEGIN(INITIAL); }
@@ -277,12 +279,12 @@ IPADDRESS (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-
   return WFD_TAG;
   }
 
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=0" {
+<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=0" {
     yylval->sval = new std::string(yytext);
     return WFD_PRESENTATION_URL_0;
   }
 
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}"/wfd1.0/streamid=1" {
+<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=1" {
     yylval->sval = new std::string(yytext);
     return WFD_PRESENTATION_URL_1;
   }
