@@ -333,6 +333,7 @@ message:
   | error {
       message.reset();
       std::cerr << "Unknown message" << std::endl;
+      YYABORT;
     }
   ;
 
