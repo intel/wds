@@ -50,12 +50,12 @@ bool InitializeRequestId(Request* request) {
     break;
   case Request::MethodGetParameter:
     if (auto payload = rtsp::ToGetParameterPayload(request->payload())) {
-      if (payload->properties().empty())
-        id = Request::M16;
-      else
+      if (!payload->properties().empty())
         id = Request::M3;
-      break;
+    } else {
+      id = Request::M16;
     }
+    break;
   case Request::MethodSetParameter:
     if (auto payload = rtsp::ToPropertyMapPayload(request->payload())) {
       if (payload->HasProperty(rtsp::PresentationURLPropertyType))
