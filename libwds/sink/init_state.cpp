@@ -44,7 +44,7 @@ class M1Handler final : public MessageReceiver<Request::M1> {
     supported_methods.push_back(rtsp::GET_PARAMETER);
     supported_methods.push_back(rtsp::SET_PARAMETER);
     reply->header().set_supported_methods(supported_methods);
-    return std::move(reply);
+    return reply;
   }
 
  private:
