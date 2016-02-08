@@ -118,7 +118,7 @@ std::unique_ptr<Reply> M3Handler::HandleMessage(Message* message) {
   }
   reply->set_payload(std::unique_ptr<Payload>(reply_payload));
 
-  return std::move(reply);
+  return reply;
 }
 
 
@@ -162,7 +162,7 @@ std::unique_ptr<Reply> M4Handler::HandleMessage(Message* message) {
         std::make_shared<rtsp::PropertyErrors>(rtsp::VideoFormatsPropertyType, error_codes);
     payload->AddPropertyError(property_errors);
     reply->set_payload(std::unique_ptr<rtsp::Payload>(payload));
-    return std::move(reply);
+    return reply;
   }
 
   return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
@@ -188,7 +188,7 @@ class M5Handler final : public MessageReceiver<Request::M5> {
       reply->set_response_code(rtsp::STATUS_SeeOther);
     }
 
-    return std::move(reply);
+    return reply;
   }
 };
 

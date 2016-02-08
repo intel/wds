@@ -21,7 +21,7 @@
 
 #include "libwds/rtsp/property.h"
 
-#include <cassert>
+#include "libwds/public/logging.h"
 
 namespace wds {
 namespace rtsp {
@@ -66,7 +66,7 @@ std::string GetPropertyName(PropertyType type) {
     case DisplayEdidPropertyType:
       return PropertyName::wfd_display_edid;
     case GenericPropertyType:
-      assert(!"Generic property does not have a defined name");
+      WDS_ERROR("Generic property does not have a defined name");
       return std::string();
     case I2CPropertyType:
       return PropertyName::wfd_I2C;
@@ -93,7 +93,7 @@ std::string GetPropertyName(PropertyType type) {
     case VideoFormatsPropertyType:
       return PropertyName::wfd_video_formats;
     default:
-      assert(!"Unknown property type");
+      WDS_ERROR("Unknown property type %d", type);
       return std::string();
   }
 }

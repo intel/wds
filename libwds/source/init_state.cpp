@@ -66,7 +66,7 @@ class M2Handler final : public MessageReceiver<Request::M2> {
     supported_methods.push_back(rtsp::SETUP);
     supported_methods.push_back(rtsp::TEARDOWN);
     reply->header().set_supported_methods(supported_methods);
-    return std::move(reply);
+    return reply;
   }
 };
 

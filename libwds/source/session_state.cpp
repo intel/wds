@@ -76,7 +76,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
     transport->set_server_port(ToSourceMediaManager(manager_)->GetLocalRtpPort());
     reply->header().set_transport(transport);
 
-    return std::move(reply);
+    return reply;
   }
 
   void Handle(std::unique_ptr<Message> message) override {

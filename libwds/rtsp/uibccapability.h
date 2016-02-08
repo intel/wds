@@ -76,7 +76,6 @@ class UIBCCapability: public Property {
   std::vector<InputType> generic_capabilities_;
   std::vector<DetailedCapability> hidc_capabilities_;
   int tcp_port_;
-  bool has_capabilities_;
 };
 
 }  // namespace rtsp
