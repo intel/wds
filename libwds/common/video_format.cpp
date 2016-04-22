@@ -21,19 +21,13 @@
 
 #include "libwds/public/media_manager.h"
 
-#include <algorithm>
 #include <assert.h>
+
+#include <algorithm>
 
 #include "libwds/public/logging.h"
 
 namespace wds {
-
-// FIXME : find a better place for log functions initialization.
-static void Dummy(const char*, ...) {}
-LogSystem::LogFunction LogSystem::log_func_ = &Dummy;
-LogSystem::LogFunction LogSystem::vlog_func_ = &Dummy;
-LogSystem::LogFunction LogSystem::warning_func_ = &Dummy;
-LogSystem::LogFunction LogSystem::error_func_ = &Dummy;
 
 namespace {
 // Quality weight is calculated using following formula:
