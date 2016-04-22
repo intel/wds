@@ -31,7 +31,7 @@ class SinkMediaManager;
 /**
  * Sink state machine implementation
  */
-class WDS_EXPORT Sink : public Peer {
+class Sink : public Peer {
  public:
   virtual ~Sink() {}
 

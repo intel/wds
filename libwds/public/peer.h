@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "wds_export.h"
-
 namespace wds {
 
 enum ErrorType {
@@ -43,7 +41,7 @@ enum ErrorType {
  *
  * Peer is a base class for sink and source state machines.
  */
-class WDS_EXPORT Peer {
+class Peer {
  public:
   /**
    * Delegate interface.

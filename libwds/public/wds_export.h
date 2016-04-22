@@ -22,11 +22,6 @@
 #ifndef LIBWDS_PUBLIC_WDS_EXPORT_H_
 #define LIBWDS_PUBLIC_WDS_EXPORT_H_
 
-#if defined _WIN32 || defined _WIN64
-  #define WDS_EXPORT __declspec(dllexport)
-#else
-  #define WDS_EXPORT __attribute__((visibility("default")))
-#endif
-
+#define WDS_EXPORT __attribute__((visibility("default")))
 
 #endif  // LIBWDS_PUBLIC_WDS_EXPORT_H_
