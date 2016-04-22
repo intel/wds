@@ -27,10 +27,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  */
+
+#include <stdint.h>
+
+#define YY_NO_UNISTD_H 1
 }
 
 %{
 #include <string>
+
 #include "parser.h"
 #define yyterminate() return(END)
 %}

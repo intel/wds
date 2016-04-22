@@ -31,7 +31,7 @@ class SourceMediaManager;
 /**
  * Source state machine implementation
  */
-class Source : public Peer {
+class WDS_EXPORT Source : public Peer {
  public:
   /**
    * Factory method that creates Source state machine.

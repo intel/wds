@@ -3,7 +3,7 @@
 WDS is a set of libraries for developers who want to build Wi-Fi Display applications on linux.
 
 WDS consists of:
- * libwds: Main library implements a Wi-Fi Display dialect of RTSP that includes the parser, actual negotiation logic for sink and source, and the related data structures. It is not tied to any specific connection manager, media framework or main loop
+ * libwds: Main library implements a Wi-Fi Display dialect of RTSP that includes the parser, actual negotiation logic for sink and source, and the related data structures. It is not tied to any specific connection manager, media framework or main loop. This Library is also compatible with MSVC.
  * network: Supports integration with GLib main loop and GStreamer
  * p2p: Supports integration with Connman Wifi P2P features
 
