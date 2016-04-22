@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(wds CXX)
 
 set(WDS_VERSION_MAJOR 1)
-set(WDS_VERSION_MINOR 0)
+set(WDS_VERSION_MINOR 1)
 set(WDS_VERSION_PATCH 0)
 
 enable_testing()
