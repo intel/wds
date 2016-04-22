@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "wds_export.h"
+
 namespace wds {
 
 enum ErrorType {
@@ -41,7 +43,7 @@ enum ErrorType {
  *
  * Peer is a base class for sink and source state machines.
  */
-class Peer {
+class WDS_EXPORT Peer {
  public:
   /**
    * Delegate interface.
@@ -66,12 +68,12 @@ class Peer {
      * @param seconds the time interval in seconds
      * @return unique timer id within the session
      */
-    virtual uint CreateTimer(int seconds) = 0;
+    virtual unsigned CreateTimer(int seconds) = 0;
     /**
      * The implementation should release timer by the given id.
      * @param timer_id id of the timer to be released.
      */
-    virtual void ReleaseTimer(uint timer_id) = 0;
+    virtual void ReleaseTimer(unsigned timer_id) = 0;
 
     /**
      * Returns the sequence number for the following RTSP request-response pair
@@ -165,7 +167,7 @@ class Peer {
    *
    * @see Delegate::CreateTimer()
    */
-  virtual void OnTimerEvent(uint timer_id) = 0;
+  virtual void OnTimerEvent(unsigned timer_id) = 0;
 };
 
 }

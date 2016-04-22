@@ -39,45 +39,45 @@ class WDS_EXPORT LogSystem {
    * Sets a function to log a normal message.
    * @param function to log a normal message
    */
-  static void set_log_func(LogFunction func) { log_func_ = func; }
+  static void set_log_func(LogFunction func);
   /**
    * Gets a function to log a normal message @see set_log_func
    * @return function to log a normal message
    */
-  static LogFunction log_func() { return log_func_; }
+  static LogFunction log_func();
 
   /**
    * Sets a function to log a verbose message.
    * @param function to log a verbose message
    */
-  static void set_vlog_func(LogFunction func) { vlog_func_ = func; }
+  static void set_vlog_func(LogFunction func);
   /**
    * Gets a function to log a verbose message @see set_vlog_func
    * @return function to log a verbose message
    */
-  static LogFunction vlog_func() { return vlog_func_; }
+  static LogFunction vlog_func();
 
   /**
    * Sets a function to log a warning message.
    * @param function to log a warning message
    */
-  static void set_warning_func(LogFunction func) { warning_func_ = func; }
+  static void set_warning_func(LogFunction func);
   /**
    * Gets a function to log a warning message @see set_warning_func
    * @return function to log a warning message
    */
-  static LogFunction warning_func() { return warning_func_; }
+  static LogFunction warning_func();
 
   /**
    * Sets a function to log an error message.
    * @param function to log an error message
    */
-  static void set_error_func(LogFunction func) { error_func_ = func; }
+  static void set_error_func(LogFunction func);
   /**
    * Gets a function to log an error message @see set_error_func
    * @return function to log an error message
    */
-  static LogFunction error_func() { return error_func_; }
+  static LogFunction error_func();
 
  private:
   static LogFunction log_func_;

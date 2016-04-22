@@ -59,7 +59,7 @@ class M5Handler final : public SequencedMessageSender {
 
 class M6Handler final : public MessageReceiver<Request::M6> {
  public:
-  M6Handler(const InitParams& init_params, uint& timer_id)
+  M6Handler(const InitParams& init_params, unsigned& timer_id)
     : MessageReceiver<Request::M6>(init_params),
       keep_alive_timer_(timer_id) {
   }
@@ -85,7 +85,7 @@ class M6Handler final : public MessageReceiver<Request::M6> {
         sender_->CreateTimer(kDefaultTimeoutValue);
   }
 
-  uint& keep_alive_timer_;
+  unsigned& keep_alive_timer_;
 };
 
 M7Handler::M7Handler(const InitParams& init_params)
@@ -108,7 +108,7 @@ bool M16Sender::HandleReply(Reply* reply) {
   return (reply->response_code() == rtsp::STATUS_OK);
 }
 
-SessionState::SessionState(const InitParams& init_params, uint& timer_id,
+SessionState::SessionState(const InitParams& init_params, unsigned& timer_id,
     MessageHandlerPtr& m16_sender)
   : MessageSequenceWithOptionalSetHandler(init_params) {
   AddSequencedHandler(make_ptr(new M5Handler(init_params)));

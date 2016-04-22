@@ -5,6 +5,7 @@
 %option case-insensitive
 %option extra-type="bool"
 %option outfile="gen/headerscanner.cpp" header-file="gen/headerscanner.h"
+%option nounistd
 
 %top{
 /*
@@ -30,7 +31,10 @@
 }
 
 %{
+#include <stdint.h>
+
 #include <string>
+
 #include "parser.h"
 #define yyterminate() return(END)
 %}

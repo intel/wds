@@ -78,7 +78,7 @@ class MessageHandler : public std::enable_shared_from_this<MessageHandler> {
   virtual void Handle(std::unique_ptr<rtsp::Message> message) = 0;
 
   // For handlers that require timeout
-  virtual bool HandleTimeoutEvent(uint timer_id) const;
+  virtual bool HandleTimeoutEvent(unsigned timer_id) const;
 
   void set_observer(Observer* observer) {
     assert(observer);
@@ -114,7 +114,7 @@ class MessageSequenceHandler : public MessageHandler,
   bool CanHandle(rtsp::Message* message) const override;
   void Handle(std::unique_ptr<rtsp::Message> message) override;
 
-  bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(unsigned timer_id) const override;
 
  protected:
   void AddSequencedHandler(MessageHandlerPtr handler);
@@ -137,7 +137,7 @@ class MessageSequenceWithOptionalSetHandler : public MessageSequenceHandler {
   bool CanHandle(rtsp::Message* message) const override;
   void Handle(std::unique_ptr<rtsp::Message> message) override;
 
-  bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(unsigned timer_id) const override;
 
  protected:
   void AddOptionalHandler(MessageHandlerPtr handler);
@@ -196,7 +196,7 @@ class MessageSenderBase : public MessageHandler {
   virtual bool HandleReply(rtsp::Reply* reply) = 0;
   void Send(std::unique_ptr<rtsp::Message> message) override;
   void Reset() override;
-  bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(unsigned timer_id) const override;
 
 
  private:
@@ -207,7 +207,7 @@ class MessageSenderBase : public MessageHandler {
 
   struct ParcelData {
     int cseq;
-    uint timer_id;
+    unsigned timer_id;
   };
   std::list<ParcelData> parcel_queue_;
 };

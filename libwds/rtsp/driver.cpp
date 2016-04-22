@@ -22,6 +22,8 @@
 
 #include "libwds/rtsp/driver.h"
 
+#include <stdint.h>
+
 #include <cctype>
 #include <sstream>
 

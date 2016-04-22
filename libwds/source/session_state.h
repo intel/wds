@@ -31,7 +31,7 @@ namespace source {
 // Includes M5, M6, M7 messages handling and optionally can handle M3, M4, M8
 class SessionState : public MessageSequenceWithOptionalSetHandler {
  public:
-  SessionState(const InitParams& init_params, uint& timer_id,
+  SessionState(const InitParams& init_params, unsigned& timer_id,
       MessageHandlerPtr& m16_sender);
   ~SessionState() override;
 };
