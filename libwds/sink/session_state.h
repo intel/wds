@@ -29,24 +29,24 @@ namespace sink {
 
 class M6Handler final : public SequencedMessageSender {
  public:
-  M6Handler(const InitParams& init_params, uint& keep_alive_timer);
+  M6Handler(const InitParams& init_params, unsigned& keep_alive_timer);
 
  private:
   std::unique_ptr<rtsp::Message> CreateMessage() override;
   bool HandleReply(rtsp::Reply* reply) override;
 
-  uint& keep_alive_timer_;
+  unsigned& keep_alive_timer_;
 };
 
 class M16Handler final : public MessageReceiver<rtsp::Request::M16> {
  public:
-  M16Handler(const InitParams& init_params, uint& keep_alive_timer);
+  M16Handler(const InitParams& init_params, unsigned& keep_alive_timer);
 
  private:
-  bool HandleTimeoutEvent(uint timer_id) const override;
+  bool HandleTimeoutEvent(unsigned timer_id) const override;
   std::unique_ptr<rtsp::Reply> HandleMessage(rtsp::Message* message) override;
 
-  uint& keep_alive_timer_;
+  unsigned& keep_alive_timer_;
 };
 
 // WFD session state for RTSP sink.

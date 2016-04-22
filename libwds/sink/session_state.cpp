@@ -37,11 +37,11 @@ using rtsp::Reply;
 
 namespace sink {
 
-M16Handler::M16Handler(const InitParams& init_params, uint& keep_alive_timer)
+M16Handler::M16Handler(const InitParams& init_params, unsigned& keep_alive_timer)
   : MessageReceiver<Request::M16>(init_params),
     keep_alive_timer_(keep_alive_timer) { }
 
-bool M16Handler::HandleTimeoutEvent(uint timer_id) const {
+bool M16Handler::HandleTimeoutEvent(unsigned timer_id) const {
   return timer_id == keep_alive_timer_;
 }
 
@@ -53,7 +53,7 @@ std::unique_ptr<Reply> M16Handler::HandleMessage(Message* message) {
   return std::unique_ptr<Reply>(new Reply(rtsp::STATUS_OK));
 }
 
-M6Handler::M6Handler(const InitParams& init_params, uint& keep_alive_timer)
+M6Handler::M6Handler(const InitParams& init_params, unsigned& keep_alive_timer)
   : SequencedMessageSender(init_params),
     keep_alive_timer_(keep_alive_timer) {}
 

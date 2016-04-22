@@ -88,7 +88,7 @@ bool InitializeRequestId(Request* request) {
 
 class SourceStateMachine : public MessageSequenceHandler {
  public:
-   SourceStateMachine(const InitParams& init_params, uint& timer_id)
+   SourceStateMachine(const InitParams& init_params, unsigned& timer_id)
      : MessageSequenceHandler(init_params) {
      MessageHandlerPtr m16_sender = make_ptr(new source::M16Sender(init_params));
      AddSequencedHandler(make_ptr(new source::InitState(init_params)));
@@ -115,7 +115,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   void OnCompleted(MessageHandlerPtr handler) override;
   void OnError(MessageHandlerPtr handler) override;
 
-  void OnTimerEvent(uint timer_id) override;
+  void OnTimerEvent(unsigned timer_id) override;
 
   // RTSPInputHandler
   void MessageParsed(std::unique_ptr<Message> message) override;
@@ -125,7 +125,7 @@ class SourceImpl final : public Source, public RTSPInputHandler, public MessageH
   void SendKeepAlive();
   void ResetAndTeardownMedia();
 
-  uint keep_alive_timer_;
+  unsigned keep_alive_timer_;
   std::shared_ptr<SourceStateMachine> state_machine_;
   Delegate* delegate_;
   SourceMediaManager* media_manager_;
@@ -153,7 +153,7 @@ void SourceImpl::RTSPDataReceived(const std::string& message) {
   AddInput(message);
 }
 
-void SourceImpl::OnTimerEvent(uint timer_id) {
+void SourceImpl::OnTimerEvent(unsigned timer_id) {
   if (keep_alive_timer_ == timer_id)
     SendKeepAlive();
   else if (state_machine_->HandleTimeoutEvent(timer_id) && observer_)
@@ -254,7 +254,7 @@ void SourceImpl::ParserErrorOccurred(const std::string& invalid_input) {
     observer_->ErrorOccurred(MessageParseError);
 }
 
-WDS_EXPORT Source* Source::Create(Delegate* delegate, SourceMediaManager* mng, Peer::Observer* observer) {
+Source* Source::Create(Delegate* delegate, SourceMediaManager* mng, Peer::Observer* observer) {
   return new SourceImpl(delegate, mng, observer);
 }
 

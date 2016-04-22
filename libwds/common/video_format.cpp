@@ -33,9 +33,9 @@ namespace {
 // Quality weight is calculated using following formula:
 // width * height * fps * 2 for progressive or 1 for interlaced frames
 struct QualityInfo {
-  uint width;
-  uint height;
-  uint weight;
+  unsigned width;
+  unsigned height;
+  unsigned weight;
 };
 
 const QualityInfo cea_info_table[] = {
@@ -145,9 +145,9 @@ QualityInfo get_quality_info(const H264VideoFormat& format) {
   return info;
 }
 
-std::pair<uint, uint> get_resolution(const H264VideoFormat& format) {
+std::pair<unsigned, unsigned> get_resolution(const H264VideoFormat& format) {
   QualityInfo info = get_quality_info(format);
-  return std::pair<uint, uint>(info.width, info.height);
+  return std::pair<unsigned, unsigned>(info.width, info.height);
 }
 
 bool video_format_sort_func(const H264VideoFormat& a, const H264VideoFormat& b) {

@@ -94,7 +94,7 @@ class SinkStateMachine : public MessageSequenceHandler {
      : SinkStateMachine({sender, mng, this}) {}
 
  private:
-   uint keep_alive_timer_;
+   unsigned keep_alive_timer_;
 };
 
 class SinkImpl final : public Sink, public RTSPInputHandler, public MessageHandler::Observer {
@@ -116,7 +116,7 @@ class SinkImpl final : public Sink, public RTSPInputHandler, public MessageHandl
   // public MessageHandler::Observer
   void OnCompleted(MessageHandlerPtr handler) override;
   void OnError(MessageHandlerPtr handler) override;
-  void OnTimerEvent(uint timer_id) override;
+  void OnTimerEvent(unsigned timer_id) override;
 
   bool HandleCommand(std::unique_ptr<Message> command);
 
@@ -207,12 +207,12 @@ void SinkImpl::OnError(MessageHandlerPtr handler) {
    ResetAndTeardownMedia();
 }
 
-void SinkImpl::OnTimerEvent(uint timer_id) {
+void SinkImpl::OnTimerEvent(unsigned timer_id) {
   if (state_machine_->HandleTimeoutEvent(timer_id))
     state_machine_->Reset();
 }
 
-WDS_EXPORT Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
+Sink* Sink::Create(Delegate* delegate, SinkMediaManager* mng) {
   return new SinkImpl(delegate, mng);
 }
 

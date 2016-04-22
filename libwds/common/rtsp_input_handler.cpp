@@ -70,7 +70,7 @@ bool RTSPInputHandler::ParseHeader() {
 
 bool RTSPInputHandler::ParsePayload() {
   assert(message_);
-  uint content_length = message_->header().content_length();
+  unsigned content_length = message_->header().content_length();
   if (content_length == 0) {
     MessageParsed(std::move(message_));
     return true;
