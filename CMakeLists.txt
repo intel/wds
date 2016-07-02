@@ -8,6 +8,8 @@ set(WDS_VERSION_PATCH 0)
 
 enable_testing()
 
+option(WDS_INSTALL_TESTS "Install test programs" off)
+
 include(GNUInstallDirs)
 
 add_subdirectory(data)

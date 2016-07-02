@@ -18,3 +18,7 @@ add_executable(test-ie test-ie.cpp)
 target_link_libraries (test-ie p2p ${GIO_LIBRARIES})
 
 add_test(InformationElementTest test-ie)
+
+if (WDS_INSTALL_TESTS)
+  install(PROGRAMS test-ie DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+endif()
