@@ -46,8 +46,12 @@ void MiracBrokerSource::on_connection_failure(ConnectionFailure failure) {
   switch (failure) {
       case CONNECTION_LOST:
           std::cout << "* RTSP connection lost" << std::endl;
+          break;
       case CONNECTION_TIMEOUT:
           std::cout << "* RTSP connection failed: timeout" << std::endl;
+          break;
+      default:
+          std::cout << "* RTSP connection failure" << std::endl;
   }
 }
 
