@@ -59,13 +59,7 @@ bool RTSPInputHandler::ParseHeader() {
 
   const std::string& header = rtsp_input_buffer_.substr(0, eom + delimiter_length);
   rtsp_input_buffer_.erase(0, eom + delimiter_length);
-  Driver::Parse(header, message_);
-  if (!message_) {
-    ParserErrorOccurred(rtsp_input_buffer_);
-    rtsp_input_buffer_.clear();
-    return false;
-  }
-  return true;
+  return Parse(header);
 }
 
 bool RTSPInputHandler::ParsePayload() {
@@ -81,8 +75,21 @@ bool RTSPInputHandler::ParsePayload() {
 
   const std::string& payload = rtsp_input_buffer_.substr(0, content_length);
   rtsp_input_buffer_.erase(0, content_length);
-  Driver::Parse(payload, message_);
+  if (!Parse(payload))
+    return false;
+
   MessageParsed(std::move(message_));
+  return true;
+}
+
+bool RTSPInputHandler::Parse(const std::string& input) {
+  Driver::Parse(input, message_);
+  if (!message_) {
+    ParserErrorOccurred(rtsp_input_buffer_);
+    rtsp_input_buffer_.clear();
+    return false;
+  }
+
   return true;
 }
 

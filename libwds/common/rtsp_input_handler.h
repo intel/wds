@@ -46,6 +46,7 @@ class RTSPInputHandler {
  private:
   bool ParseHeader();
   bool ParsePayload();
+  bool Parse(const std::string& input);
 
   std::string rtsp_input_buffer_;
   std::unique_ptr<rtsp::Message> message_;
