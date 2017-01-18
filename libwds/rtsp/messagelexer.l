@@ -284,12 +284,12 @@ IPPORT [:]({DIGIT}){1,5}
   return WFD_TAG;
   }
 
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=0" {
+<MATCH_PRESENTATION_URL>"rtsp://"{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=0" {
     yylval->sval = new std::string(yytext);
     return WFD_PRESENTATION_URL_0;
   }
 
-<MATCH_PRESENTATION_URL>"rtsp://"[^ \t\n]+{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=1" {
+<MATCH_PRESENTATION_URL>"rtsp://"{IPADDRESS}{IPPORT}?"/wfd1.0/streamid=1" {
     yylval->sval = new std::string(yytext);
     return WFD_PRESENTATION_URL_1;
   }

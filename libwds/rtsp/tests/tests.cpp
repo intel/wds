@@ -750,6 +750,44 @@ static bool test_valid_set_parameter_url_with_port ()
   return true;
 }
 
+static bool test_valid_set_parameter_with_all_ipv4_url ()
+{
+  std::string header("SET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n"
+                     "CSeq: 3\r\n"
+                     "Content-Type: text/parameters\r\n"
+                     "Content-Length: 61\r\n\r\n");
+  std::string payload_buffer("wfd_presentation_URL: rtsp://0.0.0.0/wfd1.0/streamid=0 none\r\n");
+
+  std::unique_ptr<wds::rtsp::Message> message;
+  Driver::Parse(header, message);
+  ASSERT(message != NULL);
+  ASSERT(message->is_request());
+  Driver::Parse(payload_buffer, message);
+  ASSERT(message != NULL);
+  wds::rtsp::Request* request = wds::rtsp::ToRequest(message.get());
+  ASSERT_EQUAL(request->method(), wds::rtsp::Request::MethodSetParameter);
+  ASSERT_EQUAL(request->request_uri(), "rtsp://localhost/wfd1.0");
+  ASSERT_EQUAL(request->header().cseq(), 3);
+  ASSERT_EQUAL(request->header().content_length(), 61);
+  ASSERT_EQUAL(request->header().require_wfd_support(), false);
+
+  auto payload = ToPropertyMapPayload(message->payload());
+  ASSERT(payload);
+  std::shared_ptr<wds::rtsp::Property> prop;
+
+  ASSERT_NO_EXCEPTION (prop =
+      payload->GetProperty(wds::rtsp::PresentationURLPropertyType));
+
+  std::shared_ptr<wds::rtsp::PresentationUrl> presentation_url =
+      std::static_pointer_cast<wds::rtsp::PresentationUrl> (prop);
+
+  ASSERT_EQUAL(presentation_url->presentation_url_1(), "rtsp://0.0.0.0/wfd1.0/streamid=0");
+
+  ASSERT_EQUAL(request->ToString(), header + payload_buffer);
+
+  return true;
+}
+
 static bool test_valid_setup ()
 {
   std::string header("SETUP rtsp://10.82.24.140/wfd1.0/streamid=0 RTSP/1.0\r\n"
@@ -928,6 +966,7 @@ int main(const int argc, const char **argv)
   tests.push_back(test_valid_setup_reply);
   tests.push_back(test_valid_set_parameter);
   tests.push_back(test_valid_set_parameter_url_with_port);
+  tests.push_back(test_valid_set_parameter_with_all_ipv4_url);
   tests.push_back(test_valid_setup);
   tests.push_back(test_valid_play);
   tests.push_back(test_invalid_property_value);
