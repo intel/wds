@@ -9,6 +9,10 @@ target_link_libraries (test-wds)
 
 add_test(WfdTest test-wds)
 
+if (WDS_INSTALL_TESTS)
+  install(PROGRAMS test-wds DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+endif()
+
 OPTION(WDS_FUZZER "Binary that is used for fuzzer tests." OFF)
 IF(WDS_FUZZER)
 add_executable(wdsfuzzer wdsfuzzer.cpp $<TARGET_OBJECTS:wdsrtsp> $<TARGET_OBJECTS:wdscommon>)

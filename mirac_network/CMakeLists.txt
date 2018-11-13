@@ -24,3 +24,7 @@ target_link_libraries (network-test ${GLIB2_LIBRARIES} mirac)
 
 add_executable(gst-test gst-test.cpp)
 target_link_libraries (gst-test mirac wds ${GLIB2_LIBRARIES} ${GIO_LIBRARIES} ${GST_LIBRARIES})
+
+if (WDS_INSTALL_TESTS)
+  install(PROGRAMS network-test gst-test DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+endif()

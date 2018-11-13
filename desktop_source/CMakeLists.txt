@@ -21,3 +21,7 @@ include_directories(${GST_INCLUDE_DIRS})
 
 add_executable(desktop-source-test main.cpp source-app.cpp mirac_broker_source.cpp desktop_media_manager.cpp)
 target_link_libraries (desktop-source-test  mirac wds p2p ${GIO_LIBRARIES} ${GST_LIBRARIES})
+
+if (WDS_INSTALL_TESTS)
+  install(PROGRAMS desktop-source-test DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+endif()
