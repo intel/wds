@@ -63,7 +63,7 @@ SinkApp::SinkApp(){
 
     // register the P2P service with connman
     std::cout << "* Registering Wifi Display" <<  std::endl;
-    p2p_client_.reset(new P2P::Client(params, this));
+    p2p_client_.reset(new P2P::ConnmanClient(params, this));
 }
 
 SinkApp::SinkApp(const std::string& hostname, int port)

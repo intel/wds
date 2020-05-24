@@ -25,42 +25,24 @@
 #include <memory>
 #include <gio/gio.h>
 
+#include "client.h"
 #include "information-element.h"
 #include "connman-peer.h"
 
 namespace P2P {
 
-class Client {
+class ConnmanClient : public Client {
     public:
-        class Observer {
-            public:
-                virtual void on_peer_added(Client *client, std::shared_ptr<P2P::Peer> peer) {}
-                virtual void on_peer_removed(Client *client, std::shared_ptr<P2P::Peer> peer) {}
-                virtual void on_availability_changed(Client *client) {}
+        ConnmanClient(const Parameters &params, Observer *observer = NULL);
+        virtual ~ConnmanClient();
 
-            protected:
-                virtual ~Observer() {}
-        };
+        void set_parameters(const Parameters &params) override;
 
-        struct Parameters {
-            bool source;
-            bool sink;
-            uint16_t session_management_control_port;
-        };
-
-        Client(const Parameters &params, Observer *observer = NULL);
-        virtual ~Client();
-
-        void set_parameters(const Parameters &params);
-        void set_observer(Observer* observer) {
-            observer_ = observer;
-        }
-
-        bool is_available() const;
+        bool is_available() const override;
         /* TODO error / finished handling */
-        void scan();
+        void scan() override;
 
-    private:
+    protected:
         static void connman_appeared_cb(GDBusConnection *connection, const char *name, const char *owner, gpointer data_ptr);
         static void connman_disappeared_cb(GDBusConnection *connection, const char *name, gpointer data_ptr);
         static void proxy_signal_cb (GDBusProxy *proxy, const char *sender, const char *signal, GVariant *params, gpointer data_ptr);
@@ -87,9 +69,7 @@ class Client {
         GDBusProxy *proxy_;
         GDBusProxy *technology_proxy_;
 
-        Observer* observer_;
         std::unique_ptr<P2P::InformationElementArray>array_;
-        std::map<std::string, std::shared_ptr<P2P::Peer>> peers_;
 };
 
 }

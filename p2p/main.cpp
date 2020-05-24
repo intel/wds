@@ -44,7 +44,7 @@ int main (int argc, const char **argv)
 
     // register the P2P service with connman
     std::cout << "Registering" <<  std::endl;
-    P2P::Client p2p_client (params);
+    P2P::ConnmanClient p2p_client (params);
 
     g_main_loop_run (main_loop);
     g_main_loop_unref (main_loop);
