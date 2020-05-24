@@ -42,10 +42,16 @@ class Client {
                 virtual ~Observer() {}
         };
 
-        Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer = NULL);
+        struct Parameters {
+            bool source;
+            bool sink;
+            uint16_t session_management_control_port;
+        };
+
+        Client(const Parameters &params, Observer *observer = NULL);
         virtual ~Client();
 
-        void set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array);
+        void set_parameters(const Parameters &params);
         void set_observer(Observer* observer) {
             observer_ = observer;
         }
@@ -74,6 +80,8 @@ class Client {
         void initialize_peers();
         void register_peer_service();
         void unregister_peer_service();
+
+        void set_ie_array_from_parameters(const Parameters &params);
 
         uint connman_watcher_;
         GDBusProxy *proxy_;

@@ -323,12 +323,12 @@ void Client::technology_proxy_cb (GAsyncResult *result)
         observer_->on_availability_changed(this);
 }
 
-Client::Client(std::unique_ptr<P2P::InformationElementArray> &take_array, Observer *observer):
+Client::Client(const Parameters &params, Observer *observer):
     proxy_(NULL),
     technology_proxy_(NULL),
-    observer_(observer),
-    array_(std::move(take_array))
+    observer_(observer)
 {
+    set_ie_array_from_parameters(params);
     connman_watcher_ = g_bus_watch_name (G_BUS_TYPE_SYSTEM,
                                          "net.connman",
                                          G_BUS_NAME_WATCHER_FLAGS_NONE,
@@ -349,12 +349,12 @@ Client::~Client()
         g_clear_object (&technology_proxy_);
 }
 
-void Client::set_information_element(std::unique_ptr<P2P::InformationElementArray> &take_array)
+void Client::set_parameters(const Parameters &params)
 {
     g_return_if_fail (is_available());
 
     unregister_peer_service();
-    array_ = std::move (take_array);
+    set_ie_array_from_parameters(params);
     register_peer_service();
 }
 
@@ -375,6 +375,33 @@ void Client::scan()
                        NULL,
                        Client::scan_cb,
                        this);
+}
+
+void Client::set_ie_array_from_parameters(const Parameters &params)
+{
+    P2P::InformationElement ie;
+    auto sub_element = P2P::new_subelement(P2P::DEVICE_INFORMATION);
+    auto dev_info = (P2P::DeviceInformationSubelement *) sub_element;
+
+    if (params.source && params.session_management_control_port != 0)
+        dev_info->session_management_control_port =
+            g_htons(params.session_management_control_port);
+    else
+        dev_info->session_management_control_port = g_htons(7236);
+
+    dev_info->maximum_throughput = g_htons(50);
+
+    if (params.source) {
+        if (params.sink)
+            dev_info->field1.device_type = P2P::DUAL_ROLE;
+	else
+            dev_info->field1.device_type = P2P::SOURCE;
+    } else
+        dev_info->field1.device_type = P2P::PRIMARY_SINK;
+
+    dev_info->field1.session_availability = true;
+    ie.add_subelement(sub_element);
+    array_ = ie.serialize();
 }
 
 }
