@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "source-app.h"
-#include "connman-client.h"
+#include "multi-client.h"
 
 void SourceApp::on_availability_changed(P2P::Client *client)
 {
@@ -90,9 +90,9 @@ SourceApp::SourceApp(int port) :
         .session_management_control_port = (uint16_t) port,
     };
 
-    // register the P2P service with connman
+    // register the P2P service with the DBus service in use
     std::cout << "* Registering Wi-Fi Display Source" <<  std::endl;
-    p2p_client_.reset(new P2P::ConnmanClient(params, this));
+    p2p_client_.reset(new P2P::MultiClient(params, this));
 
     source_.reset(new MiracBrokerSource(port));
 }

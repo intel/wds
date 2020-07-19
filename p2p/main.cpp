@@ -23,7 +23,7 @@
 #include <iostream>
 #include <string.h>
 
-#include "connman-client.h"
+#include "multi-client.h"
 #include "information-element.h"
 
 int main (int argc, const char **argv)
@@ -42,9 +42,9 @@ int main (int argc, const char **argv)
         .sink = true,
     };
 
-    // register the P2P service with connman
+    // register the P2P service with the DBus service in use
     std::cout << "Registering" <<  std::endl;
-    P2P::ConnmanClient p2p_client (params);
+    P2P::MultiClient p2p_client (params);
 
     g_main_loop_run (main_loop);
     g_main_loop_unref (main_loop);

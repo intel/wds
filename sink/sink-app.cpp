@@ -24,7 +24,7 @@
 
 #include "sink-app.h"
 #include "sink.h"
-#include "connman-client.h"
+#include "multi-client.h"
 
 void SinkApp::on_peer_added(P2P::Client *client, std::shared_ptr<P2P::Peer> peer)
 {
@@ -61,9 +61,9 @@ SinkApp::SinkApp(){
         .sink = true,
     };
 
-    // register the P2P service with connman
+    // register the P2P service with the DBus service in use
     std::cout << "* Registering Wifi Display" <<  std::endl;
-    p2p_client_.reset(new P2P::ConnmanClient(params, this));
+    p2p_client_.reset(new P2P::MultiClient(params, this));
 }
 
 SinkApp::SinkApp(const std::string& hostname, int port)
