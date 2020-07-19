@@ -40,12 +40,6 @@ class Client {
                 virtual ~Observer() {}
         };
 
-        struct Parameters {
-            bool source;
-            bool sink;
-            uint16_t session_management_control_port;
-        };
-
         virtual void set_parameters(const Parameters &params) = 0;
         virtual void set_observer(Observer* observer) {
             observer_ = observer;

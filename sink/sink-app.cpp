@@ -57,7 +57,7 @@ void SinkApp::on_availability_changed(P2P::Peer *peer)
 }
 
 SinkApp::SinkApp(){
-    struct P2P::Client::Parameters params = {
+    static struct P2P::Parameters params = {
         .sink = true,
     };
 

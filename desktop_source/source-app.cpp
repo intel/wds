@@ -85,7 +85,7 @@ void SourceApp::on_availability_changed(P2P::Peer *peer)
 SourceApp::SourceApp(int port) :
     peer_index_(0)
 {
-    struct P2P::Client::Parameters params = {
+    static struct P2P::Parameters params = {
         .source = true,
         .session_management_control_port = (uint16_t) port,
     };

@@ -27,6 +27,12 @@
 
 namespace P2P {
 
+struct Parameters {
+    bool source;
+    bool sink;
+    uint16_t session_management_control_port;
+};
+
 class Peer {
     public:
         class Observer {

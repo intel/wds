@@ -38,7 +38,7 @@ int main (int argc, const char **argv)
     assert (sizeof(P2P::CoupledSinkInformationSubelement) ==
             P2P::SubelementSize[P2P::COUPLED_SINK_INFORMATION]);
 
-    struct P2P::Client::Parameters params = {
+    static struct P2P::Parameters params = {
         .sink = true,
     };
 
